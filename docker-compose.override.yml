@@ -1,8 +1,20 @@
+# dev, automatically loaded
 version: '3'
 
 services:
-###> doctrine/doctrine-bundle ###
   database:
     ports:
-      - "5432"
-###< doctrine/doctrine-bundle ###
+      - "127.0.0.1:27018:27017"
+    healthcheck:
+      interval: 5s
+      start_interval: 2s
+
+  app:
+    build:
+      target: dev
+      # sometimes needed for DNS issues when building the image (quick fix for dev only, don't use it in prod)
+      network: host
+    volumes:
+      - ./:/app
+    # human-readable logs
+    tty: true

@@ -1,0 +1,27 @@
+# prod, see hajime shell script
+version: '3'
+
+services:
+  database:
+    environment:
+      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/db_username
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_username
+      - db_password
+    ports:
+      - "27018:27017"
+
+  app:
+    build:
+      target: prod
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+
+secrets:
+  db_username:
+    file: ./secrets/db_username.txt
+  db_password:
+    file: ./secrets/db_password.txt
