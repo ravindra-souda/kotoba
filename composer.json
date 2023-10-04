@@ -80,6 +80,7 @@
         }
     },
     "require-dev": {
+        "captainhook/captainhook": "^5.17",
         "friendsofphp/php-cs-fixer": "^3.34",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "6.3.*",
