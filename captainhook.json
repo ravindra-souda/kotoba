@@ -1,7 +1,15 @@
 {
     "commit-msg": {
         "enabled": true,
-        "actions": []
+        "actions": [
+            {
+              "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Rules",
+              "options": [
+                ["\\CaptainHook\\App\\Hook\\Message\\Rule\\LimitSubjectLength", [72]],
+                "\\App\\GitHook\\Rules\\LooselyConventionalCommits"
+              ]
+            }
+          ]
     },
     "pre-push": {
         "enabled": false,
