@@ -19,12 +19,11 @@
         "enabled": true,
         "actions": [
             {
-                "action": "docker compose exec app php bin/phpunit"
+                "action": "docker compose exec app vendor/bin/phpstan"
             },
             {
-                "action": "\\CaptainHook\\App\\Hook\\PHP\\Action\\Linting"
+                "action": "docker compose exec app php bin/phpunit"
             },
-            
             {
                 "action": "docker compose exec app vendor/bin/php-cs-fixer fix {$STAGED_FILES|of-type:php} --config=.php-cs-fixer.dist.php"
             },
