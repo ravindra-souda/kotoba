@@ -43,6 +43,6 @@ class LooselyConventionalCommits implements Rule
             implode('|', self::TYPES).
             ')(\([a-z]+\))?: [a-z0-9].*[^.]$/m';
 
-        return preg_match($re, $message->getSubject());
+        return (bool) preg_match($re, $message->getSubject());
     }
 }
