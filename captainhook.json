@@ -19,12 +19,11 @@
         "enabled": true,
         "actions": [
             {
-                "action": "php bin/phpunit"
+                "action": "vendor/bin/phpstan"
             },
             {
-                "action": "\\CaptainHook\\App\\Hook\\PHP\\Action\\Linting"
+                "action": "php bin/phpunit"
             },
-            
             {
                 "action": "vendor/bin/php-cs-fixer fix {$STAGED_FILES|of-type:php} --config=.php-cs-fixer.dist.php"
             },
