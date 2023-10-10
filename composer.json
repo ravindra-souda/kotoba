@@ -67,7 +67,11 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "test": "php bin/phpunit",
+        "stan": "phpstan",
+        "cs": "php-cs-fixer fix src tests --config=.php-cs-fixer.dist.php",
+        "lint": ["@stan", "@cs"]
     },
     "conflict": {
         "symfony/symfony": "*"
