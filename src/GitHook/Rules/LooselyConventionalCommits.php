@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\GitHook\Rules;
 
 use CaptainHook\App\Hook\Message\Rule;
@@ -43,6 +45,6 @@ class LooselyConventionalCommits implements Rule
             implode('|', self::TYPES).
             ')(\([a-z]+\))?: [a-z0-9].*[^.]$/m';
 
-        return preg_match($re, $message->getSubject());
+        return (bool) preg_match($re, $message->getSubject());
     }
 }

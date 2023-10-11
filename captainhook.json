@@ -25,7 +25,7 @@
                 "action": "php bin/phpunit"
             },
             {
-                "action": "vendor/bin/php-cs-fixer fix {$STAGED_FILES|of-type:php} --config=.php-cs-fixer.dist.php"
+                "action": "vendor/bin/php-cs-fixer fix {$STAGED_FILES|of-type:php} --config=.php-cs-fixer.dist.php --allow-risky=yes"
             },
             {
                 "action": "\\App\\GitHook\\StageBackLintedFiles"
