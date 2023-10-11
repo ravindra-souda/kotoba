@@ -70,7 +70,7 @@
         ],
         "test": "php bin/phpunit",
         "stan": "phpstan",
-        "cs": "php-cs-fixer fix src tests --config=.php-cs-fixer.dist.php",
+        "cs": "php-cs-fixer fix src tests --config=.php-cs-fixer.dist.php --allow-risky=yes --path-mode=intersection",
         "lint": ["@stan", "@cs"]
     },
     "conflict": {
