@@ -12,6 +12,7 @@ return (new PhpCsFixer\Config())
     ->setRules([
         '@PhpCsFixer' => true,
         'declare_strict_types' => true,
+        'phpdoc_to_comment' => ['ignored_tags' => ['var']],
     ])
     ->setFinder($finder)
 ;
