@@ -1,0 +1,5 @@
+services:
+    # Disable logger to avoid showing errors during tests
+    # https://github.com/symfony/symfony/issues/28023
+    Psr\Log\NullLogger: ~
+    logger: '@Psr\Log\NullLogger'
