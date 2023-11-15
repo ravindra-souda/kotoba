@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use App\State\DeckSaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
@@ -61,6 +62,7 @@ class Deck extends AbstractKotobaDocument
     protected string $title = '';
 
     /** Slugified by the API from the name */
+    #[ApiProperty(identifier: true)]
     #[Groups('read')]
     #[MongoDB\Field(type: 'string')]
     protected string $code = '';
@@ -105,9 +107,13 @@ class Deck extends AbstractKotobaDocument
     /** @var array<string> */
     protected iterable $words;
 
+    #[ApiProperty(identifier: false)]
     #[Groups('read')]
     #[MongoDB\Id(strategy: 'AUTO', type: 'object_id')]
     private string $id;
+
+    #[MongoDB\Field(type: 'int')]
+    private int $increment;
 
     public function __construct()
     {
@@ -137,6 +143,11 @@ class Deck extends AbstractKotobaDocument
     public function getId(): ?string
     {
         return $this->id;
+    }
+
+    public function getIncrement(): int
+    {
+        return $this->increment;
     }
 
     public function getTitle(): ?string
@@ -194,6 +205,13 @@ class Deck extends AbstractKotobaDocument
     public function setId(string $id): static
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function setIncrement(int $increment): static
+    {
+        $this->increment = $increment;
 
         return $this;
     }
