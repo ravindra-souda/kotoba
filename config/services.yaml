@@ -27,3 +27,4 @@ services:
     App\State\DeckSaveProcessor:
         bind:
             $persistProcessor: '@api_platform.doctrine_mongodb.odm.state.persist_processor'
+            $removeProcessor: '@api_platform.doctrine_mongodb.odm.state.remove_processor'

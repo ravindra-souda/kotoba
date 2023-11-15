@@ -11,7 +11,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  *
  * @coversNothing
  */
-class DecksTest extends ApiTestCase
+class DecksPostTest extends ApiTestCase
 {
     private const POST_COMPLETE_VALID_DECK = [
         'title' => '    My first ten animals     ',
@@ -56,10 +56,16 @@ class DecksTest extends ApiTestCase
         ],
     ];
 
+    private const UNIQUE_INCREMENT_DECKS = [
+        ['title' => 'to be deleted'],
+        ['title' => 'unique increment 1'],
+        ['title' => 'unique increment 2'],
+    ];
+
     /**
      * @return array<array<array<string>>>
      */
-    public function createValidDeckProvider(): array
+    public function validDeckProvider(): array
     {
         return [
             [
@@ -75,12 +81,12 @@ class DecksTest extends ApiTestCase
     }
 
     /**
-     * @dataProvider createValidDeckProvider
+     * @dataProvider validDeckProvider
      *
      * @param array<string> $payload
      * @param array<string> $expected
      */
-    public function testCreateValidDeck(
+    public function testDecksPostValid(
         array $payload,
         array $expected,
         string $code
@@ -111,7 +117,7 @@ class DecksTest extends ApiTestCase
     /**
      * @return array<array<array<string>>>
      */
-    public function createInvalidDeckProvider(): array
+    public function invalidDeckProvider(): array
     {
         return [
             [
@@ -166,11 +172,11 @@ class DecksTest extends ApiTestCase
     }
 
     /**
-     * @dataProvider createInvalidDeckProvider
+     * @dataProvider invalidDeckProvider
      *
      * @param array<string> $payload
      */
-    public function testCreateInvalidDeck(array $payload, string $message): void
+    public function testDecksPostInvalid(array $payload, string $message): void
     {
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage($message);
@@ -197,5 +203,49 @@ class DecksTest extends ApiTestCase
 
         // needed to trigger the exception
         $content = json_decode($response->getContent(), true);
+    }
+
+    public function testGeneratedIncrementMustBeUnique(): void
+    {
+        $increments = [];
+        foreach (array_slice(self::UNIQUE_INCREMENT_DECKS, 0, 2) as $deck) {
+            $response = static::createClient()->request(
+                'POST',
+                '/api/decks',
+                ['json' => $deck]
+            );
+            $this->assertResponseStatusCodeSame(201);
+            $increments[] = strstr(
+                json_decode($response->getContent(), true)['code'],
+                '-',
+                true
+            );
+            if (!isset($_id)) {
+                $_id = json_decode(
+                    $response->getContent(),
+                    true
+                )['@id'];
+            }
+        }
+
+        static::createClient()->request(
+            'DELETE',
+            $_id,
+        );
+        $this->assertResponseStatusCodeSame(204);
+
+        $response = static::createClient()->request(
+            'POST',
+            '/api/decks',
+            ['json' => self::UNIQUE_INCREMENT_DECKS[2]]
+        );
+        $this->assertResponseStatusCodeSame(201);
+
+        $increments[] = strstr(
+            json_decode($response->getContent(), true)['code'],
+            '-',
+            true
+        );
+        $this->assertSame($increments, array_unique($increments));
     }
 }

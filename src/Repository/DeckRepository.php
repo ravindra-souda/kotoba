@@ -15,6 +15,8 @@ use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
  */
 class DeckRepository extends ServiceDocumentRepository
 {
+    use Trait\RepositoryTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Deck::class);
