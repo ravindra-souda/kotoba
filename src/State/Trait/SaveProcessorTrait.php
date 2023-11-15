@@ -13,13 +13,21 @@ trait SaveProcessorTrait
     private function slugifyCode(mixed $data): void
     {
         try {
-            $nextIncrement = count($this->repository->findAll()) + 1;
+            /** @var \App\Repository\DeckRepository<object> $repo */
+            $repo = $this->repository;
+
+            /** @var class-string $className */
+            $className = get_class($data);
+            $nextIncrement = $repo->getNextIncrement($className);
         } catch (\Throwable $e) {
             throw new \Exception('Error during code slugify');
         }
 
-        $data->setCode(
-            $this->slugify->slugify($nextIncrement.'-'.$data->getTitle())
-        );
+        $data
+            ->setIncrement($nextIncrement)
+            ->setCode(
+                $this->slugify->slugify($nextIncrement.'-'.$data->getTitle())
+            )
+        ;
     }
 }
