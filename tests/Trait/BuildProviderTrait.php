@@ -10,16 +10,26 @@ use App\Tests\Types;
 /**
  * @phpstan-import-type DeckType from Types
  *
- * @phpstan-type Test array{
+ * @phpstan-type Message string|array{
+ *      text:string,
+ *      values:string|int|array<string>
+ * }
+ * @phpstan-type PostTest array{
  *      payload: DeckType,
- *      message: string|array{text:string,values:string|int|array<string>},
+ *      message: Message,
+ *      maxlength?: array<string,string>,
+ * }
+ * @phpstan-type PutTest array{
+ *      fixture: string,
+ *      payload?: DeckType,
+ *      message: Message,
  *      maxlength?: array<string,string>,
  * }
  */
 trait BuildProviderTrait
 {
     /**
-     * @param array<string,Test> $tests
+     * @param array<string,PostTest> $tests
      *
      * @return array<string,array<DeckType|string>>
      */
@@ -40,8 +50,38 @@ trait BuildProviderTrait
     }
 
     /**
-     * @param Test     $test
-     * @param DeckType $payload
+     * @param array<string,PutTest>  $tests
+     * @param array<string,DeckType> $fixtures
+     *
+     * @return array<string,array<DeckType|string>>
+     */
+    final protected function buildPutProvider(
+        array $tests,
+        array $fixtures
+    ): array {
+        $provider = [];
+
+        foreach ($tests as $key => $test) {
+            ['fixture' => $fixture_key, 'message' => $message] = $test;
+
+            /** @var string $fixture_key */
+            $fixture = $fixtures[$fixture_key];
+
+            $payload = $test['payload'] ?? [];
+            $payload = array_merge($fixture, $payload);
+
+            $payload = $this->generateMaxlengthValues($test, $payload);
+            $message = $this->generateMessage($message);
+
+            $provider[$key] = [$fixture, $payload, $message];
+        }
+
+        return $provider;
+    }
+
+    /**
+     * @param PostTest|PutTest $test
+     * @param DeckType         $payload
      *
      * @return DeckType
      */

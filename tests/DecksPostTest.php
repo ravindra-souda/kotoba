@@ -182,7 +182,8 @@ class DecksPostTest extends ApiTestCase
             ['json' => $payload]
         );
 
-        if (self::UNIQUE_TITLE === $payload['title']) {
+        if (isset($payload['title'])
+            && self::UNIQUE_TITLE === $payload['title']) {
             $response = static::createClient()->request(
                 'POST',
                 '/api/decks',

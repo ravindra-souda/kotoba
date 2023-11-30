@@ -6,7 +6,7 @@ namespace App\Tests;
 
 /**
  * @phpstan-type DeckType array{
- *     title: string,
+ *     title?: string,
  *     description?: string,
  *     type?: string,
  *     color?: string,
