@@ -30,6 +30,36 @@ trait BuildProviderTrait
     }
 
     /**
+     * @param array<string,array<string,array<string,mixed>>> $tests
+     * @param array<string,array<string,mixed>>               $fixtures
+     *
+     * @return array<array<array<string>>>
+     */
+    final protected function buildPutProvider(
+        array $tests,
+        array $fixtures
+    ): array {
+        $provider = [];
+
+        foreach ($tests as $key => $test) {
+            ['fixture' => $fixture_key, 'message' => $message] = $test;
+
+            /** @var string $fixture_key */
+            $fixture = $fixtures[$fixture_key];
+
+            $payload = $test['payload'] ?? [];
+            $payload = array_merge($fixture, $payload);
+
+            $payload = $this->generateMaxlengthValues($test, $payload);
+            $message = $this->generateMessage($message);
+
+            $provider[$key] = [$fixture, $payload, $message];
+        }
+
+        return $provider;
+    }
+
+    /**
      * @param array<string,mixed> $test
      * @param array<string,mixed> $payload
      *
