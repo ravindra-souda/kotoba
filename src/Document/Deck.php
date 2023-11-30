@@ -6,6 +6,10 @@ namespace App\Document;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Controller\FetchDeckByCode;
 use App\State\DeckSaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,12 +18,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
+    operations: [
+        new Post(),
+        new Delete(),
+        new Put(
+            controller: FetchDeckByCode::class,
+            uriTemplate: '/decks/{code}',
+            /* bypassing faulty internal document fetching with our custom
+               controller */
+            read: false
+        ),
+    ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
     processor: DeckSaveProcessor::class,
 )]
-#[MongoDB\Document]
-#[MongoDB\HasLifecycleCallbacks]
+#[MongoDB\Document(repositoryClass: 'App\Repository\DeckRepository')]
 #[Unique(fields: ['title'], message: self::VALIDATION_ERR_DUPLICATE)]
 class Deck extends AbstractKotobaDocument
 {
@@ -159,6 +173,11 @@ class Deck extends AbstractKotobaDocument
         return $this->type;
     }
 
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -186,10 +205,10 @@ class Deck extends AbstractKotobaDocument
         return $this;
     }
 
-    #[MongoDB\PrePersist]
-    public function setCreatedAt(): Deck
+    // see App\EventListener\PrePersistListener
+    public function setCreatedAt(\DateTimeImmutable $date): Deck
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = $date;
 
         return $this;
     }
@@ -208,6 +227,7 @@ class Deck extends AbstractKotobaDocument
         return $this;
     }
 
+    // see App\EventListener\PrePersistListener
     public function setIncrement(int $increment): Deck
     {
         $this->increment = $increment;
@@ -225,6 +245,14 @@ class Deck extends AbstractKotobaDocument
     public function setType(string $type): Deck
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    // see App\EventListener\PreUpdateListener
+    public function setUpdatedAt(\DateTimeImmutable $date): Deck
+    {
+        $this->updatedAt = $date;
 
         return $this;
     }

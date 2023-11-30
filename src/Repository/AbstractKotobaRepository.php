@@ -2,9 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Repository\Trait;
+namespace App\Repository;
 
-trait RepositoryTrait
+use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
+
+/**
+ * @template T of object
+ *
+ * @template-extends ServiceDocumentRepository<T>
+ */
+abstract class AbstractKotobaRepository extends ServiceDocumentRepository
 {
     public function getNextIncrement(string $class): int
     {
