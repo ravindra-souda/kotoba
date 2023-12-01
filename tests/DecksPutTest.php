@@ -7,6 +7,7 @@ namespace App\Tests;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Deck;
 use Symfony\Component\HttpClient\Exception\ClientException;
+use App\Controller\FetchDeckByCode;
 
 /**
  * @internal
@@ -48,6 +49,10 @@ class DecksPutTest extends ApiTestCase
         'color' => [
             ...self::PUT_COMPLETE_VALID_DECK,
             'title' => 'put invalid color',
+        ],
+        'missing_@id' => [
+            ...self::PUT_COMPLETE_VALID_DECK,
+            'title' => 'put missing @id',
         ],
     ];
 
@@ -127,6 +132,13 @@ class DecksPutTest extends ApiTestCase
             'fixture' => 'color',
             'payload' => [
                 'color' => '#G1F2F3F4',
+            ],
+            'message' => 'color: '.Deck::VALIDATION_ERR_COLOR,
+        ],
+        'missing_@id' => [
+            'fixture' => 'missing_@id',
+            'payload' => [
+                'description' => 'put missing @id',
             ],
             'message' => 'color: '.Deck::VALIDATION_ERR_COLOR,
         ],
@@ -253,6 +265,7 @@ class DecksPutTest extends ApiTestCase
      *
      * @param array<string> $fixture
      * @param array<string> $payload
+     * @param string $message
      */
     public function testDecksPutInvalid(
         array $fixture,
@@ -283,7 +296,10 @@ class DecksPutTest extends ApiTestCase
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage($message);
 
-        $payload['@id'] = $_id;
+        if (self::PUT_INVALID_DECKS['missing_@id'] !== $payload) {
+            $payload['@id'] = $_id;
+        }
+        
         $response = static::createClient()->request(
             'PUT',
             $_id,
