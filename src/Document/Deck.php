@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchDeckByCode;
@@ -17,6 +22,20 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'code' => 'iexact',
+        'title' => 'ipartial',
+        'description' => 'ipartial',
+        'type' => 'iexact',
+    ],
+)]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: ['title', 'description', 'type'],
+    arguments: ['orderParameterName' => 'order'],
+)]
 #[ApiResource(
     operations: [
         new Post(),
@@ -28,6 +47,8 @@ use Symfony\Component\Validator\Constraints as Assert;
                controller */
             read: false
         ),
+        new Get(),
+        new GetCollection(),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
