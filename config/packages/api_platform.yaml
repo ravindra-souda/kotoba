@@ -8,5 +8,6 @@ api_platform:
             vary: ['Content-Type', 'Authorization', 'Origin']
         extra_properties:
             standard_put: true
+        pagination_items_per_page: '%env(int:ITEMS_PER_PAGE)%'
     exception_to_status:
         App\Exception\NotFoundException: 404
