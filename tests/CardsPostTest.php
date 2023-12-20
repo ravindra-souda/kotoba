@@ -1,0 +1,518 @@
+<?php
+
+declare(strict_types=1);
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Document\Deck;
+use Symfony\Component\HttpClient\Exception\ClientException;
+
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+class CardsPostTest extends ApiTestCase
+{
+    private const POST_COMPLETE_VALID_CARDS = [
+        'hiragana' => [
+            'type' => 'noun',
+            'romaji' => '  gakKou       ',
+            'hiragana' => '   がっこう ',
+            'katakana' => '',
+            'kanji' => '学校',
+            'jlpt' => 5,
+            'trans' => [
+                'en' => ' schoOl',
+                'fr' => 'école ',
+            ],
+        ],
+        'katakana' => [
+            'type' => 'noun',
+            'romaji' => '    Neko     ',
+            'hiragana' => '',
+            'katakana' => '    ネコ ',
+            'kanji' => ' 猫  ',
+            'jlpt' => 5,
+            'trans' => [
+                'en' => ' cat  ',
+                'fr' => ' cHat ',
+            ],
+        ],
+        'godan' => [
+            'type' => 'verb',
+            'romaji' => 'iku',
+            'hiragana' => 'いく',
+            'kanji' => '行く',
+            'jlpt' => 5,
+            'group' => 'godan',
+            'trans' => [
+                'en' => 'to go',
+            ],
+            'conj' => [
+                'dictionary' => '行く',
+            ],
+        ],
+        'ichidan' => [
+            'type' => 'verb',
+            'romaji' => 'taberu',
+            'hiragana' => 'たべる',
+            'kanji' => '食べる',
+            'jlpt' => 5,
+            'group' => 'ichidan',
+            'trans' => [
+                'en' => 'to eat',
+            ],
+            'conj' => [
+                'dictionary' => '食べる',
+            ],
+        ],
+        'irregular' => [
+            'type' => 'verb',
+            'romaji' => 'kuru',
+            'hiragana' => 'くる',
+            'kanji' => '来る',
+            'jlpt' => 5,
+            'group' => 'irregular',
+            'trans' => [
+                'en' => 'to come',
+            ],
+            'conj' => [
+                'dictionary' => '来る',
+            ],
+        ],
+        'i-adjective' => [
+            'type' => 'adjective',
+            'romaji' => 'kawaii',
+            'hiragana' => 'かわいい',
+            'kanji' => '可愛い',
+            'jlpt' => 5,
+            'group' => 'i',
+            'trans' => [
+                'en' => 'cute, adorable, charming, lovely, pretty',
+            ],
+        ],
+        'na-adjective' => [
+            'type' => 'adjective',
+            'romaji' => 'kirei',
+            'hiragana' => 'きれい',
+            'kanji' => '綺麗',
+            'jlpt' => 5,
+            'group' => 'na',
+            'trans' => [
+                'en' => [
+                    'pretty, lovely, beautiful, fair',
+                    'clean, clear, pure, tidy, neat',
+                ],
+            ],
+        ],
+        'kana-hiragana' => [
+            'type' => 'kana',
+            'romaji' => 'a',
+            'hiragana' => 'あ',
+        ],
+        'kana-katakana' => [
+            'type' => 'kana',
+            'romaji' => 'a',
+            'katakana' => 'ア',
+        ],
+        'kana-hiragana-glide' => [
+            'type' => 'kana',
+            'romaji' => 'kya',
+            'hiragana' => 'きゃ',
+        ],
+        'kana-katakana-glide' => [
+            'type' => 'kana',
+            'romaji' => 'kya',
+            'katakana' => 'キャ',
+        ],
+    ];
+    private const POST_COMPLETE_EXPECTED_CARDS = [
+        'hiragana' => [
+            ...self::POST_COMPLETE_VALID_CARDS['hiragana'],
+            'romaji' => 'gakkou',
+            'hiragana' => 'がっこう',
+            'trans' => [
+                'en' => 'school',
+                'fr' => 'école',
+            ],
+        ],
+        'katakana' => [
+            ...self::POST_COMPLETE_VALID_CARDS['katakana'],
+            'romaji' => 'neko',
+            'katakana' => 'ネコ',
+            'kanji' => '猫',
+            'trans' => [
+                'en' => 'cat',
+                'fr' => 'chat',
+            ],
+        ],
+        'godan' => [
+            ...self::POST_COMPLETE_VALID_CARDS['godan'],
+            'conj' => [
+                'dictionary' => '行く',
+                'non-past' => [
+                    'informal' => [
+                        'affirmative' => '行く',
+                        'negative' => '行かない',
+                    ],
+                    'polite' => [
+                        'affirmative' => '行きます',
+                        'negative' => '行きません',
+                    ],
+                ],
+                'past' => [
+                    'informal' => [
+                        'affirmative' => '行かた', /* automatic conjugation 
+                        should be wrong since this an exception for this verb
+                        in the japanese langage, user can correct this 
+                        afterwards */
+                        'negative' => '行かなかった',
+                    ],
+                    'polite' => [
+                        'affirmative' => '行きました',
+                        'negative' => '行きませんでした',
+                    ],
+                ],
+                'te' => [
+                    'affirmative' => '行って',
+                    'negative' => '行かなくて',
+                ],
+                'potential' => [
+                    'affirmative' => '行ける',
+                    'negative' => '行けない',
+                ],
+                'passive' => [
+                    'affirmative' => '行かれる',
+                    'negative' => '行かれない',
+                ],
+                'causative' => [
+                    'affirmative' => '行かせる',
+                    'negative' => '行かせない',
+                    'passive' => [
+                        'affirmative' => '行かせられる',
+                        'negative' => '行かせられない',
+                    ]
+                ],
+                'imperative' => [
+                    'affirmative' => '行け',
+                    'negative' => '行くな',
+                ],
+            ],
+        ],
+        'ichidan' => [
+            ...self::POST_COMPLETE_VALID_CARDS['ichidan'],
+            'conj' => [
+                'dictionary' => '食べる',
+                'non-past' => [
+                    'informal' => [
+                        'affirmative' => '食べる',
+                        'negative' => '食べない',
+                    ],
+                    'polite' => [
+                        'affirmative' => '食べます',
+                        'negative' => '食べません',
+                    ],
+                ],
+                'past' => [
+                    'informal' => [
+                        'affirmative' => '食べた', 
+                        'negative' => '食べなかった',
+                    ],
+                    'polite' => [
+                        'affirmative' => '食べました',
+                        'negative' => '食べませんでした',
+                    ],
+                ],
+                'te' => [
+                    'affirmative' => '食べて',
+                    'negative' => '食べなくて',
+                ],
+                'potential' => [
+                    'affirmative' => '食べられる',
+                    'negative' => '食べられない',
+                ],
+                'passive' => [
+                    'affirmative' => '食べられる',
+                    'negative' => '食べられない',
+                ],
+                'causative' => [
+                    'affirmative' => '食べさせる',
+                    'negative' => '食べさせない',
+                    'passive' => [
+                        'affirmative' => '食べさせられる',
+                        'negative' => '食べさせられない',
+                    ]
+                ],
+                'imperative' => [
+                    'affirmative' => '食べろ',
+                    'negative' => '食べるな',
+                ],
+            ],
+        ],
+        'irregular' => [
+            ...self::POST_COMPLETE_VALID_CARDS['ichidan'],
+            /* automatic conjugation must be disabled for irregular verbs,
+            leaving the completion to the user */
+            'conj' => [
+                'dictionary' => '来る',
+            ],
+        ],
+        'i-adjective' => [
+            ...self::POST_COMPLETE_VALID_CARDS['i-adjective'],
+            'conj' => [
+                'non-past' => [
+                    'affirmative' => '可愛い',
+                    'negative' => '可愛くない',
+                ],
+                'past' => [
+                    'affirmative' => '可愛かった',
+                    'negative' => '可愛くなかった',
+                ],
+            ],
+        ],
+        'na-adjective' => [
+            ...self::POST_COMPLETE_VALID_CARDS['na-adjective'],
+            'conj' => [
+                'non-past' => [
+                    'affirmative' => '綺麗',
+                    'negative' => '綺麗じゃない',
+                ],
+                'past' => [
+                    'affirmative' => '綺麗だった',
+                    'negative' => '綺麗じゃなかった',
+                ],
+            ],
+        ],
+    ];
+    private const POST_MINIMAL_VALID_CARD = [
+        'type' => 'verb',
+        'romaji' => 'taberu',
+        'hiragana' => 'たべる',
+        'group' => 'ichidan',
+        'trans' => [
+            'en' => 'to eat',
+        ]
+    ];
+    private const POST_INVALID_DECKS = [
+        'title_empty' => [
+            ...self::POST_COMPLETE_VALID_DECK,
+            'title' => '',
+        ],
+        'title_maxlength' => [
+            ...self::POST_COMPLETE_VALID_DECK,
+            'title' => 'very long title',
+        ],
+        'title_duplicate' => [
+            ...self::POST_COMPLETE_VALID_DECK,
+            'title' => 'duplicate deck',
+        ],
+        'description_maxlength' => [
+            ...self::POST_COMPLETE_VALID_DECK,
+            'title' => 'A deck with a long description',
+            'description' => 'very long description',
+        ],
+        'type' => [
+            ...self::POST_COMPLETE_VALID_DECK,
+            'title' => 'A deck with a dummy type',
+            'type' => 'dummy',
+        ],
+        'color' => [
+            ...self::POST_COMPLETE_VALID_DECK,
+            'title' => 'A deck with crazy colors',
+            'color' => '#GG00112233',
+        ],
+    ];
+
+    private const UNIQUE_INCREMENT_DECKS = [
+        ['title' => 'to be deleted'],
+        ['title' => 'unique increment 1'],
+        ['title' => 'unique increment 2'],
+    ];
+
+    /**
+     * @return array<array<array<string>>>
+     */
+    public function validDeckProvider(): array
+    {
+        return [
+            [
+                self::POST_COMPLETE_VALID_DECK,
+                self::POST_COMPLETE_EXPECTED_DECK,
+                'my-first-ten-animals',
+            ], [
+                self::POST_MINIMAL_VALID_DECK,
+                self::POST_MINIMAL_VALID_DECK,
+                'numbers',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider validDeckProvider
+     *
+     * @param array<string> $payload
+     * @param array<string> $expected
+     */
+    public function testDecksPostValid(
+        array $payload,
+        array $expected,
+        string $code
+    ): void {
+        $response = static::createClient()->request(
+            'POST',
+            '/api/decks',
+            ['json' => $payload]
+        );
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame(
+            'content-type',
+            'application/ld+json; charset=utf-8'
+        );
+        $this->assertJsonContains($expected);
+        $this->assertMatchesResourceItemJsonSchema(Deck::class);
+
+        $content = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('createdAt', $content);
+        $this->assertStringStartsWith(date('Y-m-d'), $content['createdAt']);
+        $this->assertMatchesRegularExpression(
+            '/\d+-'.$code.'/',
+            $content['code']
+        );
+    }
+
+    /**
+     * @return array<array<array<string>>>
+     */
+    public function invalidDeckProvider(): array
+    {
+        return [
+            [
+                self::POST_INVALID_DECKS['title_empty'],
+                'title: '.Deck::VALIDATION_ERR_EMPTY,
+            ],
+            [
+                [
+                    ...self::POST_INVALID_DECKS['title_maxlength'],
+                    'title' => str_repeat('*', Deck::TITLE_MAXLENGTH + 1),
+                ],
+                'title: '.str_replace(
+                    '{{ limit }}',
+                    (string) Deck::TITLE_MAXLENGTH,
+                    Deck::VALIDATION_ERR_MAXLENGTH
+                ),
+            ],
+            [
+                [
+                    ...self::POST_INVALID_DECKS['description_maxlength'],
+                    'description' => str_repeat(
+                        '*',
+                        Deck::DESCRIPTION_MAXLENGTH + 1
+                    ),
+                ],
+                'description: '.str_replace(
+                    '{{ limit }}',
+                    (string) Deck::DESCRIPTION_MAXLENGTH,
+                    Deck::VALIDATION_ERR_MAXLENGTH
+                ),
+            ],
+            [
+                self::POST_INVALID_DECKS['type'],
+                'type: '.str_replace(
+                    '{{ choices }}',
+                    '"'.implode('", "', Deck::ALLOWED_TYPES).'"',
+                    Deck::VALIDATION_ERR_TYPE
+                ),
+            ], [
+                self::POST_INVALID_DECKS['color'],
+                'color: '.Deck::VALIDATION_ERR_COLOR,
+            ], [
+                self::POST_INVALID_DECKS['title_duplicate'],
+                'title: '.str_replace(
+                    '{{ value }}',
+                    '"'.
+                    self::POST_INVALID_DECKS['title_duplicate']['title'].'"',
+                    Deck::VALIDATION_ERR_DUPLICATE
+                ),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidDeckProvider
+     *
+     * @param array<string> $payload
+     */
+    public function testDecksPostInvalid(array $payload, string $message): void
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage($message);
+
+        $response = static::createClient()->request(
+            'POST',
+            '/api/decks',
+            ['json' => $payload]
+        );
+
+        if (self::POST_INVALID_DECKS['title_duplicate'] === $payload) {
+            $response = static::createClient()->request(
+                'POST',
+                '/api/decks',
+                ['json' => $payload]
+            );
+        }
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertResponseHeaderSame(
+            'content-type',
+            'application/ld+json; charset=utf-8'
+        );
+
+        // needed to trigger the exception
+        $content = json_decode($response->getContent(), true);
+    }
+
+    public function testGeneratedIncrementMustBeUnique(): void
+    {
+        $increments = [];
+        foreach (array_slice(self::UNIQUE_INCREMENT_DECKS, 0, 2) as $deck) {
+            $response = static::createClient()->request(
+                'POST',
+                '/api/decks',
+                ['json' => $deck]
+            );
+            $this->assertResponseStatusCodeSame(201);
+            $increments[] = strstr(
+                json_decode($response->getContent(), true)['code'],
+                '-',
+                true
+            );
+            if (!isset($_id)) {
+                $_id = json_decode(
+                    $response->getContent(),
+                    true
+                )['@id'];
+            }
+        }
+
+        static::createClient()->request(
+            'DELETE',
+            $_id,
+        );
+        $this->assertResponseStatusCodeSame(204);
+
+        $response = static::createClient()->request(
+            'POST',
+            '/api/decks',
+            ['json' => self::UNIQUE_INCREMENT_DECKS[2]]
+        );
+        $this->assertResponseStatusCodeSame(201);
+
+        $increments[] = strstr(
+            json_decode($response->getContent(), true)['code'],
+            '-',
+            true
+        );
+        $this->assertSame($increments, array_unique($increments));
+    }
+}
