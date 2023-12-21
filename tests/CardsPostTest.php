@@ -80,7 +80,7 @@ class CardsPostTest extends ApiTestCase
                 'dictionary' => '来る',
             ],
         ],
-        'i-adjective' => [
+        'i_adjective' => [
             'type' => 'adjective',
             'romaji' => 'kawaii',
             'hiragana' => 'かわいい',
@@ -91,7 +91,7 @@ class CardsPostTest extends ApiTestCase
                 'en' => 'cute, adorable, charming, lovely, pretty',
             ],
         ],
-        'na-adjective' => [
+        'na_adjective' => [
             'type' => 'adjective',
             'romaji' => 'kirei',
             'hiragana' => 'きれい',
@@ -105,22 +105,22 @@ class CardsPostTest extends ApiTestCase
                 ],
             ],
         ],
-        'kana-hiragana' => [
+        'kana_hiragana' => [
             'type' => 'kana',
             'romaji' => 'a',
             'hiragana' => 'あ',
         ],
-        'kana-katakana' => [
+        'kana_katakana' => [
             'type' => 'kana',
             'romaji' => 'a',
             'katakana' => 'ア',
         ],
-        'kana-hiragana-glide' => [
+        'kana_hiragana_glide' => [
             'type' => 'kana',
             'romaji' => 'kya',
             'hiragana' => 'きゃ',
         ],
-        'kana-katakana-glide' => [
+        'kana_katakana_glide' => [
             'type' => 'kana',
             'romaji' => 'kya',
             'katakana' => 'キャ',
@@ -257,8 +257,8 @@ class CardsPostTest extends ApiTestCase
                 'dictionary' => '来る',
             ],
         ],
-        'i-adjective' => [
-            ...self::POST_COMPLETE_VALID_CARDS['i-adjective'],
+        'i_adjective' => [
+            ...self::POST_COMPLETE_VALID_CARDS['i_adjective'],
             'conj' => [
                 'non-past' => [
                     'affirmative' => '可愛い',
@@ -270,8 +270,8 @@ class CardsPostTest extends ApiTestCase
                 ],
             ],
         ],
-        'na-adjective' => [
-            ...self::POST_COMPLETE_VALID_CARDS['na-adjective'],
+        'na_adjective' => [
+            ...self::POST_COMPLETE_VALID_CARDS['na_adjective'],
             'conj' => [
                 'non-past' => [
                     'affirmative' => '綺麗',
@@ -293,33 +293,67 @@ class CardsPostTest extends ApiTestCase
             'en' => 'to eat',
         ]
     ];
-    private const POST_INVALID_DECKS = [
-        'title_empty' => [
-            ...self::POST_COMPLETE_VALID_DECK,
-            'title' => '',
+    private const POST_INVALID_CARDS = [
+        'romaji_empty' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'romaji' => '',
         ],
-        'title_maxlength' => [
-            ...self::POST_COMPLETE_VALID_DECK,
-            'title' => 'very long title',
+        'romaji_written_in_kana' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'romaji' => 'ローマジ',
         ],
-        'title_duplicate' => [
-            ...self::POST_COMPLETE_VALID_DECK,
-            'title' => 'duplicate deck',
+        'no_hiragana_nor_katakana' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'hiragana' => '',
+            'katakana' => '',
         ],
-        'description_maxlength' => [
-            ...self::POST_COMPLETE_VALID_DECK,
-            'title' => 'A deck with a long description',
-            'description' => 'very long description',
+        'hiragana_written_in_katakana' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'hiragana' => 'カタカナ',
+        ],
+        'katakana_written_in_hiragana' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'katakana' => 'ひらがな',
         ],
         'type' => [
-            ...self::POST_COMPLETE_VALID_DECK,
-            'title' => 'A deck with a dummy type',
+            ...self::POST_MINIMAL_VALID_CARD,
             'type' => 'dummy',
         ],
-        'color' => [
-            ...self::POST_COMPLETE_VALID_DECK,
-            'title' => 'A deck with crazy colors',
-            'color' => '#GG00112233',
+        'group_verb' => [
+            ...self::POST_COMPLETE_VALID_CARDS['godan'],
+            'group' => 'i',
+        ],
+        'group_adjective' => [
+            ...self::POST_COMPLETE_VALID_CARDS['i_adjective'],
+            'group' => 'godan',
+        ],
+        'jlpt_not_an_integer' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'jlpt' => 'five',
+        ],
+        'jlpt_min' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'jlpt' => 0,
+        ],
+        'jlpt_max' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'jlpt' => 6,
+        ],
+        'kana_hiragana' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kana_hiragana'],
+            'hiragana' => 'いい',
+        ],
+        'kana_katakana' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kana_katakana'],
+            'katakana' => 'アア',
+        ],
+        'kana_hiragana_glide' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kana_hiragana_glide'],
+            'hiragana' => 'きゃあ',
+        ],
+        'kana_katakana_glide' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kana_katakana_glide'],
+            'katakana' => 'キャア',
         ],
     ];
 
@@ -329,38 +363,41 @@ class CardsPostTest extends ApiTestCase
         ['title' => 'unique increment 2'],
     ];
 
+    private const CLASSES = [
+        'verb' => Verb::class,
+        'adjective' => Adjective::class,
+        'noun' => Noun::class,
+        'kana' => Kana::class,
+    ];
+
     /**
      * @return array<array<array<string>>>
      */
-    public function validDeckProvider(): array
+    public function validCardProvider(): array
     {
-        return [
-            [
-                self::POST_COMPLETE_VALID_DECK,
-                self::POST_COMPLETE_EXPECTED_DECK,
-                'my-first-ten-animals',
-            ], [
-                self::POST_MINIMAL_VALID_DECK,
-                self::POST_MINIMAL_VALID_DECK,
-                'numbers',
-            ],
-        ];
+        $provider = [];
+        array_walk(self::POST_COMPLETE_VALID_CARDS, function($value, $key) {
+            $expected = isset(self::POST_COMPLETE_EXPECTED_CARDS[$key]) ?
+                self::POST_COMPLETE_EXPECTED_CARDS[$key] : $value;
+            $provider[] = [$value, $expected];
+        });
+
+        return $provider;
     }
 
     /**
-     * @dataProvider validDeckProvider
+     * @dataProvider validCardProvider
      *
      * @param array<string> $payload
      * @param array<string> $expected
      */
-    public function testDecksPostValid(
+    public function testCardsPostValid(
         array $payload,
         array $expected,
-        string $code
     ): void {
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
+            '/api/cards',
             ['json' => $payload]
         );
 
@@ -370,13 +407,16 @@ class CardsPostTest extends ApiTestCase
             'application/ld+json; charset=utf-8'
         );
         $this->assertJsonContains($expected);
-        $this->assertMatchesResourceItemJsonSchema(Deck::class);
+        $this->assertMatchesResourceItemJsonSchema(Card::class);
+        $this->assertMatchesResourceItemJsonSchema(
+            self::CLASSES[$expected['type']]
+        );
 
         $content = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('createdAt', $content);
         $this->assertStringStartsWith(date('Y-m-d'), $content['createdAt']);
         $this->assertMatchesRegularExpression(
-            '/\d+-'.$code.'/',
+            '/\d+-'.$expected['romaji'].'/',
             $content['code']
         );
     }
