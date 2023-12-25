@@ -437,7 +437,8 @@ class CardsPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_CARDS['no_hiragana_nor_katakana'],
-                'hiragana, katakana: '.Card::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+                'hiragana, katakana: '.
+                Card::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
             ],
             [
                 self::POST_INVALID_CARDS['hiragana_written_in_katakana'],
@@ -449,27 +450,27 @@ class CardsPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_CARDS['type'],
-                'type: '.Card::VALIDATION_ERR_TYPE,
+                'type: '.Card::VALIDATION_ERR_ENUM,
             ],
             [
                 self::POST_INVALID_CARDS['group_verb'],
-                'group: '.Verb::VALIDATION_ERR_GROUP,
+                'group: '.Verb::VALIDATION_ERR_ENUM,
             ],
             [
                 self::POST_INVALID_CARDS['group_adjective'],
-                'group: '.Adjective::VALIDATION_ERR_GROUP,
+                'group: '.Adjective::VALIDATION_ERR_ENUM,
             ],
             [
                 self::POST_INVALID_CARDS['jlpt_not_an_integer'],
-                'jlpt: '.Card::VALIDATION_ERR_JLPT_NOT_INTEGER,
+                'jlpt: '.Card::VALIDATION_ERR_JLPT,
             ],
             [
                 self::POST_INVALID_CARDS['jlpt_min'],
-                'jlpt: '.Card::VALIDATION_ERR_JLPT_MIN,
+                'jlpt: '.Card::VALIDATION_ERR_JLPT,
             ],
             [
                 self::POST_INVALID_CARDS['jlpt_max'],
-                'jlpt: '.Card::VALIDATION_ERR_JLPT_MAX,
+                'jlpt: '.Card::VALIDATION_ERR_JLPT,
             ],
             [
                 self::POST_INVALID_CARDS['kana_hiragana'],
