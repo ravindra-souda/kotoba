@@ -424,56 +424,68 @@ class CardsPostTest extends ApiTestCase
     /**
      * @return array<array<array<string>>>
      */
-    public function invalidDeckProvider(): array
+    public function invalidCardProvider(): array
     {
         return [
             [
-                self::POST_INVALID_DECKS['title_empty'],
-                'title: '.Deck::VALIDATION_ERR_EMPTY,
+                self::POST_INVALID_CARDS['romaji_empty'],
+                'romaji: '.Card::VALIDATION_ERR_EMPTY,
             ],
             [
-                [
-                    ...self::POST_INVALID_DECKS['title_maxlength'],
-                    'title' => str_repeat('*', Deck::TITLE_MAXLENGTH + 1),
-                ],
-                'title: '.str_replace(
-                    '{{ limit }}',
-                    (string) Deck::TITLE_MAXLENGTH,
-                    Deck::VALIDATION_ERR_MAXLENGTH
-                ),
+                self::POST_INVALID_CARDS['romaji_written_in_kana'],
+                'romaji: '.Card::VALIDATION_ERR_ROMAJI,
             ],
             [
-                [
-                    ...self::POST_INVALID_DECKS['description_maxlength'],
-                    'description' => str_repeat(
-                        '*',
-                        Deck::DESCRIPTION_MAXLENGTH + 1
-                    ),
-                ],
-                'description: '.str_replace(
-                    '{{ limit }}',
-                    (string) Deck::DESCRIPTION_MAXLENGTH,
-                    Deck::VALIDATION_ERR_MAXLENGTH
-                ),
+                self::POST_INVALID_CARDS['no_hiragana_nor_katakana'],
+                'hiragana, katakana: '.Card::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
             ],
             [
-                self::POST_INVALID_DECKS['type'],
-                'type: '.str_replace(
-                    '{{ choices }}',
-                    '"'.implode('", "', Deck::ALLOWED_TYPES).'"',
-                    Deck::VALIDATION_ERR_TYPE
-                ),
-            ], [
-                self::POST_INVALID_DECKS['color'],
-                'color: '.Deck::VALIDATION_ERR_COLOR,
-            ], [
-                self::POST_INVALID_DECKS['title_duplicate'],
-                'title: '.str_replace(
-                    '{{ value }}',
-                    '"'.
-                    self::POST_INVALID_DECKS['title_duplicate']['title'].'"',
-                    Deck::VALIDATION_ERR_DUPLICATE
-                ),
+                self::POST_INVALID_CARDS['hiragana_written_in_katakana'],
+                'hiragana: '.Card::VALIDATION_ERR_HIRAGANA,
+            ],
+            [
+                self::POST_INVALID_CARDS['katakana_written_in_hiragana'],
+                'katakana: '.Card::VALIDATION_ERR_KATAKANA,
+            ],
+            [
+                self::POST_INVALID_CARDS['type'],
+                'type: '.Card::VALIDATION_ERR_TYPE,
+            ],
+            [
+                self::POST_INVALID_CARDS['group_verb'],
+                'group: '.Verb::VALIDATION_ERR_GROUP,
+            ],
+            [
+                self::POST_INVALID_CARDS['group_adjective'],
+                'group: '.Adjective::VALIDATION_ERR_GROUP,
+            ],
+            [
+                self::POST_INVALID_CARDS['jlpt_not_an_integer'],
+                'jlpt: '.Card::VALIDATION_ERR_JLPT_NOT_INTEGER,
+            ],
+            [
+                self::POST_INVALID_CARDS['jlpt_min'],
+                'jlpt: '.Card::VALIDATION_ERR_JLPT_MIN,
+            ],
+            [
+                self::POST_INVALID_CARDS['jlpt_max'],
+                'jlpt: '.Card::VALIDATION_ERR_JLPT_MAX,
+            ],
+            [
+                self::POST_INVALID_CARDS['kana_hiragana'],
+                'hiragana: '.Kana::VALIDATION_ERR_KANA,
+            ],
+            [
+                self::POST_INVALID_CARDS['kana_katakana'],
+                'katakana: '.Kana::VALIDATION_ERR_KANA,
+            ],
+            [
+                self::POST_INVALID_CARDS['kana_hiragana_glide'],
+                'hiragana: '.Kana::VALIDATION_ERR_KANA,
+            ],
+            [
+                self::POST_INVALID_CARDS['kana_katakana_glide'],
+                'katakana: '.Kana::VALIDATION_ERR_KANA,
             ],
         ];
     }
@@ -490,17 +502,9 @@ class CardsPostTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
+            '/api/cards',
             ['json' => $payload]
         );
-
-        if (self::POST_INVALID_DECKS['title_duplicate'] === $payload) {
-            $response = static::createClient()->request(
-                'POST',
-                '/api/decks',
-                ['json' => $payload]
-            );
-        }
 
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
