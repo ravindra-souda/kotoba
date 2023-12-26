@@ -55,12 +55,15 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: DeckSaveProcessor::class,
 )]
 #[MongoDB\Document(repositoryClass: 'App\Repository\DeckRepository')]
-#[Unique(fields: ['title'], message: self::VALIDATION_ERR_DUPLICATE)]
-class Card extends AbstractKotobaDocument
+abstract class Card extends AbstractKotobaDocument
 {
-    public const TITLE_MAXLENGTH = 100;
+    public const ROMAJI_MAXLENGTH = 50;
 
-    public const DESCRIPTION_MAXLENGTH = 500;
+    public const HIRAGANA_MAXLENGTH = 30;
+
+    public const KATAKANA_MAXLENGTH = 30;
+
+    public const KANJI_MAXLENGTH = 10;
 
     public const ALLOWED_TYPES = [
         'adjective',
@@ -79,10 +82,13 @@ class Card extends AbstractKotobaDocument
         'at least one of these fields must be filled';
 
     public const VALIDATION_ERR_HIRAGANA =
-        'must be written using only hiragana characters';
+        'must be written using only hiragana';
 
     public const VALIDATION_ERR_KATAKANA =
-        'must be written using only katakana characters';
+        'must be written using only katakana';
+    
+    public const VALIDATION_ERR_KANJI =
+        'must be written using only kanji or hiragana';
 
     public const VALIDATION_ERR_MAXLENGTH =
         'cannot not be longer than {{ limit }} characters';
@@ -93,35 +99,52 @@ class Card extends AbstractKotobaDocument
     public const VALIDATION_ERR_JLPT =
         'must be an integer between 1 and 5';
 
-    public const VALIDATION_ERR_DUPLICATE =
-        'another Deck with the same title {{ value }} already exists';
-
-    /** Must be unique */
+    /** Must be written using only roman characters */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Length(
-        max: self::TITLE_MAXLENGTH,
+        max: self::ROMAJI_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
-    protected string $title = '';
+    protected string $romaji = '';
 
-    /** Slugified by the API from the name */
+    /** Slugified by the API from romaji */
     #[ApiProperty(identifier: true)]
     #[Groups('read')]
     #[MongoDB\Field(type: 'string')]
     protected string $code = '';
 
-    /** Long Description */
+    /** Must be written using only hiragana */
+    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Length(
-        max: self::DESCRIPTION_MAXLENGTH,
+        max: self::HIRAGANA_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
-    protected ?string $description = null;
+    protected ?string $hiragana = null;
 
-    /** 'any' removes restrictions */
+    /** Must be written using only katakana */
+    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
+    #[Assert\Length(
+        max: self::KATAKANA_MAXLENGTH,
+        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
+    )]
+    #[Groups(['read', 'write'])]
+    #[MongoDB\Field(type: 'string')]
+    protected ?string $katakana = '';
+
+    /** Must be written using only kanji or hiragana */
+    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
+    #[Assert\Length(
+        max: self::KANJI_MAXLENGTH,
+        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
+    )]
+    #[Groups(['read', 'write'])]
+    #[MongoDB\Field(type: 'string')]
+    protected ?string $kanji = '';
+
     #[Assert\Choice(
         choices: self::ALLOWED_TYPES,
         message: self::VALIDATION_ERR_TYPE,
@@ -130,14 +153,14 @@ class Card extends AbstractKotobaDocument
     #[MongoDB\Field]
     protected string $type = 'any';
 
-    /** rgba color in hex format */
-    #[Assert\CssColor(
-        formats: Assert\CssColor::HEX_LONG_WITH_ALPHA,
-        message: self::VALIDATION_ERR_COLOR,
+    #[Assert\Range(
+        min: 1,
+        max: 5,
+        notInRangeMessage: self::VALIDATION_ERR_JLPT,
     )]
     #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $color = '#ffffffff';
+    #[MongoDB\Field(type: 'int')]
+    protected ?int $jlpt = 5;
 
     /** set by MongoDB */
     #[Groups('read')]
@@ -149,9 +172,6 @@ class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'date_immutable')]
     protected ?\DateTimeImmutable $updatedAt = null;
 
-    /** @var array<string> */
-    protected iterable $words;
-
     #[ApiProperty(identifier: false)]
     #[Groups('read')]
     #[MongoDB\Id(strategy: 'AUTO', type: 'object_id')]
@@ -160,19 +180,9 @@ class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'int')]
     private int $increment;
 
-    public function __construct()
-    {
-        $this->words = new ArrayCollection();
-    }
-
     public function getCode(): ?string
     {
         return $this->code;
-    }
-
-    public function getColor(): ?string
-    {
-        return $this->color;
     }
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -180,9 +190,9 @@ class Card extends AbstractKotobaDocument
         return $this->createdAt;
     }
 
-    public function getDescription(): ?string
+    public function getHiragana(): ?string
     {
-        return $this->description;
+        return $this->hiragana;
     }
 
     public function getId(): ?string
@@ -190,14 +200,29 @@ class Card extends AbstractKotobaDocument
         return $this->id;
     }
 
+    public function getKanji(): ?string
+    {
+        return $this->kanji;
+    }
+
+    public function getKatakana(): ?string
+    {
+        return $this->katakana;
+    }
+
     public function getIncrement(): int
     {
         return $this->increment;
     }
 
-    public function getTitle(): ?string
+    public function getJlpt(): ?int
     {
-        return $this->title;
+        return $this->jlpt;
+    }
+
+    public function getRomaji(): string
+    {
+        return $this->romaji;
     }
 
     public function getType(): string
@@ -216,65 +241,72 @@ class Card extends AbstractKotobaDocument
     public static function getFields(): array
     {
         return [
-            'string' => ['title', 'description'],
+            'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
             'enum' => [
                 'type' => self::ALLOWED_TYPES,
             ],
         ];
     }
 
-    public function setCode(string $code): Deck
+    public function setCode(string $code): Card
     {
         $this->code = $code;
 
         return $this;
     }
 
-    public function setColor(string $color): Deck
-    {
-        $this->color = $color;
-
-        return $this;
-    }
-
     // see App\EventListener\PrePersistListener
-    public function setCreatedAt(\DateTimeImmutable $date): Deck
+    public function setCreatedAt(\DateTimeImmutable $date): Card
     {
         $this->createdAt = $date;
 
         return $this;
     }
 
-    public function setDescription(string $description): Deck
+    public function setHiragana(?string $hiragana): Card
     {
-        $this->description = $description;
+        $this->hiragana = $hiragana;
 
         return $this;
     }
 
-    public function setId(string $id): Deck
+    public function setId(string $id): Card
     {
         $this->id = $id;
 
         return $this;
     }
 
+    public function setJlpt(?int $jlpt): Card
+    {
+        $this->jlpt = $jlpt;
+
+        return $this;
+    }
+
+    public function setKanji(?string $kanji): Card
+    {
+        $this->kanji = $kanji;
+
+        return $this;
+    }
+
+    public function setKatakana(?string $katakana): Card
+    {
+        $this->katakana = $katakana;
+
+        return $this;
+    }
+
     // see App\EventListener\PrePersistListener
-    public function setIncrement(int $increment): Deck
+    public function setIncrement(int $increment): Card
     {
         $this->increment = $increment;
 
         return $this;
     }
 
-    public function setTitle(string $title): Deck
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function setType(string $type): Deck
+    public function setType(string $type): Card
     {
         $this->type = $type;
 
@@ -282,7 +314,7 @@ class Card extends AbstractKotobaDocument
     }
 
     // see App\EventListener\PreUpdateListener
-    public function setUpdatedAt(\DateTimeImmutable $date): Deck
+    public function setUpdatedAt(\DateTimeImmutable $date): Card
     {
         $this->updatedAt = $date;
 
