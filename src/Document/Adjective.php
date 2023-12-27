@@ -10,7 +10,4 @@ final class Adjective extends Card
         'i',
         'na',
     ];
-
-    public const VALIDATION_ERR_GROUPS =
-        'must be one of these: {{ choices }}';
 }

@@ -76,7 +76,7 @@ class Deck extends AbstractKotobaDocument
     public const VALIDATION_ERR_MAXLENGTH =
         'cannot not be longer than {{ limit }} characters';
 
-    public const VALIDATION_ERR_TYPE =
+    public const VALIDATION_ERR_ENUM =
         'must be one of these: {{ choices }}';
 
     public const VALIDATION_ERR_COLOR =
@@ -113,7 +113,7 @@ class Deck extends AbstractKotobaDocument
     /** 'any' removes restrictions */
     #[Assert\Choice(
         choices: self::ALLOWED_TYPES,
-        message: self::VALIDATION_ERR_TYPE,
+        message: self::VALIDATION_ERR_ENUM,
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field]

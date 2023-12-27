@@ -50,6 +50,18 @@ class CardsPostTest extends ApiTestCase
                 'fr' => ' cHat ',
             ],
         ],
+        'teneigo' => [
+            'type' => 'noun',
+            'romaji' => ' oKane ',
+            'hiragana' => ' おかね',
+            'katakana' => '',
+            'kanji' => 'お金',
+            'bikago' => 'お',
+            'jlpt' => 5,
+            'trans' => [
+                'en' => ' money   ',
+            ],
+        ],
         'godan' => [
             'type' => 'verb',
             'romaji' => 'iku',
@@ -156,6 +168,14 @@ class CardsPostTest extends ApiTestCase
             'trans' => [
                 'en' => 'cat',
                 'fr' => 'chat',
+            ],
+        ],
+        'teneigo' => [
+            ...self::POST_COMPLETE_VALID_CARDS['teneigo'],
+            'romaji' => 'okane',
+            'hiragana' => 'おかね',
+            'trans' => [
+                'en' => 'money',
             ],
         ],
         'godan' => [
@@ -348,6 +368,10 @@ class CardsPostTest extends ApiTestCase
             ...self::POST_MINIMAL_VALID_CARD,
             'kanji' => 'kanji',
         ],
+        'bikago' => [
+            ...self::POST_COMPLETE_VALID_CARD['teneigo'],
+            'bikago' => 'dummy',
+        ],
         'type' => [
             ...self::POST_MINIMAL_VALID_CARD,
             'type' => 'dummy',
@@ -500,6 +524,10 @@ class CardsPostTest extends ApiTestCase
             [
                 self::POST_INVALID_CARDS['kanji_written_in_romaji'],
                 'kanji: '.Card::VALIDATION_ERR_KANJI,
+            ],
+            [
+                self::POST_INVALID_CARDS['teneigo'],
+                'bikago: '.Card::VALIDATION_ERR_ENUM,
             ],
             [
                 self::POST_INVALID_CARDS['type'],

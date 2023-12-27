@@ -147,11 +147,11 @@ abstract class Card extends AbstractKotobaDocument
 
     #[Assert\Choice(
         choices: self::ALLOWED_TYPES,
-        message: self::VALIDATION_ERR_TYPE,
+        message: self::VALIDATION_ERR_ENUM,
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field]
-    protected string $type = 'any';
+    protected string $type = '';
 
     #[Assert\Range(
         min: 1,
