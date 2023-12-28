@@ -162,6 +162,8 @@ abstract class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'int')]
     protected ?int $jlpt = 5;
 
+    protected ?array $trans = null;
+
     /** set by MongoDB */
     #[Groups('read')]
     #[MongoDB\Field(type: 'date_immutable')]
@@ -223,6 +225,11 @@ abstract class Card extends AbstractKotobaDocument
     public function getRomaji(): string
     {
         return $this->romaji;
+    }
+
+    public function getTrans(): ?array
+    {
+        return $this->trans;
     }
 
     public function getType(): string
@@ -302,6 +309,13 @@ abstract class Card extends AbstractKotobaDocument
     public function setIncrement(int $increment): Card
     {
         $this->increment = $increment;
+
+        return $this;
+    }
+
+    public function setTrans(?array $trans): Card
+    {
+        $this->trans = $trans;
 
         return $this;
     }

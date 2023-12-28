@@ -10,4 +10,29 @@ final class Noun extends Card
         'お',
         'ご',
     ];
+
+    protected string $bikago;
+
+    public function getBikago(): ?string
+    {
+        return $this->bikago;
+    }
+
+    public function setBikago(?string $bikago): Noun
+    {
+        $this->bikago = $bikago;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getFields(): array
+    {
+        $fields = parent::getFields();
+        $fields['enum']['bikago'] = self::ALLOWED_BIKAGO;
+        
+        return $fields;
+    }
 }

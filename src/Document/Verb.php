@@ -11,4 +11,15 @@ final class Verb extends Card
         'ichidan',
         'irregular',
     ];
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getFields(): array
+    {
+        $fields = parent::getFields();
+        $fields['enum']['group'] = self::ALLOWED_GROUPS;
+        
+        return $fields;
+    }
 }
