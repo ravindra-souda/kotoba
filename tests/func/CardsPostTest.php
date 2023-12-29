@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Document\Deck;
+use App\Document\Card;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -13,9 +13,17 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  */
 class CardsPostTest extends ApiTestCase
 {
+    private string $romajiMaxlengthString;
+
+    private string $hiraganaMaxlengthString;
+
+    private string $katakanaMaxlengthString;
+    
+    private string $kanjiMaxlengthString;
+    
     public function __construct()
     {
-        $this->romajiMaxlengthString = 
+        $this->romajiMaxlengthString =
             str_repeat('a', Card::ROMAJI_MAXLENGTH + 1);
         $this->hiraganaMaxlengthString = 
             str_repeat('あ', Card::HIRAGANA_MAXLENGTH + 1);
@@ -333,7 +341,7 @@ class CardsPostTest extends ApiTestCase
         ],
         'romaji_maxlength' => [
             ...self::POST_MINIMAL_VALID_CARD,
-            'romaji' => self::romajiMaxlengthString,
+            'romaji' => '*',
         ],
         'romaji_written_in_kana' => [
             ...self::POST_MINIMAL_VALID_CARD,
@@ -350,7 +358,7 @@ class CardsPostTest extends ApiTestCase
         ],
         'hiragana_maxlength' => [
             ...self::POST_MINIMAL_VALID_CARD,
-            'hiragana' => self::hiraganaMaxlengthString,
+            'hiragana' => '*',
         ],
         'katakana_written_in_hiragana' => [
             ...self::POST_MINIMAL_VALID_CARD,
@@ -358,18 +366,18 @@ class CardsPostTest extends ApiTestCase
         ],
         'katakana_maxlength' => [
             ...self::POST_MINIMAL_VALID_CARD,
-            'katakana' => self::katakanaMaxlengthString,
+            'katakana' => '*',
         ],
         'kanji_maxlength' => [
             ...self::POST_MINIMAL_VALID_CARD,
-            'kanji' => self::kanjiMaxlengthString,
+            'kanji' => '*',
         ],
         'kanji_written_in_romaji' => [
             ...self::POST_MINIMAL_VALID_CARD,
             'kanji' => 'kanji',
         ],
         'bikago' => [
-            ...self::POST_COMPLETE_VALID_CARD['teneigo'],
+            ...self::POST_COMPLETE_VALID_CARDS['teneigo'],
             'bikago' => 'dummy',
         ],
         'type' => [
@@ -489,7 +497,10 @@ class CardsPostTest extends ApiTestCase
                 'romaji: '.Card::VALIDATION_ERR_EMPTY,
             ],
             [
-                self::POST_INVALID_CARDS['romaji_maxlength'],
+                [
+                    ...self::POST_INVALID_CARDS['romaji_maxlength'],
+                    'romaji' => $romajiMaxlengthString,
+                ],
                 'romaji: '.Card::VALIDATION_ERR_MAXLENGTH,
             ],
             [
@@ -506,7 +517,10 @@ class CardsPostTest extends ApiTestCase
                 'hiragana: '.Card::VALIDATION_ERR_HIRAGANA,
             ],
             [
-                self::POST_INVALID_CARDS['hiragana_maxlength'],
+                [
+                    ...self::POST_INVALID_CARDS['hiragana_maxlength'],
+                    'hiragana' => $hiraganaMaxlengthString,
+                ],
                 'hiragana: '.Card::VALIDATION_ERR_MAXLENGTH,
             ],
             [
@@ -514,11 +528,17 @@ class CardsPostTest extends ApiTestCase
                 'katakana: '.Card::VALIDATION_ERR_KATAKANA,
             ],
             [
-                self::POST_INVALID_CARDS['katakana_maxlength'],
+                [
+                    ...self::POST_INVALID_CARDS['katakana_maxlength'],
+                    'katakana' => $katakanaMaxlengthString,
+                ],
                 'katakana: '.Card::VALIDATION_ERR_MAXLENGTH,
             ],
             [
-                self::POST_INVALID_CARDS['kanji_maxlength'],
+                [
+                    ...self::POST_INVALID_CARDS['kanji_maxlength'],
+                    'kanji' => $kanjiMaxlengthString,
+                ],
                 'kanji: '.Card::VALIDATION_ERR_MAXLENGTH,
             ],
             [

@@ -99,7 +99,7 @@ abstract class Card extends AbstractKotobaDocument
     public const VALIDATION_ERR_JLPT =
         'must be an integer between 1 and 5';
 
-    /** Must be written using only roman characters */
+    /** Must be written using only latin characters */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Length(
         max: self::ROMAJI_MAXLENGTH,
@@ -125,7 +125,8 @@ abstract class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'string')]
     protected ?string $hiragana = null;
 
-    /** Must be written using only katakana */
+    /** Must be written using only katakana or latin 
+     *  and with at least one katakana */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Length(
         max: self::KATAKANA_MAXLENGTH,
@@ -135,7 +136,7 @@ abstract class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'string')]
     protected ?string $katakana = '';
 
-    /** Must be written using only kanji or hiragana */
+    /** Must be written using only kanji or kanji with hiragana ending */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Length(
         max: self::KANJI_MAXLENGTH,
@@ -253,6 +254,38 @@ abstract class Card extends AbstractKotobaDocument
                 'type' => self::ALLOWED_TYPES,
             ],
         ];
+    }
+
+    public static function isValidHiragana(?string $string): bool
+    {
+        if ($string === null) {
+            return true;
+        }
+
+        // must be hiragana only
+        return preg_match('/\P{Hiragana}/um', $string) !== 1;
+    }
+
+    public static function isValidKanji(?string $string): bool
+    {
+        if ($string === null || $string === '') {
+            return true;
+        }
+
+        // must be kanji only or kanji with hiragana ending
+        return preg_match('/^\p{Han}+\p{Hiragana}*$/um', $string) === 1;
+    }
+
+    public static function isValidKatakana(?string $string): bool
+    {
+        if ($string === null || $string === '') {
+            return true;
+        }
+
+        // can mix katakana and latin but must have at least one katakana
+        return preg_match('/[^\p{Katakana}\p{Latin}]/um', $string) !== 1
+            && preg_match('/\p{Katakana}/um', $string) === 1
+        ;
     }
 
     public function setCode(string $code): Card
