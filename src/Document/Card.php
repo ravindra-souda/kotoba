@@ -65,6 +65,11 @@ abstract class Card extends AbstractKotobaDocument
 
     public const KANJI_MAXLENGTH = 10;
 
+    public const ALLOWED_MEANING_LANGS = [
+        'en',
+        'fr',
+    ];
+
     public const ALLOWED_TYPES = [
         'adjective',
         'kana',
@@ -92,6 +97,12 @@ abstract class Card extends AbstractKotobaDocument
 
     public const VALIDATION_ERR_MAXLENGTH =
         'cannot not be longer than {{ limit }} characters';
+
+    public const VALIDATION_ERR_MEANING =
+        'language unknown must be one of these {{ langList }}';
+
+    public const VALIDATION_ERR_NOT_AN_ARRAY =
+        'must be a valid array';
 
     public const VALIDATION_ERR_ENUM =
         'must be one of these: {{ choices }}';
@@ -163,7 +174,11 @@ abstract class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'int')]
     protected ?int $jlpt = 5;
 
-    protected ?array $trans = null;
+    #[Assert\Type(
+        type: 'array',
+        message: self::VALIDATION_ERR_NOT_AN_ARRAY,
+    )]
+    protected ?array $meaning = null;
 
     /** set by MongoDB */
     #[Groups('read')]
@@ -228,9 +243,9 @@ abstract class Card extends AbstractKotobaDocument
         return $this->romaji;
     }
 
-    public function getTrans(): ?array
+    public function getMeaning(): ?array
     {
-        return $this->trans;
+        return $this->meaning;
     }
 
     public function getType(): string
@@ -286,6 +301,24 @@ abstract class Card extends AbstractKotobaDocument
         return preg_match('/[^\p{Katakana}\p{Latin}]/um', $string) !== 1
             && preg_match('/\p{Katakana}/um', $string) === 1
         ;
+    }
+
+    public static function isValidMeaning(array|string|null $meaning): bool
+    {
+        if ($meaning === null || $meaning === '') {
+            return true;
+        }
+
+        $validMeaning = true;
+
+        foreach(array_keys($meaning) as $userLang) {
+            if (!in_array($userLang, self::ALLOWED_MEANING_LANGS)) {
+                $validMeaning = false;
+                break;
+            }
+        }
+        
+        return $validMeaning;
     }
 
     public function setCode(string $code): Card
@@ -346,9 +379,9 @@ abstract class Card extends AbstractKotobaDocument
         return $this;
     }
 
-    public function setTrans(?array $trans): Card
+    public function setmeaning(?array $meaning): Card
     {
-        $this->trans = $trans;
+        $this->meaning = $meaning;
 
         return $this;
     }

@@ -41,7 +41,7 @@ class CardsPostTest extends ApiTestCase
             'katakana' => '',
             'kanji' => '学校',
             'jlpt' => 5,
-            'trans' => [
+            'meaning' => [
                 'en' => ' schoOl',
                 'fr' => 'école ',
             ],
@@ -53,7 +53,7 @@ class CardsPostTest extends ApiTestCase
             'katakana' => '    ネコ ',
             'kanji' => ' 猫  ',
             'jlpt' => 5,
-            'trans' => [
+            'meaning' => [
                 'en' => ' cat  ',
                 'fr' => ' cHat ',
             ],
@@ -66,7 +66,7 @@ class CardsPostTest extends ApiTestCase
             'kanji' => 'お金',
             'bikago' => 'お',
             'jlpt' => 5,
-            'trans' => [
+            'meaning' => [
                 'en' => ' money   ',
             ],
         ],
@@ -77,7 +77,7 @@ class CardsPostTest extends ApiTestCase
             'kanji' => '行く',
             'jlpt' => 5,
             'group' => 'godan',
-            'trans' => [
+            'meaning' => [
                 'en' => 'to go',
             ],
             'conj' => [
@@ -91,7 +91,7 @@ class CardsPostTest extends ApiTestCase
             'kanji' => '食べる',
             'jlpt' => 5,
             'group' => 'ichidan',
-            'trans' => [
+            'meaning' => [
                 'en' => 'to eat',
             ],
             'conj' => [
@@ -105,7 +105,7 @@ class CardsPostTest extends ApiTestCase
             'kanji' => '来る',
             'jlpt' => 5,
             'group' => 'irregular',
-            'trans' => [
+            'meaning' => [
                 'en' => 'to come',
             ],
             'conj' => [
@@ -119,7 +119,7 @@ class CardsPostTest extends ApiTestCase
             'kanji' => '可愛い',
             'jlpt' => 5,
             'group' => 'i',
-            'trans' => [
+            'meaning' => [
                 'en' => 'cute, adorable, charming, lovely, pretty',
             ],
         ],
@@ -130,7 +130,7 @@ class CardsPostTest extends ApiTestCase
             'kanji' => '綺麗',
             'jlpt' => 5,
             'group' => 'na',
-            'trans' => [
+            'meaning' => [
                 'en' => [
                     'pretty, lovely, beautiful, fair',
                     'clean, clear, pure, tidy, neat',
@@ -163,7 +163,7 @@ class CardsPostTest extends ApiTestCase
             ...self::POST_COMPLETE_VALID_CARDS['hiragana'],
             'romaji' => 'gakkou',
             'hiragana' => 'がっこう',
-            'trans' => [
+            'meaning' => [
                 'en' => 'school',
                 'fr' => 'école',
             ],
@@ -173,7 +173,7 @@ class CardsPostTest extends ApiTestCase
             'romaji' => 'neko',
             'katakana' => 'ネコ',
             'kanji' => '猫',
-            'trans' => [
+            'meaning' => [
                 'en' => 'cat',
                 'fr' => 'chat',
             ],
@@ -182,7 +182,7 @@ class CardsPostTest extends ApiTestCase
             ...self::POST_COMPLETE_VALID_CARDS['teneigo'],
             'romaji' => 'okane',
             'hiragana' => 'おかね',
-            'trans' => [
+            'meaning' => [
                 'en' => 'money',
             ],
         ],
@@ -329,7 +329,7 @@ class CardsPostTest extends ApiTestCase
         'romaji' => 'taberu',
         'hiragana' => 'たべる',
         'group' => 'ichidan',
-        'trans' => [
+        'meaning' => [
             'en' => 'to eat',
         ]
     ];
@@ -383,6 +383,17 @@ class CardsPostTest extends ApiTestCase
         'type' => [
             ...self::POST_MINIMAL_VALID_CARD,
             'type' => 'dummy',
+        ],
+        'meaning_not_an_array' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'meaning' => 'to eat',
+        ],
+        'meaning_lang_unknown' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'meaning' => [
+                'en' => 'to eat',
+                'dummy' => '🂡🂱🃁🃑',
+            ],
         ],
         'group_verb' => [
             ...self::POST_COMPLETE_VALID_CARDS['godan'],
@@ -552,6 +563,14 @@ class CardsPostTest extends ApiTestCase
             [
                 self::POST_INVALID_CARDS['type'],
                 'type: '.Card::VALIDATION_ERR_ENUM,
+            ],
+            [
+                self::POST_INVALID_CARDS['meaning_not_an_array'],
+                'meaning: '.Card::VALIDATION_ERR_NOT_AN_ARRAY,
+            ],
+            [
+                self::POST_INVALID_CARDS['meaning_lang_unknown'],
+                'meaning: '.Card::VALIDATION_ERR_MEANING,
             ],
             [
                 self::POST_INVALID_CARDS['group_verb'],
