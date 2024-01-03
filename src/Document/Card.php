@@ -300,6 +300,8 @@ abstract class Card extends AbstractKotobaDocument
         // can mix katakana and latin but must have at least one katakana
         return preg_match('/[^\p{Katakana}\p{Latin}]/um', $string) !== 1
             && preg_match('/\p{Katakana}/um', $string) === 1
+            // half-width katakana are not allowed
+            && preg_match('/[\x{FF65}-\x{FF9F}]/um', $string) !== 1
         ;
     }
 

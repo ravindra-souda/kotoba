@@ -65,6 +65,7 @@ class CardTest extends TestCase
             ['a', false],
             ['1', false],
             ['字', false],
+            ['ｦ', false],
             ['アあ', false],
             ['あア', false],
             ['アあア', false],
