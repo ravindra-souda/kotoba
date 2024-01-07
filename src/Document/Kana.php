@@ -6,6 +6,10 @@ namespace App\Document;
 
 final class Kana extends Card
 {
+    use Trait\HiraganaTrait;
+
+    use Trait\KatakanaTrait;
+
     public const VALIDATION_ERR_KANA =
         'must be a mora long';
 

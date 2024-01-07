@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Card;
+use App\Document\Noun;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -24,13 +25,13 @@ class CardsPostTest extends ApiTestCase
     public function __construct()
     {
         $this->romajiMaxlengthString =
-            str_repeat('a', Card::ROMAJI_MAXLENGTH + 1);
+            str_repeat('a', Noun::ROMAJI_MAXLENGTH + 1);
         $this->hiraganaMaxlengthString = 
-            str_repeat('あ', Card::HIRAGANA_MAXLENGTH + 1);
+            str_repeat('あ', Noun::HIRAGANA_MAXLENGTH + 1);
         $this->katakanaMaxlengthString = 
-            str_repeat('ア', Card::KATAKANA_MAXLENGTH + 1);
+            str_repeat('ア', Noun::KATAKANA_MAXLENGTH + 1);
         $this->kanjiMaxlengthString = 
-            str_repeat('字', Card::KANJI_MAXLENGTH + 1);
+            str_repeat('字', Noun::KANJI_MAXLENGTH + 1);
     }
 
     private const POST_COMPLETE_VALID_CARDS = [
@@ -156,6 +157,16 @@ class CardsPostTest extends ApiTestCase
             'type' => 'kana',
             'romaji' => 'kya',
             'katakana' => 'キャ',
+        ],
+        'kanji' => [
+            'type' => 'kanji',
+            'kanji' => '人',
+            'meaning' => [
+                'en' => 'person',
+                'fr' => 'personne, humain'
+            ],
+            'kunyomi' => 'hito, hitori, hitoto',
+            'onyomi' => 'jin, nin',
         ],
     ];
     private const POST_COMPLETE_EXPECTED_CARDS = [
@@ -384,6 +395,10 @@ class CardsPostTest extends ApiTestCase
             ...self::POST_MINIMAL_VALID_CARD,
             'type' => 'dummy',
         ],
+        'meaning_empty' => [
+            ...self::POST_MINIMAL_VALID_CARD,
+            'meaning' => '',
+        ],
         'meaning_not_an_array' => [
             ...self::POST_MINIMAL_VALID_CARD,
             'meaning' => 'to eat',
@@ -430,6 +445,26 @@ class CardsPostTest extends ApiTestCase
         'kana_katakana_glide' => [
             ...self::POST_COMPLETE_VALID_CARDS['kana_katakana_glide'],
             'katakana' => 'キャア',
+        ],
+        'kanji_kanji_maxlength' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kanji'],
+            'kanji' => '一人',
+        ],
+        'kanji_kunyomi_empty' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kanji'],
+            'kunyomi' => '',
+        ],
+        'kanji_kunyomi_not_in_romaji' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kanji'],
+            'kunyomi' => 'ひと, ひとり, ひとと',
+        ],
+        'kanji_onyomi_empty' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kanji'],
+            'onyomi' => '',
+        ],
+        'kanji_onyomi_not_in_romaji' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kanji'],
+            'kunyomi' => 'ジン, ニン',
         ],
     ];
 
@@ -565,6 +600,10 @@ class CardsPostTest extends ApiTestCase
                 'type: '.Card::VALIDATION_ERR_ENUM,
             ],
             [
+                self::POST_INVALID_CARDS['meaning_empty'],
+                'meaning: '.Card::VALIDATION_ERR_NOT_AN_ARRAY,
+            ],
+            [
                 self::POST_INVALID_CARDS['meaning_not_an_array'],
                 'meaning: '.Card::VALIDATION_ERR_NOT_AN_ARRAY,
             ],
@@ -607,6 +646,26 @@ class CardsPostTest extends ApiTestCase
             [
                 self::POST_INVALID_CARDS['kana_katakana_glide'],
                 'katakana: '.Kana::VALIDATION_ERR_KANA,
+            ],
+            [
+                self::POST_INVALID_CARDS['kanji_kanji_maxlength'],
+                'kanji: '.Kanji::VALIDATION_ERR_MAXLENGTH,
+            ],
+            [
+                self::POST_INVALID_CARDS['kanji_kunyomi_empty'],
+                'kunyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
+            ],
+            [
+                self::POST_INVALID_CARDS['kanji_kunyomi_not_in_romaji'],
+                'kunyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
+            ],
+            [
+                self::POST_INVALID_CARDS['kanji_onyomi_empty'],
+                'onyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
+            ],
+            [
+                self::POST_INVALID_CARDS['kanji_onyomi_not_in_romaji'],
+                'onyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
             ],
         ];
     }

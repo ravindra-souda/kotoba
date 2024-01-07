@@ -59,12 +59,6 @@ abstract class Card extends AbstractKotobaDocument
 {
     public const ROMAJI_MAXLENGTH = 50;
 
-    public const HIRAGANA_MAXLENGTH = 30;
-
-    public const KATAKANA_MAXLENGTH = 30;
-
-    public const KANJI_MAXLENGTH = 10;
-
     public const ALLOWED_MEANING_LANGS = [
         'en',
         'fr',
@@ -73,6 +67,7 @@ abstract class Card extends AbstractKotobaDocument
     public const ALLOWED_TYPES = [
         'adjective',
         'kana',
+        'kanji',
         'noun',
         'verb',
     ];
@@ -85,15 +80,6 @@ abstract class Card extends AbstractKotobaDocument
     
     public const VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA =
         'at least one of these fields must be filled';
-
-    public const VALIDATION_ERR_HIRAGANA =
-        'must be written using only hiragana';
-
-    public const VALIDATION_ERR_KATAKANA =
-        'must be written using only katakana';
-    
-    public const VALIDATION_ERR_KANJI =
-        'must be written using only kanji or hiragana';
 
     public const VALIDATION_ERR_MAXLENGTH =
         'cannot not be longer than {{ limit }} characters';
@@ -125,37 +111,6 @@ abstract class Card extends AbstractKotobaDocument
     #[Groups('read')]
     #[MongoDB\Field(type: 'string')]
     protected string $code = '';
-
-    /** Must be written using only hiragana */
-    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
-    #[Assert\Length(
-        max: self::HIRAGANA_MAXLENGTH,
-        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
-    )]
-    #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $hiragana = null;
-
-    /** Must be written using only katakana or latin 
-     *  and with at least one katakana */
-    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
-    #[Assert\Length(
-        max: self::KATAKANA_MAXLENGTH,
-        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
-    )]
-    #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $katakana = '';
-
-    /** Must be written using only kanji or kanji with hiragana ending */
-    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
-    #[Assert\Length(
-        max: self::KANJI_MAXLENGTH,
-        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
-    )]
-    #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $kanji = '';
 
     #[Assert\Choice(
         choices: self::ALLOWED_TYPES,
@@ -208,24 +163,9 @@ abstract class Card extends AbstractKotobaDocument
         return $this->createdAt;
     }
 
-    public function getHiragana(): ?string
-    {
-        return $this->hiragana;
-    }
-
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function getKanji(): ?string
-    {
-        return $this->kanji;
-    }
-
-    public function getKatakana(): ?string
-    {
-        return $this->katakana;
     }
 
     public function getIncrement(): int
@@ -238,14 +178,14 @@ abstract class Card extends AbstractKotobaDocument
         return $this->jlpt;
     }
 
-    public function getRomaji(): string
-    {
-        return $this->romaji;
-    }
-
     public function getMeaning(): ?array
     {
         return $this->meaning;
+    }
+
+    public function getRomaji(): string
+    {
+        return $this->romaji;
     }
 
     public function getType(): string
@@ -269,40 +209,6 @@ abstract class Card extends AbstractKotobaDocument
                 'type' => self::ALLOWED_TYPES,
             ],
         ];
-    }
-
-    public static function isValidHiragana(?string $string): bool
-    {
-        if ($string === null) {
-            return true;
-        }
-
-        // must be hiragana only
-        return preg_match('/\P{Hiragana}/um', $string) !== 1;
-    }
-
-    public static function isValidKanji(?string $string): bool
-    {
-        if ($string === null || $string === '') {
-            return true;
-        }
-
-        // must be kanji only or kanji with hiragana ending
-        return preg_match('/^\p{Han}+\p{Hiragana}*$/um', $string) === 1;
-    }
-
-    public static function isValidKatakana(?string $string): bool
-    {
-        if ($string === null || $string === '') {
-            return true;
-        }
-
-        // can mix katakana and latin but must have at least one katakana
-        return preg_match('/[^\p{Katakana}\p{Latin}]/um', $string) !== 1
-            && preg_match('/\p{Katakana}/um', $string) === 1
-            // half-width katakana are not allowed
-            && preg_match('/[\x{FF65}-\x{FF9F}]/um', $string) !== 1
-        ;
     }
 
     public static function isValidMeaning(array|string|null $meaning): bool
@@ -338,13 +244,6 @@ abstract class Card extends AbstractKotobaDocument
         return $this;
     }
 
-    public function setHiragana(?string $hiragana): Card
-    {
-        $this->hiragana = $hiragana;
-
-        return $this;
-    }
-
     public function setId(string $id): Card
     {
         $this->id = $id;
@@ -359,20 +258,6 @@ abstract class Card extends AbstractKotobaDocument
         return $this;
     }
 
-    public function setKanji(?string $kanji): Card
-    {
-        $this->kanji = $kanji;
-
-        return $this;
-    }
-
-    public function setKatakana(?string $katakana): Card
-    {
-        $this->katakana = $katakana;
-
-        return $this;
-    }
-
     // see App\EventListener\PrePersistListener
     public function setIncrement(int $increment): Card
     {
@@ -381,9 +266,16 @@ abstract class Card extends AbstractKotobaDocument
         return $this;
     }
 
-    public function setmeaning(?array $meaning): Card
+    public function setMeaning(?array $meaning): Card
     {
         $this->meaning = $meaning;
+
+        return $this;
+    }
+
+    public function setRomaji(string $romaji): Card
+    {
+        $this->romaji = $romaji;
 
         return $this;
     }

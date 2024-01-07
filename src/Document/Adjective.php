@@ -6,6 +6,12 @@ namespace App\Document;
 
 final class Adjective extends Card
 {
+    use Trait\HiraganaTrait;
+
+    use Trait\KanjiTrait;
+
+    use Trait\KatakanaTrait;
+
     public const ALLOWED_GROUPS = [
         'i',
         'na',
