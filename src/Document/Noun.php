@@ -6,11 +6,10 @@ namespace App\Document;
 
 final class Noun extends Card
 {
-    use Trait\HiraganaTrait;
-
-    use Trait\KanjiTrait;
-
-    use Trait\KatakanaTrait;
+    use Trait\HiraganaTrait, 
+        Trait\KanjiTrait, 
+        Trait\KatakanaTrait, 
+        Trait\MeaningTrait;
     
     public const ALLOWED_BIKAGO = [
         'お',

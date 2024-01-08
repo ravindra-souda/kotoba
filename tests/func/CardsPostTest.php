@@ -475,10 +475,11 @@ class CardsPostTest extends ApiTestCase
     ];
 
     private const CLASSES = [
-        'verb' => Verb::class,
         'adjective' => Adjective::class,
-        'noun' => Noun::class,
         'kana' => Kana::class,
+        'kanji' => Kanji::class,
+        'noun' => Noun::class,
+        'verb' => Verb::class,
     ];
 
     /**
@@ -671,11 +672,11 @@ class CardsPostTest extends ApiTestCase
     }
 
     /**
-     * @dataProvider invalidDeckProvider
+     * @dataProvider invalidCardProvider
      *
      * @param array<string> $payload
      */
-    public function testDecksPostInvalid(array $payload, string $message): void
+    public function testCardsPostInvalid(array $payload, string $message): void
     {
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage($message);

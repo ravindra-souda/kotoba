@@ -59,11 +59,6 @@ abstract class Card extends AbstractKotobaDocument
 {
     public const ROMAJI_MAXLENGTH = 50;
 
-    public const ALLOWED_MEANING_LANGS = [
-        'en',
-        'fr',
-    ];
-
     public const ALLOWED_TYPES = [
         'adjective',
         'kana',
@@ -129,12 +124,6 @@ abstract class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'int')]
     protected ?int $jlpt = 5;
 
-    #[Assert\Type(
-        type: 'array',
-        message: self::VALIDATION_ERR_NOT_AN_ARRAY,
-    )]
-    protected ?array $meaning = null;
-
     /** set by MongoDB */
     #[Groups('read')]
     #[MongoDB\Field(type: 'date_immutable')]
@@ -178,11 +167,6 @@ abstract class Card extends AbstractKotobaDocument
         return $this->jlpt;
     }
 
-    public function getMeaning(): ?array
-    {
-        return $this->meaning;
-    }
-
     public function getRomaji(): string
     {
         return $this->romaji;
@@ -209,24 +193,6 @@ abstract class Card extends AbstractKotobaDocument
                 'type' => self::ALLOWED_TYPES,
             ],
         ];
-    }
-
-    public static function isValidMeaning(array|string|null $meaning): bool
-    {
-        if ($meaning === null || $meaning === '') {
-            return true;
-        }
-
-        $validMeaning = true;
-
-        foreach(array_keys($meaning) as $userLang) {
-            if (!in_array($userLang, self::ALLOWED_MEANING_LANGS)) {
-                $validMeaning = false;
-                break;
-            }
-        }
-        
-        return $validMeaning;
     }
 
     public function setCode(string $code): Card
@@ -262,13 +228,6 @@ abstract class Card extends AbstractKotobaDocument
     public function setIncrement(int $increment): Card
     {
         $this->increment = $increment;
-
-        return $this;
-    }
-
-    public function setMeaning(?array $meaning): Card
-    {
-        $this->meaning = $meaning;
 
         return $this;
     }

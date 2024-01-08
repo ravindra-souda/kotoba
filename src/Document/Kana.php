@@ -6,12 +6,10 @@ namespace App\Document;
 
 final class Kana extends Card
 {
-    use Trait\HiraganaTrait;
+    use Trait\HiraganaTrait,
+        Trait\KatakanaTrait;
 
-    use Trait\KatakanaTrait;
-
-    public const VALIDATION_ERR_KANA =
-        'must be a mora long';
+    public const VALIDATION_ERR_KANA = 'must be a mora long';
 
     public static function isValidHiragana(?string $string): bool
     {

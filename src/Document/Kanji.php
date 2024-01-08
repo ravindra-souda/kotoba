@@ -6,6 +6,8 @@ namespace App\Document;
 
 final class Kanji extends Card
 {
+    use Trait\MeaningTrait;
+    
     public const VALIDATION_ERR_KANJI = 'must be written using only kanji';
 
     /** Must be written using only kanji */
