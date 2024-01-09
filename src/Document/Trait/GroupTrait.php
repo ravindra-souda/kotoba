@@ -13,7 +13,7 @@ trait GroupTrait
 {
     #[Assert\Choice(
         choices: self::ALLOWED_GROUPS,
-        message: self::VALIDATION_ERR_ENUM,
+        message: Card::VALIDATION_ERR_ENUM,
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field]
@@ -36,7 +36,7 @@ trait GroupTrait
      */
     public static function getFields(): array
     {
-        $fields = parent::getFields();
+        $fields = Card::getFields();
         $fields['enum']['group'] = self::ALLOWED_GROUPS;
         
         return $fields;

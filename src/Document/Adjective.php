@@ -16,15 +16,4 @@ final class Adjective extends Card
         'i',
         'na',
     ];
-
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getFields(): array
-    {
-        $fields = parent::getFields();
-        $fields['enum']['group'] = self::ALLOWED_GROUPS;
-        
-        return $fields;
-    }
 }
