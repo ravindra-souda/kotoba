@@ -6,7 +6,8 @@ namespace App\Document;
 
 final class Verb extends Card
 {
-    use Trait\HiraganaTrait, 
+    use Trait\GroupTrait, 
+        Trait\HiraganaTrait, 
         Trait\KanjiTrait, 
         Trait\KatakanaTrait, 
         Trait\MeaningTrait;
@@ -16,15 +17,4 @@ final class Verb extends Card
         'ichidan',
         'irregular',
     ];
-
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getFields(): array
-    {
-        $fields = parent::getFields();
-        $fields['enum']['group'] = self::ALLOWED_GROUPS;
-        
-        return $fields;
-    }
 }

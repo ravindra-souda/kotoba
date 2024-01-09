@@ -7,7 +7,7 @@ namespace App\Document;
 final class Kanji extends Card
 {
     use Trait\MeaningTrait;
-    
+
     public const VALIDATION_ERR_KANJI = 'must be written using only kanji';
 
     /** Must be written using only kanji */
@@ -64,5 +64,16 @@ final class Kanji extends Card
         $this->onyomi = $onyomi;
 
         return $this;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getFields(): array
+    {
+        $fields = parent::getFields();
+        $fields['string'] = [...$fields['string'], 'kunyomi', 'onyomi'];
+        
+        return $fields;
     }
 }

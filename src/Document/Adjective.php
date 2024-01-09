@@ -6,7 +6,8 @@ namespace App\Document;
 
 final class Adjective extends Card
 {
-    use Trait\HiraganaTrait, 
+    use Trait\GroupTrait,
+        Trait\HiraganaTrait, 
         Trait\KanjiTrait, 
         Trait\KatakanaTrait, 
         Trait\MeaningTrait;

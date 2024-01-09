@@ -56,9 +56,9 @@ trait MeaningTrait
         return !empty($meaning[self::getMandatoryLang()]);
     }
 
-    public function setMeaning(?array $meaning): Card
-    {
-        $this->meaning = $meaning;
+    public function setMeaning(array $meaning): Card
+    {        
+        $this->meaning = array_map(fn($m) => trim(strtolower($m)), $meaning);
 
         return $this;
     }
