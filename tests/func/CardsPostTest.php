@@ -81,7 +81,7 @@ class CardsPostTest extends ApiTestCase
             'meaning' => [
                 'en' => 'to go',
             ],
-            'conj' => [
+            'inflections' => [
                 'dictionary' => '行く',
             ],
         ],
@@ -95,7 +95,7 @@ class CardsPostTest extends ApiTestCase
             'meaning' => [
                 'en' => 'to eat',
             ],
-            'conj' => [
+            'inflections' => [
                 'dictionary' => '食べる',
             ],
         ],
@@ -109,7 +109,7 @@ class CardsPostTest extends ApiTestCase
             'meaning' => [
                 'en' => 'to come',
             ],
-            'conj' => [
+            'inflections' => [
                 'dictionary' => '来る',
             ],
         ],
@@ -199,7 +199,7 @@ class CardsPostTest extends ApiTestCase
         ],
         'godan' => [
             ...self::POST_COMPLETE_VALID_CARDS['godan'],
-            'conj' => [
+            'inflections' => [
                 'dictionary' => '行く',
                 'non-past' => [
                     'informal' => [
@@ -252,7 +252,7 @@ class CardsPostTest extends ApiTestCase
         ],
         'ichidan' => [
             ...self::POST_COMPLETE_VALID_CARDS['ichidan'],
-            'conj' => [
+            'inflections' => [
                 'dictionary' => '食べる',
                 'non-past' => [
                     'informal' => [
@@ -304,13 +304,13 @@ class CardsPostTest extends ApiTestCase
             ...self::POST_COMPLETE_VALID_CARDS['ichidan'],
             /* automatic conjugation must be disabled for irregular verbs,
             leaving the completion to the user */
-            'conj' => [
+            'inflections' => [
                 'dictionary' => '来る',
             ],
         ],
         'i_adjective' => [
             ...self::POST_COMPLETE_VALID_CARDS['i_adjective'],
-            'conj' => [
+            'inflections' => [
                 'non-past' => [
                     'affirmative' => '可愛い',
                     'negative' => '可愛くない',
@@ -323,7 +323,7 @@ class CardsPostTest extends ApiTestCase
         ],
         'na_adjective' => [
             ...self::POST_COMPLETE_VALID_CARDS['na_adjective'],
-            'conj' => [
+            'inflections' => [
                 'non-past' => [
                     'affirmative' => '綺麗',
                     'negative' => '綺麗じゃない',

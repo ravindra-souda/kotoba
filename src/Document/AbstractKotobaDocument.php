@@ -17,4 +17,9 @@ abstract class AbstractKotobaDocument
             $this->{$field} = trim($this->{$field} ?? '');
         }
     }
+
+    public static function trimArrayValues(array $array): array
+    {
+        return array_map(fn($value) => trim(strtolower($value)), $array);
+    }
 }

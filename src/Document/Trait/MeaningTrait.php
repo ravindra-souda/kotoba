@@ -58,7 +58,7 @@ trait MeaningTrait
 
     public function setMeaning(array $meaning): Card
     {        
-        $this->meaning = array_map(fn($m) => trim(strtolower($m)), $meaning);
+        $this->meaning = Card::trimArrayValues($meaning);
 
         return $this;
     }
