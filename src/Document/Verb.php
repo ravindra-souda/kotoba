@@ -78,9 +78,19 @@ final class Verb extends Card
     )]
     protected array $inflections;
 
+    /** Reviewed by users after automatic conjugation */
+    #[Groups(['read', 'write'])]
+    #[MongoDB\Field(type: 'bool')]
+    protected bool $reviewed = false;
+
     public function getInflections(): array
     {
         return $this->inflections;
+    }
+
+    public function isReviewed(): bool
+    {
+        return $this->reviewed;
     }
 
     public static function isValidInflections(
@@ -123,9 +133,16 @@ final class Verb extends Card
         return true;
     }
 
-    public function setInflections(array $inflections): Card
+    public function setInflections(array $inflections): Verb
     {        
         $this->inflections = trimArrayValues($inflections);
+
+        return $this;
+    }
+
+    public function setReviewed(bool $reviewed): Verb
+    {        
+        $this->reviewed = $reviewed;
 
         return $this;
     }
@@ -153,8 +170,8 @@ final class Verb extends Card
             }
         }
 
-        $this->setInflections($inflections);
-
-        return $this;
+        return $this
+            ->setInflections($inflections)
+            ->setReviewed(false);
     }
 }
