@@ -20,6 +20,11 @@ abstract class AbstractKotobaDocument
 
     public static function trimArrayValues(array $array): array
     {
-        return array_map(fn($value) => trim(strtolower($value)), $array);
+        array_walk_recursive(
+            $array,
+            fn(&$value) => $value = trim(strtolower($value)),
+        );
+
+        return $array;
     }
 }

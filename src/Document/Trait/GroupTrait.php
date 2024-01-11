@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Document\Trait;
 
-use Document\Card;
+use App\Document\Adjective;
+use App\Document\Card;
+use App\Document\Verb;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,7 +26,7 @@ trait GroupTrait
         return $this->group;
     }
 
-    public function setGroup(string $group): Card
+    public function setGroup(string $group): Adjective|Verb
     {
         $this->group = $group;
 

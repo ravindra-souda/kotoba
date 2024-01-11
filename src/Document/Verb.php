@@ -12,16 +12,16 @@ final class Verb extends Card
         Trait\KatakanaTrait, 
         Trait\MeaningTrait;
 
-    private const GODAN = 'godan';
+    public const GODAN = 'godan';
 
-    private const ICHIDAN = 'ichidan';
+    public const ICHIDAN = 'ichidan';
 
-    private const IRREGULAR = 'irregular';
+    public const IRREGULAR = 'irregular';
 
     public const ALLOWED_GROUPS = [
-        GODAN,
-        ICHIDAN,
-        IRREGULAR,
+        self::GODAN,
+        self::ICHIDAN,
+        self::IRREGULAR,
     ];
 
     private const SUFFIXES = [
@@ -93,7 +93,7 @@ final class Verb extends Card
         return $this->reviewed;
     }
 
-    public static function isValidInflections(
+    public function isValidInflections(
         array|string|null $inflections
     ): bool
     {
@@ -117,9 +117,18 @@ final class Verb extends Card
         ];
 
         if ($this->group === self::GODAN 
-            && !in_array(substr($dict, -1), $validGodanEndings)) {
+            && !in_array(mb_substr($dict, -1), $validGodanEndings)) {
             return false;
         }
+
+        $irregularVerbs = ['する', 'くる', '来る'];
+
+        if ($this->group !== self::IRREGULAR 
+            && in_array($dict, $irregularVerbs)) {
+            return false;
+        }
+
+        return true;
     }
 
     public static function isValidCompletedInflections(array $inflections): bool
@@ -135,7 +144,7 @@ final class Verb extends Card
 
     public function setInflections(array $inflections): Verb
     {        
-        $this->inflections = trimArrayValues($inflections);
+        $this->inflections = $this->trimArrayValues($inflections);
 
         return $this;
     }
@@ -150,19 +159,28 @@ final class Verb extends Card
     public function conjugate(): Verb
     {
         if (!$this->isValidInflections($this->inflections)) {
-            return false;
+            throw new \Exception('Set inflections are not valid');
         }
 
         if ($this->group === self::ICHIDAN) {
             return $this->conjugateIchidan();
+        }
+
+        if ($this->group === self::IRREGULAR) {
+            return $this;
         }
     }
 
     private function conjugateIchidan(): Verb
     {
         $inflections = $this->getInflections();
-        $root = substr($this->inflections['dictionary'], 0, -1);
-        $autoConjugations = array_map(fn($a) => $root.$a, $self::SUFFIXES);
+        $root = mb_substr($this->inflections['dictionary'], 0, -1);
+
+        $autoConjugations = self::SUFFIXES;
+        array_walk_recursive(
+            $autoConjugations,
+            fn(&$v, $k) => $v = $root.$v,
+        );
 
         foreach ($autoConjugations as $tense => $autoConjugation) {
             if (empty($inflections[$tense])) {
