@@ -24,10 +24,10 @@ final class Verb extends Card
         self::IRREGULAR,
     ];
 
-    private const SUFFIXES = [
+    private const ICHIDAN_SUFFIXES = [
         'non-past' => [
             'informal' => [
-                'affirmative' => 'る',
+                'affirmative' => '',
                 'negative' => 'ない',
             ],
             'polite' => [
@@ -71,6 +71,65 @@ final class Verb extends Card
         ],
     ];
 
+    private const GODAN_SUFFIXES = [
+        'non-past' => [
+            'informal' => [
+                'affirmative' => '',
+                'negative' => '{a}ない',
+            ],
+            'polite' => [
+                'affirmative' => '{i}ます',
+                'negative' => '{i}ません',
+            ],
+        ],
+        'past' => [
+            'informal' => [
+                'affirmative' => '{i-past-te}た', 
+                'negative' => '{a}なかった',
+            ],
+            'polite' => [
+                'affirmative' => '{i}ました',
+                'negative' => '{i}ませんでした',
+            ],
+        ],
+        'te' => [
+            'affirmative' => '{i-past-te}て',
+            'negative' => '{a}なくて',
+        ],
+        'potential' => [
+            'affirmative' => '{e}る',
+            'negative' => '{e}ない',
+        ],
+        'passive' => [
+            'affirmative' => '{a}れる',
+            'negative' => '{a}れない',
+        ],
+        'causative' => [
+            'affirmative' => '{a}せる',
+            'negative' => '{a}せない',
+            'passive' => [
+                'affirmative' => '{a}せられる',
+                'negative' => '{a}せられない',
+            ]
+        ],
+        'imperative' => [
+            'affirmative' => '{e}',
+            'negative' => '{u}な',
+        ],
+    ];
+
+    private const OKURIGANA = [
+        'う' => ['わ', 'い', 'う', 'え', 'お', 'っ'],
+        'く' => ['か', 'き', 'く', 'け', 'こ', 'い'],
+        'ぐ' => ['が', 'ぎ', 'ぐ', 'げ', 'ご', 'い'],
+        'す' => ['さ', 'し', 'す', 'せ', 'そ', 'し'],
+        'つ' => ['た', 'ち', 'つ', 'て', 'と', 'っ'],
+        'ぬ' => ['な', 'に', 'ぬ', 'ね', 'の', 'ん'],
+        'ぶ' => ['ば', 'び', 'ぶ', 'べ', 'ぼ', 'ん'],
+        'む' => ['ま', 'み', 'む', 'め', 'も', 'ん'],
+        'る' => ['ら', 'り', 'る', 'れ', 'ろ', 'っ']
+    ];
+
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
     #[Assert\Type(
         type: 'array',
@@ -112,8 +171,7 @@ final class Verb extends Card
         }
         
         $validGodanEndings = [
-            'う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 
-            'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'
+            'う', 'く', 'ぐ', 'す', 'つ', 'ぬ', 'ぶ', 'む', 'る'
         ];
 
         if ($this->group === self::GODAN 
@@ -166,6 +224,10 @@ final class Verb extends Card
             return $this->conjugateIchidan();
         }
 
+        if ($this->group === self::GODAN) {
+            return $this->conjugateGodan();
+        }
+
         if ($this->group === self::IRREGULAR) {
             return $this;
         }
@@ -174,19 +236,47 @@ final class Verb extends Card
     private function conjugateIchidan(): Verb
     {
         $inflections = $this->getInflections();
-        $root = mb_substr($this->inflections['dictionary'], 0, -1);
+        $root = mb_substr($inflections['dictionary'], 0, -1);
 
-        $autoConjugations = self::SUFFIXES;
+        $autoConjugations = self::ICHIDAN_SUFFIXES;
         array_walk_recursive(
             $autoConjugations,
             fn(&$v, $k) => $v = $root.$v,
         );
+
+        return $this->fillEmptyInflections($autoConjugations);
+    }
+
+    private function conjugateGodan(): Verb
+    {
+        $inflections = $this->getInflections();
+        $root = mb_substr($inflections['dictionary'], 0, -1);
+        $lastOkurigana = mb_substr($inflections['dictionary'], -1);
+
+        $autoConjugations = self::GODAN_SUFFIXES;
+        $vowels = ['{a}', '{i}', '{u}', '{e}', '{o}', '{i-past-te}'];
+        $okurigana = self::OKURIGANA[$lastOkurigana];
+
+        array_walk_recursive(
+            $autoConjugations,
+            fn(&$v, $k) => $v = str_replace($vowels, $okurigana, $root.$v),
+        );
+
+        return $this->fillEmptyInflections($autoConjugations);
+    }
+
+    private function fillEmptyInflections(array $autoConjugations): Verb
+    {
+        $inflections = $this->getInflections();
 
         foreach ($autoConjugations as $tense => $autoConjugation) {
             if (empty($inflections[$tense])) {
                 $inflections[$tense] = $autoConjugation;
             }
         }
+
+        $inflections['non-past']['informal']['affirmative'] = 
+            $inflections['dictionary'];
 
         return $this
             ->setInflections($inflections)

@@ -224,6 +224,60 @@ class VerbTest extends TestCase
                 [
                     'group' => Verb::GODAN,
                     'inflections' => [
+                        'dictionary' => '       聞く    ',
+                    ],
+                ], [
+                    'dictionary' => '聞く',
+                    'non-past' => [
+                        'informal' => [
+                            'affirmative' => '聞く',
+                            'negative' => '聞かない',
+                        ],
+                        'polite' => [
+                            'affirmative' => '聞きます',
+                            'negative' => '聞きません',
+                        ],
+                    ],
+                    'past' => [
+                        'informal' => [
+                            'affirmative' => '聞いた', 
+                            'negative' => '聞かなかった',
+                        ],
+                        'polite' => [
+                            'affirmative' => '聞きました',
+                            'negative' => '聞きませんでした',
+                        ],
+                    ],
+                    'te' => [
+                        'affirmative' => '聞いて',
+                        'negative' => '聞かなくて',
+                    ],
+                    'potential' => [
+                        'affirmative' => '聞ける',
+                        'negative' => '聞けない',
+                    ],
+                    'passive' => [
+                        'affirmative' => '聞かれる',
+                        'negative' => '聞かれない',
+                    ],
+                    'causative' => [
+                        'affirmative' => '聞かせる',
+                        'negative' => '聞かせない',
+                        'passive' => [
+                            'affirmative' => '聞かせられる',
+                            'negative' => '聞かせられない',
+                        ]
+                    ],
+                    'imperative' => [
+                        'affirmative' => '聞け',
+                        'negative' => '聞くな',
+                    ],
+                ]
+            ],
+            [
+                [
+                    'group' => Verb::GODAN,
+                    'inflections' => [
                         'dictionary' => '  買う      ',
                     ],
                 ], [
@@ -231,7 +285,7 @@ class VerbTest extends TestCase
                     'non-past' => [
                         'informal' => [
                             'affirmative' => '買う',
-                            'negative' => '買わない',
+                            'negative' => '買わない', // u-column special rule
                         ],
                         'polite' => [
                             'affirmative' => '買います',
@@ -240,7 +294,7 @@ class VerbTest extends TestCase
                     ],
                     'past' => [
                         'informal' => [
-                            'affirmative' => '買った', 
+                            'affirmative' => '買った',
                             'negative' => '買わなかった',
                         ],
                         'polite' => [
