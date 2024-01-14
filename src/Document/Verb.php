@@ -10,7 +10,8 @@ final class Verb extends Card
         Trait\HiraganaTrait, 
         Trait\KanjiTrait, 
         Trait\KatakanaTrait, 
-        Trait\MeaningTrait;
+        Trait\MeaningTrait,
+        Trait\Const\VerbTrait;
 
     public const GODAN = 'godan';
 
@@ -22,112 +23,6 @@ final class Verb extends Card
         self::GODAN,
         self::ICHIDAN,
         self::IRREGULAR,
-    ];
-
-    private const ICHIDAN_SUFFIXES = [
-        'non-past' => [
-            'informal' => [
-                'affirmative' => '',
-                'negative' => 'ない',
-            ],
-            'polite' => [
-                'affirmative' => 'ます',
-                'negative' => 'ません',
-            ],
-        ],
-        'past' => [
-            'informal' => [
-                'affirmative' => 'た', 
-                'negative' => 'なかった',
-            ],
-            'polite' => [
-                'affirmative' => 'ました',
-                'negative' => 'ませんでした',
-            ],
-        ],
-        'te' => [
-            'affirmative' => 'て',
-            'negative' => 'なくて',
-        ],
-        'potential' => [
-            'affirmative' => 'られる',
-            'negative' => 'られない',
-        ],
-        'passive' => [
-            'affirmative' => 'られる',
-            'negative' => 'られない',
-        ],
-        'causative' => [
-            'affirmative' => 'させる',
-            'negative' => 'させない',
-            'passive' => [
-                'affirmative' => 'させられる',
-                'negative' => 'させられない',
-            ]
-        ],
-        'imperative' => [
-            'affirmative' => 'ろ',
-            'negative' => 'るな',
-        ],
-    ];
-
-    private const GODAN_SUFFIXES = [
-        'non-past' => [
-            'informal' => [
-                'affirmative' => '',
-                'negative' => '{a}ない',
-            ],
-            'polite' => [
-                'affirmative' => '{i}ます',
-                'negative' => '{i}ません',
-            ],
-        ],
-        'past' => [
-            'informal' => [
-                'affirmative' => '{i-past-te}た', 
-                'negative' => '{a}なかった',
-            ],
-            'polite' => [
-                'affirmative' => '{i}ました',
-                'negative' => '{i}ませんでした',
-            ],
-        ],
-        'te' => [
-            'affirmative' => '{i-past-te}て',
-            'negative' => '{a}なくて',
-        ],
-        'potential' => [
-            'affirmative' => '{e}る',
-            'negative' => '{e}ない',
-        ],
-        'passive' => [
-            'affirmative' => '{a}れる',
-            'negative' => '{a}れない',
-        ],
-        'causative' => [
-            'affirmative' => '{a}せる',
-            'negative' => '{a}せない',
-            'passive' => [
-                'affirmative' => '{a}せられる',
-                'negative' => '{a}せられない',
-            ]
-        ],
-        'imperative' => [
-            'affirmative' => '{e}',
-            'negative' => '{u}な',
-        ],
-    ];
-
-    private const OKURIGANA = [
-        'う' => ['わ', 'い', 'う', 'え', 'お', 'っ'],
-        'く' => ['か', 'き', 'く', 'け', 'こ', 'い'],
-        'ぐ' => ['が', 'ぎ', 'ぐ', 'げ', 'ご', 'い'],
-        'す' => ['さ', 'し', 'す', 'せ', 'そ', 'し'],
-        'つ' => ['た', 'ち', 'つ', 'て', 'と', 'っ'],
-        'ぬ' => ['な', 'に', 'ぬ', 'ね', 'の', 'ん'],
-        'ぶ' => ['ば', 'び', 'ぶ', 'べ', 'ぼ', 'ん'],
-        'む' => ['ま', 'み', 'む', 'め', 'も', 'ん'],
-        'る' => ['ら', 'り', 'る', 'れ', 'ろ', 'っ']
     ];
 
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
@@ -179,10 +74,8 @@ final class Verb extends Card
             return false;
         }
 
-        $irregularVerbs = ['する', 'くる', '来る'];
-
         if ($this->group !== self::IRREGULAR 
-            && in_array($dict, $irregularVerbs)) {
+            && in_array($dict, self::IRREGULAR_VERBS)) {
             return false;
         }
 
@@ -229,7 +122,7 @@ final class Verb extends Card
         }
 
         if ($this->group === self::IRREGULAR) {
-            return $this;
+            return $this->conjugateIrregular();
         }
     }
 
@@ -238,7 +131,7 @@ final class Verb extends Card
         $inflections = $this->getInflections();
         $root = mb_substr($inflections['dictionary'], 0, -1);
 
-        $autoConjugations = self::ICHIDAN_SUFFIXES;
+        $autoConjugations = self::ICHIDAN_INFLECTIONS;
         array_walk_recursive(
             $autoConjugations,
             fn(&$v, $k) => $v = $root.$v,
@@ -247,14 +140,27 @@ final class Verb extends Card
         return $this->fillEmptyInflections($autoConjugations);
     }
 
+    private function conjugateIrregular(): Verb
+    {
+        $dict = $this->getInflections()['dictionary'];
+
+        if (!in_array($dict, self::IRREGULAR_VERBS)) {
+            return $this;
+        }
+
+        return $this
+            ->setInflections(self::IRREGULAR_INFLECTIONS[$dict])
+            ->setReviewed(true);
+    }
+
     private function conjugateGodan(): Verb
     {
         $inflections = $this->getInflections();
         $root = mb_substr($inflections['dictionary'], 0, -1);
         $lastOkurigana = mb_substr($inflections['dictionary'], -1);
 
-        $autoConjugations = self::GODAN_SUFFIXES;
-        $vowels = ['{a}', '{i}', '{u}', '{e}', '{o}', '{i-past-te}'];
+        $autoConjugations = self::GODAN_INFLECTIONS;
+        $vowels = ['{a}', '{i}', '{u}', '{e}', '{o}', '{i-past}', '{i-te}'];
         $okurigana = self::OKURIGANA[$lastOkurigana];
 
         array_walk_recursive(

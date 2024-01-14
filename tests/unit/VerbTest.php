@@ -218,7 +218,8 @@ class VerbTest extends TestCase
                         'affirmative' => '見ろ',
                         'negative' => '見るな',
                     ],
-                ]
+                ],
+                false
             ],
             [
                 [
@@ -272,7 +273,8 @@ class VerbTest extends TestCase
                         'affirmative' => '聞け',
                         'negative' => '聞くな',
                     ],
-                ]
+                ],
+                false
             ],
             [
                 [
@@ -326,7 +328,63 @@ class VerbTest extends TestCase
                         'affirmative' => '買え',
                         'negative' => '買うな',
                     ],
-                ]
+                ],
+                false
+            ],
+            [
+                [
+                    'group' => Verb::GODAN,
+                    'inflections' => [
+                        'dictionary' => '     脱ぐ',
+                    ],
+                ], [
+                    'dictionary' => '脱ぐ',
+                    'non-past' => [
+                        'informal' => [
+                            'affirmative' => '脱ぐ',
+                            'negative' => '脱がない',
+                        ],
+                        'polite' => [
+                            'affirmative' => '脱ぎます',
+                            'negative' => '脱ぎません',
+                        ],
+                    ],
+                    'past' => [
+                        'informal' => [
+                            'affirmative' => '脱いだ', // da-ending
+                            'negative' => '脱がなかった',
+                        ],
+                        'polite' => [
+                            'affirmative' => '脱ぎました',
+                            'negative' => '脱ぎませんでした',
+                        ],
+                    ],
+                    'te' => [
+                        'affirmative' => '脱いで', // de-ending
+                        'negative' => '脱がなくて',
+                    ],
+                    'potential' => [
+                        'affirmative' => '脱げる',
+                        'negative' => '脱げない',
+                    ],
+                    'passive' => [
+                        'affirmative' => '脱がれる',
+                        'negative' => '脱がれない',
+                    ],
+                    'causative' => [
+                        'affirmative' => '脱がせる',
+                        'negative' => '脱がせない',
+                        'passive' => [
+                            'affirmative' => '脱がせられる',
+                            'negative' => '脱がせられない',
+                        ]
+                    ],
+                    'imperative' => [
+                        'affirmative' => '脱げ',
+                        'negative' => '脱ぐな',
+                    ],
+                ],
+                false
             ],
             [
                 [
@@ -336,7 +394,64 @@ class VerbTest extends TestCase
                     ],
                 ], [
                     'dictionary' => 'する',
-                ]
+                    'non-past' => [
+                        'informal' => [
+                            'affirmative' => 'する',
+                            'negative' => 'しない',
+                        ],
+                        'polite' => [
+                            'affirmative' => 'します',
+                            'negative' => 'しません',
+                        ],
+                    ],
+                    'past' => [
+                        'informal' => [
+                            'affirmative' => 'した', 
+                            'negative' => 'しなかった',
+                        ],
+                        'polite' => [
+                            'affirmative' => 'しました',
+                            'negative' => 'しませんでした',
+                        ],
+                    ],
+                    'te' => [
+                        'affirmative' => 'して',
+                        'negative' => 'しなくて',
+                    ],
+                    'potential' => [
+                        'affirmative' => 'できる',
+                        'negative' => 'できない',
+                    ],
+                    'passive' => [
+                        'affirmative' => 'される',
+                        'negative' => 'されない',
+                    ],
+                    'causative' => [
+                        'affirmative' => 'させる',
+                        'negative' => 'させない',
+                        'passive' => [
+                            'affirmative' => 'させられる',
+                            'negative' => 'させられない',
+                        ]
+                    ],
+                    'imperative' => [
+                        'affirmative' => 'しろ',
+                        'negative' => 'するな',
+                    ],
+                ],
+                true
+            ],
+            [
+                [
+                    'group' => Verb::IRREGULAR,
+                    'inflections' => [
+                        'dictionary' => '   為る ', /* する　alternative rarely 
+                        used, should not be filled by autoconjugation */
+                    ],
+                ], [
+                    'dictionary' => '為る',
+                ],
+                false
             ],
         ];
     }
@@ -350,6 +465,7 @@ class VerbTest extends TestCase
     public function testConjugateValid(
         array $params,
         array $expected,
+        bool $isReviewed,
     ): void {
         $verb = new Verb();
         $verb
@@ -358,7 +474,7 @@ class VerbTest extends TestCase
             ->conjugate();
 
         $this->assertEquals($verb->getInflections(), $expected);
-        $this->assertEquals($verb->isReviewed(), false);
+        $this->assertEquals($verb->isReviewed(), $isReviewed);
     }
 
     /**
