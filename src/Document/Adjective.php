@@ -12,8 +12,12 @@ final class Adjective extends Card
         Trait\KatakanaTrait, 
         Trait\MeaningTrait;
 
+    public const I_ADJECTIVE = 'i';
+
+    public const NA_ADJECTIVE = 'na';
+
     public const ALLOWED_GROUPS = [
-        'i',
-        'na',
+        self::I_ADJECTIVE,
+        self::NA_ADJECTIVE,
     ];
 }
