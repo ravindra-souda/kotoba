@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Document\Trait;
 
-use Document\Card;
+use App\Document\{Adjective, Card, Noun, Verb};
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,7 +23,7 @@ trait KanjiTrait
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
-    protected ?string $kanji = '';
+    protected ?string $kanji = null;
 
     public function getKanji(): ?string
     {
@@ -40,9 +40,9 @@ trait KanjiTrait
         return preg_match('/^\p{Han}+\p{Hiragana}*$/um', $string) === 1;
     }
 
-    public function setKanji(?string $kanji): Card
+    public function setKanji(?string $kanji): Adjective|Noun|Verb
     {
-        $this->kanji = $kanji;
+        $this->kanji = $this->shapeStr($kanji);
 
         return $this;
     }

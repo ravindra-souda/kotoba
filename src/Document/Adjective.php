@@ -20,4 +20,96 @@ final class Adjective extends Card
         self::I_ADJECTIVE,
         self::NA_ADJECTIVE,
     ];
+
+    public const ERR_INCORRECT_GROUP = 'Incorrect group set';
+
+    public const ERR_NO_BASE = 'Kanji, hiragana or katakana must be set';
+
+    #[Assert\Type(
+        type: 'array',
+        message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
+    )]
+    private array $inflections;
+
+    public function getInflections(): array
+    {
+        return $this->inflections;
+    }
+
+    public function setInflections(array $inflections): Adjective
+    {        
+        $this->inflections = $this->trimArrayValues($inflections);
+
+        return $this;
+    }
+
+    public function isValidGroup(): bool
+    {
+        if (self::NA_ADJECTIVE === $this->group) {
+            return true;
+        }
+
+        if (!str_ends_with($this->hiragana ?? '', 'い')) {
+            return false;
+        }
+
+        if (null !== $this->kanji && !str_ends_with($this->kanji, 'い')) {
+            return false;
+        }
+        
+        if (null === $this->hiragana && null !== $this->katakana) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function conjugate(): Adjective
+    {
+        if (!$this->isValidGroup()) {
+            throw new \Exception(self::ERR_INCORRECT_GROUP);
+        }
+
+        $base = $this->kanji ?? $this->hiragana ?? $this->katakana;
+
+        if (null === $base) {
+            throw new \Exception(self::ERR_NO_BASE);
+        }
+
+        if (self::NA_ADJECTIVE === $this->group) {
+            $inflections = [
+                'non-past' => [
+                    'affirmative' => $base,
+                    'negative' => $base.'じゃない',
+                ],
+                'past' => [
+                    'affirmative' => $base.'でした',
+                    'negative' => $base.'じゃなかった',
+                ],
+            ];
+        }
+
+        if (self::I_ADJECTIVE === $this->group) {
+            $root = mb_substr($base, 0, -1);
+
+            // いい adjective is an exception
+            if ($root === 'い') {
+                $root = 'よ';
+            }
+            
+            $inflections = [
+                'non-past' => [
+                    'affirmative' => $base,
+                    'negative' => $root.'くない',
+                ],
+                'past' => [
+                    'affirmative' => $root.'かった',
+                    'negative' => $root.'くなかった',
+                ],
+            ];
+        }
+
+        $this->setInflections($inflections);
+        return $this;
+    }
 }

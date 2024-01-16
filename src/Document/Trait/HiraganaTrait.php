@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Document\Trait;
 
-use Document\Card;
+use App\Document\{Adjective, Card, Kana, Noun, Verb};
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -41,9 +41,9 @@ trait HiraganaTrait
         return preg_match('/\P{Hiragana}/um', $string) !== 1;
     }
 
-    public function setHiragana(?string $hiragana): Card
+    public function setHiragana(?string $hiragana): Adjective|Kana|Noun|Verb
     {
-        $this->hiragana = $hiragana;
+        $this->hiragana = $this->shapeStr($hiragana);
 
         return $this;
     }

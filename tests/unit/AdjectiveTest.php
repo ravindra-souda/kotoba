@@ -15,7 +15,7 @@ class AdjectiveTest extends TestCase
     /**
      * @return array<array<<string|bool>>
      */
-    public function conjugateProvider(): array
+    public function conjugateValidProvider(): array
     {
         return [
             [
@@ -24,16 +24,14 @@ class AdjectiveTest extends TestCase
                     'hiragana' => '  はやい  ',
                     'kanji' => ' 早い    '
                 ], [
-                    'inflections' => [
-                        'non-past' => [
-                            'affirmative' => '早い',
-                            'negative' => '早くない',
-                        ],
-                        'past' => [
-                            'affirmative' => '早かった',
-                            'negative' => '早くなかった',
-                        ],
-                    ]
+                    'non-past' => [
+                        'affirmative' => '早い',
+                        'negative' => '早くない',
+                    ],
+                    'past' => [
+                        'affirmative' => '早かった',
+                        'negative' => '早くなかった',
+                    ],
                 ]
             ],
             [
@@ -42,16 +40,14 @@ class AdjectiveTest extends TestCase
                     'hiragana' => '       おそい ',
                     'kanji' => '    ',
                 ], [
-                    'inflections' => [
-                        'non-past' => [
-                            'affirmative' => 'おそい',
-                            'negative' => 'おそくない',
-                        ],
-                        'past' => [
-                            'affirmative' => 'おそかった',
-                            'negative' => 'おそくなかった',
-                        ],
-                    ]
+                    'non-past' => [
+                        'affirmative' => 'おそい',
+                        'negative' => 'おそくない',
+                    ],
+                    'past' => [
+                        'affirmative' => 'おそかった',
+                        'negative' => 'おそくなかった',
+                    ],
                 ]
             ],
             [
@@ -60,16 +56,14 @@ class AdjectiveTest extends TestCase
                     'group' => Adjective::I_ADJECTIVE,
                     'hiragana' => '  いい  ',
                 ], [
-                    'inflections' => [
-                        'non-past' => [
-                            'affirmative' => 'よい',
-                            'negative' => 'よくない',
-                        ],
-                        'past' => [
-                            'affirmative' => 'よかった',
-                            'negative' => 'よくなかった',
-                        ],
-                    ]
+                    'non-past' => [
+                        'affirmative' => 'いい',
+                        'negative' => 'よくない',
+                    ],
+                    'past' => [
+                        'affirmative' => 'よかった',
+                        'negative' => 'よくなかった',
+                    ],
                 ]
             ],
             [
@@ -78,16 +72,14 @@ class AdjectiveTest extends TestCase
                     'hiragana' => '       ゆうめい ',
                     'kanji' => '    有名',
                 ], [
-                    'inflections' => [
-                        'non-past' => [
-                            'affirmative' => '有名',
-                            'negative' => '有名じゃない',
-                        ],
-                        'past' => [
-                            'affirmative' => '有名でした',
-                            'negative' => '有名じゃなかった',
-                        ],
-                    ]
+                    'non-past' => [
+                        'affirmative' => '有名',
+                        'negative' => '有名じゃない',
+                    ],
+                    'past' => [
+                        'affirmative' => '有名でした',
+                        'negative' => '有名じゃなかった',
+                    ],
                 ]
             ],
             [
@@ -96,16 +88,14 @@ class AdjectiveTest extends TestCase
                     'hiragana' => '  きれい   ',
                     'kanji' => '  ',
                 ], [
-                    'inflections' => [
-                        'non-past' => [
-                            'affirmative' => 'きれい',
-                            'negative' => 'きれいじゃない',
-                        ],
-                        'past' => [
-                            'affirmative' => 'きれいでした',
-                            'negative' => 'きれいじゃなかった',
-                        ],
-                    ]
+                    'non-past' => [
+                        'affirmative' => 'きれい',
+                        'negative' => 'きれいじゃない',
+                    ],
+                    'past' => [
+                        'affirmative' => 'きれいでした',
+                        'negative' => 'きれいじゃなかった',
+                    ],
                 ]
             ],
             [
@@ -115,38 +105,87 @@ class AdjectiveTest extends TestCase
                     'katakana' => '  ユニーク   ',
                     'kanji' => '  ',
                 ], [
-                    'inflections' => [
-                        'non-past' => [
-                            'affirmative' => 'ユニーク',
-                            'negative' => 'ユニークじゃない',
-                        ],
-                        'past' => [
-                            'affirmative' => 'ユニークでした',
-                            'negative' => 'ユニークじゃなかった',
-                        ],
-                    ]
+                    'non-past' => [
+                        'affirmative' => 'ユニーク',
+                        'negative' => 'ユニークじゃない',
+                    ],
+                    'past' => [
+                        'affirmative' => 'ユニークでした',
+                        'negative' => 'ユニークじゃなかった',
+                    ],
                 ]
             ],
         ];
     }
 
     /**
-     * @dataProvider conjugateProvider
+     * @dataProvider conjugateValidProvider
      *
      * @param array $params
      * @param array $expected
      */
-    public function testConjugate(
+    public function testValidConjugate(
         array $params,
         array $expected,
     ): void {
         $adjective = new Adjective();
         $adjective
+            ->setHiragana($params['hiragana'] ?? null)
+            ->setKatakana($params['katakana'] ?? null)
+            ->setKanji($params['kanji'] ?? null)
             ->setGroup($params['group'])
-            ->setInflections($params['inflections'])
             ->conjugate();
 
         $this->assertEquals($adjective->getInflections(), $expected);
+    }
+
+        /**
+     * @return array<array<<string|bool>>
+     */
+    public function conjugateInvalidProvider(): array
+    {
+        return [
+                [
+                    [
+                        'group' => Adjective::I_ADJECTIVE,
+                        'hiragana' => 'にんき',
+                    ], Adjective::ERR_INCORRECT_GROUP
+                ],
+                [
+                    [
+                        'group' => Adjective::I_ADJECTIVE,
+                        'kanji' => '人気',
+                    ], Adjective::ERR_INCORRECT_GROUP
+                ],
+                [
+                    [
+                        'group' => Adjective::NA_ADJECTIVE,
+                        'kanji' => null,
+                        'hiragana' => '',
+                    ], Adjective::ERR_NO_BASE
+                ]
+            ];
+    }
+
+    /**
+     * @dataProvider conjugateInvalidProvider
+     *
+     * @param array $params
+     * @param string $errMessage
+     */
+    public function testInvalidConjugate(
+        array $params,
+        string $errMessage,
+    ): void {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage($errMessage);
+
+        $adjective = new Adjective();
+        $adjective
+            ->setHiragana($params['hiragana'] ?? null)
+            ->setKanji($params['kanji'] ?? null)
+            ->setGroup($params['group'])
+            ->conjugate();
     }
 
     /**
@@ -196,6 +235,20 @@ class AdjectiveTest extends TestCase
             [
                 [
                     'group' => Adjective::I_ADJECTIVE,
+                    'kanji' => '高', // spelling error 
+                    'hiragana' => ' たかい  ',
+                ], false
+            ],
+            [
+                [
+                    'group' => Adjective::I_ADJECTIVE,
+                    'kanji' => '安い',
+                    'hiragana' => ' やす  ', // spelling error
+                ], false
+            ],
+            [
+                [
+                    'group' => Adjective::I_ADJECTIVE,
                     'katakana' => ' クレージー  ',
                 ], false
             ],
@@ -218,7 +271,7 @@ class AdjectiveTest extends TestCase
             ->setHiragana($params['hiragana'] ?? null)
             ->setKatakana($params['katakana'] ?? null)
             ->setKanji($params['kanji'] ?? null)
-            ->setGroup($group);
+            ->setGroup($params['group']);
 
         $this->assertEquals($adjective->isValidGroup(), $isValidGroup);
     }

@@ -30,12 +30,12 @@ final class Verb extends Card
         type: 'array',
         message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
     )]
-    protected array $inflections;
+    private array $inflections;
 
     /** Reviewed by users after automatic conjugation */
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'bool')]
-    protected bool $reviewed = false;
+    private bool $reviewed = false;
 
     public function getInflections(): array
     {

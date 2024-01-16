@@ -27,4 +27,11 @@ abstract class AbstractKotobaDocument
 
         return $array;
     }
+
+    public function shapeStr(?string $string): ?string
+    {
+        $string = trim(strtolower($string ?? ''));
+        
+        return '' === $string ? null : $string;
+    }
 }
