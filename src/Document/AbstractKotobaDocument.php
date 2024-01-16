@@ -32,6 +32,6 @@ abstract class AbstractKotobaDocument
     {
         $string = trim(strtolower($string ?? ''));
         
-        return '' === $string ? null : $string;
+        return $string === '' ? null : $string;
     }
 }

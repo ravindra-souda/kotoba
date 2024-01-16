@@ -45,7 +45,7 @@ final class Adjective extends Card
 
     public function isValidGroup(): bool
     {
-        if (self::NA_ADJECTIVE === $this->group) {
+        if ($this->group === self::NA_ADJECTIVE) {
             return true;
         }
 
@@ -53,11 +53,11 @@ final class Adjective extends Card
             return false;
         }
 
-        if (null !== $this->kanji && !str_ends_with($this->kanji, 'い')) {
+        if ($this->kanji !== null && !str_ends_with($this->kanji, 'い')) {
             return false;
         }
         
-        if (null === $this->hiragana && null !== $this->katakana) {
+        if ($this->hiragana === null && $this->katakana !== null) {
             return false;
         }
 
@@ -72,11 +72,11 @@ final class Adjective extends Card
 
         $base = $this->kanji ?? $this->hiragana ?? $this->katakana;
 
-        if (null === $base) {
+        if ($base === null) {
             throw new \Exception(self::ERR_NO_BASE);
         }
 
-        if (self::NA_ADJECTIVE === $this->group) {
+        if ($this->group === self::NA_ADJECTIVE) {
             $inflections = [
                 'non-past' => [
                     'affirmative' => $base,
@@ -89,7 +89,7 @@ final class Adjective extends Card
             ];
         }
 
-        if (self::I_ADJECTIVE === $this->group) {
+        if ($this->group === self::I_ADJECTIVE) {
             $root = mb_substr($base, 0, -1);
 
             // いい adjective is an exception
