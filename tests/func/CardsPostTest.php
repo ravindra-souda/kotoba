@@ -13,27 +13,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @coversNothing
  */
 class CardsPostTest extends ApiTestCase
-{
-    private string $romajiMaxlengthString;
-
-    private string $hiraganaMaxlengthString;
-
-    private string $katakanaMaxlengthString;
-    
-    private string $kanjiMaxlengthString;
-    
-    public function __construct()
-    {
-        $this->romajiMaxlengthString =
-            str_repeat('a', Noun::ROMAJI_MAXLENGTH + 1);
-        $this->hiraganaMaxlengthString = 
-            str_repeat('あ', Noun::HIRAGANA_MAXLENGTH + 1);
-        $this->katakanaMaxlengthString = 
-            str_repeat('ア', Noun::KATAKANA_MAXLENGTH + 1);
-        $this->kanjiMaxlengthString = 
-            str_repeat('字', Noun::KANJI_MAXLENGTH + 1);
-    }
-
+{    
     private const POST_COMPLETE_VALID_CARDS = [
         'hiragana' => [
             'type' => 'noun',
@@ -488,12 +468,17 @@ class CardsPostTest extends ApiTestCase
     public function validCardProvider(): array
     {
         $provider = [];
+        /*
         array_walk(self::POST_COMPLETE_VALID_CARDS, function($value, $key) {
             $expected = isset(self::POST_COMPLETE_EXPECTED_CARDS[$key]) ?
                 self::POST_COMPLETE_EXPECTED_CARDS[$key] : $value;
             $provider[] = [$value, $expected];
         });
-
+        */
+        foreach(self::POST_COMPLETE_VALID_CARDS as $key => $value) {
+            $expected = self::POST_COMPLETE_EXPECTED_CARDS[$key] ?? $value;
+            $provider[] = [$value, $expected];
+        }
         return $provider;
     }
 
@@ -546,7 +531,7 @@ class CardsPostTest extends ApiTestCase
             [
                 [
                     ...self::POST_INVALID_CARDS['romaji_maxlength'],
-                    'romaji' => $romajiMaxlengthString,
+                    'romaji' => str_repeat('a', Noun::ROMAJI_MAXLENGTH + 1),
                 ],
                 'romaji: '.Card::VALIDATION_ERR_MAXLENGTH,
             ],
@@ -566,7 +551,8 @@ class CardsPostTest extends ApiTestCase
             [
                 [
                     ...self::POST_INVALID_CARDS['hiragana_maxlength'],
-                    'hiragana' => $hiraganaMaxlengthString,
+                    'hiragana' => 
+                        str_repeat('あ', Noun::HIRAGANA_MAXLENGTH + 1),
                 ],
                 'hiragana: '.Card::VALIDATION_ERR_MAXLENGTH,
             ],
@@ -577,14 +563,15 @@ class CardsPostTest extends ApiTestCase
             [
                 [
                     ...self::POST_INVALID_CARDS['katakana_maxlength'],
-                    'katakana' => $katakanaMaxlengthString,
+                    'katakana' => 
+                        str_repeat('ア', Noun::KATAKANA_MAXLENGTH + 1),
                 ],
                 'katakana: '.Card::VALIDATION_ERR_MAXLENGTH,
             ],
             [
                 [
                     ...self::POST_INVALID_CARDS['kanji_maxlength'],
-                    'kanji' => $kanjiMaxlengthString,
+                    'kanji' => str_repeat('字', Noun::KANJI_MAXLENGTH + 1),
                 ],
                 'kanji: '.Card::VALIDATION_ERR_MAXLENGTH,
             ],

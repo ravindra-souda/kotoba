@@ -19,42 +19,9 @@ use App\State\DeckSaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Groups; 
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'code' => 'iexact',
-        'title' => 'ipartial',
-        'description' => 'ipartial',
-        'type' => 'iexact',
-    ],
-)]
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['title', 'description', 'type'],
-    arguments: ['orderParameterName' => 'order'],
-)]
-#[ApiResource(
-    operations: [
-        new Post(),
-        new Delete(),
-        new Put(
-            controller: FetchDeckByCode::class,
-            uriTemplate: '/decks/{code}',
-            /* bypassing faulty internal document fetching with our custom
-               controller */
-            read: false
-        ),
-        new Get(),
-        new GetCollection(),
-    ],
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']],
-    processor: DeckSaveProcessor::class,
-)]
-#[MongoDB\Document(repositoryClass: 'App\Repository\DeckRepository')]
 abstract class Card extends AbstractKotobaDocument
 {
     public const ROMAJI_MAXLENGTH = 50;
@@ -137,7 +104,7 @@ abstract class Card extends AbstractKotobaDocument
     #[ApiProperty(identifier: false)]
     #[Groups('read')]
     #[MongoDB\Id(strategy: 'AUTO', type: 'object_id')]
-    private string $id;
+    protected string $id;
 
     #[MongoDB\Field(type: 'int')]
     private int $increment;

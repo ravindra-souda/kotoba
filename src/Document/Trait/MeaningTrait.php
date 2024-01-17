@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Document\Trait;
 
-use Document\Card;
+use ApiPlatform\Metadata\ApiProperty;
+use App\Document\{Adjective, Card, Kanji, Noun, Verb};
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,7 +25,20 @@ trait MeaningTrait
         type: 'array',
         message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
     )]
-    protected array $meaning;
+    #[Groups(['read', 'write'])]
+    #[ApiProperty(
+        openapiContext: [
+            'example' => [
+                'en' => ['high; tall', 'expensive; high-priced'],
+                'fr' => ['haut; grand', 'coûteux; cher'],
+            ]
+        ]
+    )]
+    #[MongoDB\Field(type: 'hash')]
+    protected array $meaning = [
+        'en' => [''],
+        'fr' => [''],
+    ];
 
     public static function getAllowedLangs(): array 
     {
@@ -56,7 +70,7 @@ trait MeaningTrait
         return !empty($meaning[self::getMandatoryLang()]);
     }
 
-    public function setMeaning(array $meaning): Card
+    public function setMeaning(array $meaning): Adjective|Kanji|Noun|Verb
     {        
         $this->meaning = Card::trimArrayValues($meaning);
 

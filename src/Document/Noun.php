@@ -4,7 +4,22 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-final class Noun extends Card
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ApiResource(
+    operations: [
+        new Post(uriTemplate: '/cards'),
+    ],
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
+    //processor: DeckSaveProcessor::class,
+)]
+#[MongoDB\Document]
+class Noun extends Card
 {
     use Trait\HiraganaTrait, 
         Trait\KanjiTrait, 
@@ -16,7 +31,19 @@ final class Noun extends Card
         'ご',
     ];
 
+    /** Must be written using only hiragana */
+    #[Assert\Choice(
+        choices: self::ALLOWED_BIKAGO,
+        message: self::VALIDATION_ERR_ENUM,
+    )]
+    #[Groups(['read', 'write'])]
+    #[MongoDB\Field]
     protected string $bikago;
+
+    /** Should be set to 'noun' to create a Noun flashcard */
+    #[Groups(['read', 'write'])]
+    #[MongoDB\Field]
+    protected string $type = 'noun';
 
     public function getBikago(): ?string
     {
