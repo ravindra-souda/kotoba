@@ -4,7 +4,22 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-final class Verb extends Card
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ApiResource(
+    operations: [
+        new Post(uriTemplate: '/cards/verbs'),
+    ],
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
+    //processor: DeckSaveProcessor::class,
+)]
+#[MongoDB\Document]
+class Verb extends Card
 {
     use Trait\GroupTrait, 
         Trait\HiraganaTrait, 
@@ -25,17 +40,71 @@ final class Verb extends Card
         self::IRREGULAR,
     ];
 
+    public const HIRAGANA_MAXLENGTH = 30;
+
+    public const KATAKANA_MAXLENGTH = 30;
+
+    /** dictionary must be filled, 
+     *  any value left empty will be completed by automatic conjugation */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
     #[Assert\Type(
         type: 'array',
         message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
     )]
-    private array $inflections;
+    #[Groups(['read', 'write'])]
+    #[MongoDB\Field(type: 'hash')]
+    protected array $inflections = [
+        'dictionary' => '',
+            'non-past' => [
+                'informal' => [
+                    'affirmative' => '',
+                    'negative' => '',
+                ],
+                'polite' => [
+                    'affirmative' => '',
+                    'negative' => '',
+                ],
+            ],
+            'past' => [
+                'informal' => [
+                    'affirmative' => '', 
+                    'negative' => '',
+                ],
+                'polite' => [
+                    'affirmative' => '',
+                    'negative' => '',
+                ],
+            ],
+            'te' => [
+                'affirmative' => '',
+                'negative' => '',
+            ],
+            'potential' => [
+                'affirmative' => '',
+                'negative' => '',
+            ],
+            'passive' => [
+                'affirmative' => '',
+                'negative' => '',
+            ],
+            'causative' => [
+                'affirmative' => '',
+                'negative' => '',
+                'passive' => [
+                    'affirmative' => '',
+                    'negative' => '',
+                ]
+            ],
+            'imperative' => [
+                'affirmative' => '',
+                'negative' => '',
+            ]
+    ];
 
     /** Reviewed by users after automatic conjugation */
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'bool')]
-    private bool $reviewed = false;
+    protected bool $reviewed = false;
 
     public function getInflections(): array
     {

@@ -4,7 +4,22 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-final class Adjective extends Card
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ApiResource(
+    operations: [
+        new Post(uriTemplate: '/cards/adjectives'),
+    ],
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
+    //processor: DeckSaveProcessor::class,
+)]
+#[MongoDB\Document]
+class Adjective extends Card
 {
     use Trait\GroupTrait,
         Trait\HiraganaTrait, 
@@ -21,15 +36,36 @@ final class Adjective extends Card
         self::NA_ADJECTIVE,
     ];
 
+    public const HIRAGANA_MAXLENGTH = 30;
+
+    public const KATAKANA_MAXLENGTH = 30;
+
     public const ERR_INCORRECT_GROUP = 'Incorrect group set';
 
     public const ERR_NO_BASE = 'Kanji, hiragana or katakana must be set';
 
+    /** Filled by the API */
     #[Assert\Type(
         type: 'array',
         message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
     )]
-    private array $inflections;
+    #[Groups(['read'])]
+    #[MongoDB\Field(type: 'hash')]
+    protected array $inflections = [
+        'non-past' => [
+            'affirmative' => '',
+            'negative' => ''
+        ],
+        'past' => [
+            'affirmative' => '',
+            'negative' => ''
+        ]
+    ];
+
+    /** Should be set to 'adjective' to create an Adjective flashcard */
+    #[Groups(['read', 'write'])]
+    #[MongoDB\Field]
+    protected string $type = 'adjective';
 
     public function getInflections(): array
     {

@@ -11,8 +11,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 trait HiraganaTrait
 {
-    public const HIRAGANA_MAXLENGTH = 30;
-
     public const VALIDATION_ERR_HIRAGANA =
         'must be written using only hiragana';
 

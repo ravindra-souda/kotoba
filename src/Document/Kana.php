@@ -4,10 +4,27 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-final class Kana extends Card
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+
+#[ApiResource(
+    operations: [
+        new Post(uriTemplate: '/cards/kana'),
+    ],
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
+    //processor: DeckSaveProcessor::class,
+)]
+#[MongoDB\Document]
+class Kana extends Card
 {
     use Trait\HiraganaTrait,
         Trait\KatakanaTrait;
+
+    public const HIRAGANA_MAXLENGTH = 2;
+
+    public const KATAKANA_MAXLENGTH = 2;
 
     public const VALIDATION_ERR_KANA = 'must be a mora long';
 

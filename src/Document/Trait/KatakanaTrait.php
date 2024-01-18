@@ -11,8 +11,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 trait KatakanaTrait
 {
-    public const KATAKANA_MAXLENGTH = 30;
-
     public const VALIDATION_ERR_KATAKANA =
         'must be written using only katakana';
 

@@ -438,6 +438,10 @@ class CardsPostTest extends ApiTestCase
             ...self::POST_COMPLETE_VALID_CARDS['kanji'],
             'kunyomi' => 'ひと, ひとり, ひとと',
         ],
+        'kanji_kunyomi_maxlength' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kanji'],
+            'kunyomi' => '*',
+        ],
         'kanji_onyomi_empty' => [
             ...self::POST_COMPLETE_VALID_CARDS['kanji'],
             'onyomi' => '',
@@ -445,6 +449,10 @@ class CardsPostTest extends ApiTestCase
         'kanji_onyomi_not_in_romaji' => [
             ...self::POST_COMPLETE_VALID_CARDS['kanji'],
             'kunyomi' => 'ジン, ニン',
+        ],
+        'kanji_onyomi_maxlength' => [
+            ...self::POST_COMPLETE_VALID_CARDS['kanji'],
+            'onyomi' => '*',
         ],
     ];
 
@@ -648,12 +656,26 @@ class CardsPostTest extends ApiTestCase
                 'kunyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
             ],
             [
+                [
+                    ...self::POST_INVALID_CARDS['kanji_kunyomi_maxlength'],
+                    'kunyomi' => str_repeat('a', Kanji::KUNYOMI_MAXLENGTH + 1),
+                ],
+                'kunyomi: '.Kanji::VALIDATION_ERR_MAXLENGTH,
+            ],
+            [
                 self::POST_INVALID_CARDS['kanji_onyomi_empty'],
                 'onyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
             ],
             [
                 self::POST_INVALID_CARDS['kanji_onyomi_not_in_romaji'],
                 'onyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
+            ],
+            [
+                [
+                    ...self::POST_INVALID_CARDS['kanji_onyomi_maxlength'],
+                    'onyomi' => str_repeat('a', Kanji::ONYOMI_MAXLENGTH + 1),
+                ],
+                'onyomi: '.Kanji::VALIDATION_ERR_MAXLENGTH,
             ],
         ];
     }

@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 trait GroupTrait
 {
+    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Choice(
         choices: self::ALLOWED_GROUPS,
         message: Card::VALIDATION_ERR_ENUM,

@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new Post(uriTemplate: '/cards'),
+        new Post(uriTemplate: '/cards/nouns'),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
@@ -30,6 +30,10 @@ class Noun extends Card
         'お',
         'ご',
     ];
+
+    public const HIRAGANA_MAXLENGTH = 30;
+
+    public const KATAKANA_MAXLENGTH = 30;
 
     /** Must be written using only hiragana */
     #[Assert\Choice(
