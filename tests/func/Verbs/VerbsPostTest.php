@@ -12,7 +12,8 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @coversNothing
  */
 class VerbsPostTest extends ApiTestCase
-{    
+{   
+    /** TODO: whitespaces and payloads with a few completed inflections */
     private const POST_COMPLETE_VALID_VERBS = [
         'godan' => [
             'romaji' => 'iku',
