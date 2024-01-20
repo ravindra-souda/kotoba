@@ -388,6 +388,69 @@ class VerbTest extends TestCase
             ],
             [
                 [
+                    'group' => Verb::GODAN,
+                    'inflections' => [
+                        'dictionary' => '   しゃべる  ',
+                        'past' => [
+                            'polite' => [
+                                'affirmative' => '   つ   '
+                            ],
+                        ],
+                        'imperative' => [
+                            'negative' => 'わ'
+                        ]
+                    ],
+                ], [
+                    'dictionary' => 'しゃべる',
+                    'non-past' => [
+                        'informal' => [
+                            'affirmative' => 'しゃべる',
+                            'negative' => 'しゃべらない',
+                        ],
+                        'polite' => [
+                            'affirmative' => 'しゃべります',
+                            'negative' => 'しゃべりません',
+                        ],
+                    ],
+                    'past' => [
+                        'informal' => [
+                            'affirmative' => 'しゃべった',
+                            'negative' => 'しゃべらなかった',
+                        ],
+                        'polite' => [
+                            'affirmative' => 'つ',
+                            'negative' => 'しゃべりませんでした',
+                        ],
+                    ],
+                    'te' => [
+                        'affirmative' => 'しゃべって',
+                        'negative' => 'しゃべらなくて',
+                    ],
+                    'potential' => [
+                        'affirmative' => 'しゃべれる',
+                        'negative' => 'しゃべれない',
+                    ],
+                    'passive' => [
+                        'affirmative' => 'しゃべられる',
+                        'negative' => 'しゃべられない',
+                    ],
+                    'causative' => [
+                        'affirmative' => 'しゃべらせる',
+                        'negative' => 'しゃべらせない',
+                        'passive' => [
+                            'affirmative' => 'しゃべらせられる',
+                            'negative' => 'しゃべらせられない',
+                        ]
+                    ],
+                    'imperative' => [
+                        'affirmative' => 'しゃべれ',
+                        'negative' => 'わ',
+                    ],
+                ],
+                false
+            ],
+            [
+                [
                     'group' => Verb::IRREGULAR,
                     'inflections' => [
                         'dictionary' => '  する  ',

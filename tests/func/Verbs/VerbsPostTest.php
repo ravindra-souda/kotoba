@@ -16,42 +16,69 @@ class VerbsPostTest extends ApiTestCase
     /** TODO: whitespaces and payloads with a few completed inflections */
     private const POST_COMPLETE_VALID_VERBS = [
         'godan' => [
-            'romaji' => 'iku',
-            'hiragana' => 'いく',
-            'kanji' => '行く',
+            'romaji' => '   iKu  ',
+            'hiragana' => '  いく   ',
+            'kanji' => ' 行く   ',
             'jlpt' => 5,
             'group' => 'godan',
             'meaning' => [
-                'en' => 'to go',
+                'en' => '  to GO   ',
             ],
             'inflections' => [
-                'dictionary' => '行く',
+                'dictionary' => '  行く  ',
             ],
         ],
         'ichidan' => [
-            'romaji' => 'taberu',
-            'hiragana' => 'たべる',
-            'kanji' => '食べる',
+            'romaji' => '  tabEru  ',
+            'hiragana' => '      たべる',
+            'kanji' => '食べる     ',
             'jlpt' => 5,
             'group' => 'ichidan',
             'meaning' => [
-                'en' => 'to eat',
+                'en' => '   TO eat',
             ],
             'inflections' => [
-                'dictionary' => '食べる',
+                'dictionary' => '   食べる  ',
             ],
         ],
         'irregular' => [
-            'romaji' => 'kuru',
-            'hiragana' => 'くる',
-            'kanji' => '来る',
+            'romaji' => '  kuRu ',
+            'hiragana' => '   くる ',
+            'kanji' => ' 来る   ',
             'jlpt' => 5,
             'group' => 'irregular',
             'meaning' => [
-                'en' => 'to come',
+                'en' => '    to COME  ',
             ],
             'inflections' => [
-                'dictionary' => '来る',
+                'dictionary' => '    来る   ',
+            ],
+        ],
+        'partial_inflections' => [
+            /* only left out inflections should be filled by auto-conjugation */
+            'romaji' => '  maNaBu ',
+            'hiragana' => '   まなぶ  ',
+            'kanji' => ' 学ぶ   ',
+            'jlpt' => 3,
+            'group' => 'godan',
+            'meaning' => [
+                'en' => '    to LEarn  ',
+            ],
+            'inflections' => [
+                'dictionary' => '  学ぶ   ',
+                'past' => [
+                    'informal' => [
+                        'affirmative' => '   あ     ', 
+                    ],
+                ],
+                'te' => [
+                    'negative' => '   て ',
+                ],
+                'causative' => [
+                    'passive' => [
+                        'negative' => 'く    ',
+                    ]
+                ],
             ],
         ],
     ];
@@ -59,6 +86,12 @@ class VerbsPostTest extends ApiTestCase
     private const POST_COMPLETE_EXPECTED_VERBS = [
         'godan' => [
             ...self::POST_COMPLETE_VALID_VERBS['godan'],
+            'romaji' => 'iku',
+            'hiragana' => 'いく',
+            'kanji' => '行く',
+            'meaning' => [
+                'en' => 'to go',
+            ],
             'inflections' => [
                 'dictionary' => '行く',
                 'non-past' => [
@@ -112,6 +145,12 @@ class VerbsPostTest extends ApiTestCase
         ],
         'ichidan' => [
             ...self::POST_COMPLETE_VALID_VERBS['ichidan'],
+            'romaji' => 'taberu',
+            'hiragana' => 'たべる',
+            'kanji' => '食べる',
+            'meaning' => [
+                'en' => 'to eat',
+            ],
             'inflections' => [
                 'dictionary' => '食べる',
                 'non-past' => [
@@ -164,8 +203,70 @@ class VerbsPostTest extends ApiTestCase
             ...self::POST_COMPLETE_VALID_VERBS['ichidan'],
             /* automatic conjugation must be disabled for irregular verbs,
             leaving the completion to the user */
+            'romaji' => 'kuru',
+            'hiragana' => 'くる',
+            'kanji' => '来る',
+            'meaning' => [
+                'en' => 'to come',
+            ],
             'inflections' => [
                 'dictionary' => '来る',
+            ],
+        ],
+        'partial_inflections' => [
+            ...self::POST_COMPLETE_VALID_VERBS['partial_inflections'],
+            'romaji' => 'manabu',
+            'hiragana' => 'まなぶ',
+            'kanji' => '学ぶ',
+            'meaning' => [
+                'en' => 'to learn',
+            ],
+            'inflections' => [
+                'dictionary' => '学ぶ',
+                'non-past' => [
+                    'informal' => [
+                        'affirmative' => '学ぶ',
+                        'negative' => '学ばない',
+                    ],
+                    'polite' => [
+                        'affirmative' => '学びます',
+                        'negative' => '学びません',
+                    ],
+                ],
+                'past' => [
+                    'informal' => [
+                        'affirmative' => 'あ', 
+                        'negative' => '学ばなかった',
+                    ],
+                    'polite' => [
+                        'affirmative' => '学びました',
+                        'negative' => '学びませんでした',
+                    ],
+                ],
+                'te' => [
+                    'affirmative' => '学んで',
+                    'negative' => 'て',
+                ],
+                'potential' => [
+                    'affirmative' => '学べる',
+                    'negative' => '学べない',
+                ],
+                'passive' => [
+                    'affirmative' => '学ばれる',
+                    'negative' => '学ばれない',
+                ],
+                'causative' => [
+                    'affirmative' => '学ばせる',
+                    'negative' => '学ばせない',
+                    'passive' => [
+                        'affirmative' => '学ばせられる',
+                        'negative' => 'く',
+                    ]
+                ],
+                'imperative' => [
+                    'affirmative' => '学べ',
+                    'negative' => '学ぶな',
+                ],
             ],
         ],
     ];

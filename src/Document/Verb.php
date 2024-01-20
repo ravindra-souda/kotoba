@@ -203,7 +203,7 @@ class Verb extends Card
         $autoConjugations = self::ICHIDAN_INFLECTIONS;
         array_walk_recursive(
             $autoConjugations,
-            fn(&$v, $k) => $v = $root.$v,
+            fn(&$v) => $v = $root.$v,
         );
 
         return $this->fillEmptyInflections($autoConjugations);
@@ -234,7 +234,7 @@ class Verb extends Card
 
         array_walk_recursive(
             $autoConjugations,
-            fn(&$v, $k) => $v = str_replace($vowels, $okurigana, $root.$v),
+            fn(&$v) => $v = str_replace($vowels, $okurigana, $root.$v),
         );
 
         return $this->fillEmptyInflections($autoConjugations);
@@ -244,12 +244,7 @@ class Verb extends Card
     {
         $inflections = $this->getInflections();
 
-        foreach ($autoConjugations as $tense => $autoConjugation) {
-            if (empty($inflections[$tense])) {
-                $inflections[$tense] = $autoConjugation;
-            }
-        }
-
+        $inflections = array_replace_recursive($autoConjugations, $inflections);
         $inflections['non-past']['informal']['affirmative'] = 
             $inflections['dictionary'];
 
