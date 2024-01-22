@@ -223,8 +223,11 @@ class AdjectivesPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_ADJECTIVES['no_hiragana_nor_katakana'],
-                'hiragana, katakana: '.
-                Adjective::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+                'hiragana: '.Adjective::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+            ],
+            [
+                self::POST_INVALID_ADJECTIVES['no_hiragana_nor_katakana'],
+                'katakana: '.Adjective::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
             ],
             [
                 self::POST_INVALID_ADJECTIVES['hiragana_written_in_katakana'],

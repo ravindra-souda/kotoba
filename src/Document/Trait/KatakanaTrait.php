@@ -16,7 +16,6 @@ trait KatakanaTrait
 
     /** Must be written using only katakana or latin 
      *  and with at least one katakana */
-    #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
     #[Assert\Length(
         max: self::KATAKANA_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,

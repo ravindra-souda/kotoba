@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => ['write']],
     //processor: DeckSaveProcessor::class,
 )]
-#[MongoDB\Document]
+#[MongoDB\Document(repositoryClass: 'App\Repository\AdjectiveRepository')]
 class Adjective extends Card
 {
     use Trait\GroupTrait,

@@ -41,7 +41,7 @@ abstract class Card extends AbstractKotobaDocument
         'must be written using only roman characters';
     
     public const VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA =
-        'at least one of these fields must be filled';
+        'either hiragana or katakana must be filled';
 
     public const VALIDATION_ERR_MAXLENGTH =
         'cannot not be longer than {{ limit }} characters';
@@ -107,7 +107,7 @@ abstract class Card extends AbstractKotobaDocument
     protected string $id;
 
     #[MongoDB\Field(type: 'int')]
-    private int $increment;
+    protected int $increment;
 
     public function getCode(): ?string
     {
@@ -160,6 +160,11 @@ abstract class Card extends AbstractKotobaDocument
                 'type' => self::ALLOWED_TYPES,
             ],
         ];
+    }
+
+    public function getSlugReference(): string
+    {
+        return $this->romaji;
     }
 
     public function setCode(string $code): Card

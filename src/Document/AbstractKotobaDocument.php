@@ -11,6 +11,8 @@ abstract class AbstractKotobaDocument
      */
     abstract public static function getFields(): array;
 
+    abstract public function getSlugReference(): string;
+
     public function trimFields(): void
     {
         foreach ($this->getFields()['string'] as $field) {

@@ -212,6 +212,11 @@ class Deck extends AbstractKotobaDocument
         ];
     }
 
+    public function getSlugReference(): string
+    {
+        return $this->title;
+    }
+
     public function setCode(string $code): Deck
     {
         $this->code = $code;
