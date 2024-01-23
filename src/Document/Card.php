@@ -46,9 +46,6 @@ abstract class Card extends AbstractKotobaDocument
     public const VALIDATION_ERR_MAXLENGTH =
         'cannot not be longer than {{ limit }} characters';
 
-    public const VALIDATION_ERR_MEANING =
-        'language unknown must be one of these {{ langList }}';
-
     public const VALIDATION_ERR_NOT_AN_ARRAY =
         'must be a valid array';
 
@@ -60,6 +57,10 @@ abstract class Card extends AbstractKotobaDocument
 
     /** Must be written using only latin characters */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
+    #[Assert\Regex(
+        pattern: '/^[a-z]+$/i',
+        message: self::VALIDATION_ERR_ROMAJI
+    )]
     #[Assert\Length(
         max: self::ROMAJI_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,

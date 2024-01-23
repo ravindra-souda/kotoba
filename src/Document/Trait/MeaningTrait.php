@@ -9,6 +9,7 @@ use App\Document\{Adjective, Card, Kanji, Noun, Verb};
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 trait MeaningTrait
 {
@@ -20,6 +21,11 @@ trait MeaningTrait
         'fr',
     ];
 
+    public const VALIDATION_ERR_MEANING = [
+        1 => 'language unknown must be one of these: {{ langList }}',
+        2 => 'mandatory language "{{ mandLang }}" missing'
+    ];
+    
     /** 'en' key is mandatory and must have a non-empty array as a value */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
     #[Assert\Type(
@@ -56,19 +62,19 @@ trait MeaningTrait
         return $this->meaning;
     }
 
-    public static function isValidMeaning(array|string|null $meaning): bool
+    public static function isValidMeaning(array|string|null $meaning): int
     {
         if ($meaning === null || $meaning === '') {
-            return false;
+            return 0;
         }
 
         foreach(array_keys($meaning) as $userLang) {
             if (!in_array($userLang, self::ALLOWED_LANGS)) {
-                return false;
+                return 1;
             }
         }
         
-        return !empty($meaning[self::getMandatoryLang()]);
+        return empty($meaning[self::getMandatoryLang()]) ? 2 : 0;
     }
 
     public function setMeaning(array $meaning): Adjective|Kanji|Noun|Verb
@@ -76,5 +82,31 @@ trait MeaningTrait
         $this->meaning = Card::trimArrayValues($meaning);
 
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateMeaning(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        $errCode = $this->isValidMeaning($this->meaning);
+        if ($errCode === 0) {
+            return;
+        }
+
+        $errMessages = str_replace(
+            ['{{ langList }}', '{{ mandLang }}'],
+            [
+                '"'.implode('", "', self::getAllowedLangs()).'"', 
+                self::getMandatoryLang()
+            ],
+            self::VALIDATION_ERR_MEANING
+        );
+
+        $context
+            ->buildViolation($errMessages[$errCode])
+            ->atPath('meaning')
+            ->addViolation();
     }
 }

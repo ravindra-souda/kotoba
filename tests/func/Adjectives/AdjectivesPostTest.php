@@ -124,18 +124,24 @@ class AdjectivesPostTest extends ApiTestCase
         ],
         'meaning_not_an_array' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
-            'meaning' => 'to eat',
+            'meaning' => 'delicious',
         ],
         'meaning_lang_unknown' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
             'meaning' => [
-                'en' => 'to eat',
+                'en' => 'delicious',
                 'dummy' => '🂡🂱🃁🃑',
+            ],
+        ],
+        'meaning_mandatory_lang_missing' => [
+            ...self::POST_MINIMAL_VALID_ADJECTIVE,
+            'meaning' => [
+                'fr' => 'delicieux',
             ],
         ],
         'group_adjective' => [
             ...self::POST_COMPLETE_VALID_ADJECTIVES['i_adjective'],
-            'group' => 'godan',
+            'group' => 'dummy',
         ],
         'jlpt_not_an_integer' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
@@ -215,7 +221,11 @@ class AdjectivesPostTest extends ApiTestCase
                         'a', Adjective::ROMAJI_MAXLENGTH + 1
                     ),
                 ],
-                'romaji: '.Adjective::VALIDATION_ERR_MAXLENGTH,
+                'romaji: '.str_replace(
+                    '{{ limit }}', 
+                    (string) Adjective::ROMAJI_MAXLENGTH, 
+                    Adjective::VALIDATION_ERR_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_ADJECTIVES['romaji_written_in_kana'],
@@ -239,7 +249,11 @@ class AdjectivesPostTest extends ApiTestCase
                     'hiragana' => 
                         str_repeat('あ', Adjective::HIRAGANA_MAXLENGTH + 1),
                 ],
-                'hiragana: '.Adjective::VALIDATION_ERR_MAXLENGTH,
+                'hiragana: '.str_replace(
+                    '{{ limit }}',
+                    (string) Adjective::HIRAGANA_MAXLENGTH,
+                    Adjective::VALIDATION_ERR_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_ADJECTIVES['katakana_written_in_hiragana'],
@@ -251,14 +265,22 @@ class AdjectivesPostTest extends ApiTestCase
                     'katakana' => 
                         str_repeat('ア', Adjective::KATAKANA_MAXLENGTH + 1),
                 ],
-                'katakana: '.Adjective::VALIDATION_ERR_MAXLENGTH,
+                'katakana: '.str_replace(
+                    '{{ limit }}',
+                    (string) Adjective::KATAKANA_MAXLENGTH,
+                    Adjective::VALIDATION_ERR_MAXLENGTH
+                ),
             ],
             [
                 [
                     ...self::POST_INVALID_ADJECTIVES['kanji_maxlength'],
                     'kanji' => str_repeat('字', Adjective::KANJI_MAXLENGTH + 1),
                 ],
-                'kanji: '.Adjective::VALIDATION_ERR_MAXLENGTH,
+                'kanji: '.str_replace(
+                    '{{ limit }}',
+                    (string) Adjective::KANJI_MAXLENGTH,
+                    Adjective::VALIDATION_ERR_MAXLENGTH
+                ),
             ],
             [
                 self::POST_INVALID_ADJECTIVES['kanji_written_in_romaji'],
@@ -274,11 +296,27 @@ class AdjectivesPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_ADJECTIVES['meaning_lang_unknown'],
-                'meaning: '.Adjective::VALIDATION_ERR_MEANING,
+                'meaning: '.str_replace(
+                    '{{ langList }}',
+                    '"'.implode('", "', Adjective::getAllowedLangs()).'"',
+                    Adjective::VALIDATION_ERR_MEANING[1]
+                )
+            ],
+            [
+                self::POST_INVALID_ADJECTIVES['meaning_mandatory_lang_missing'],
+                'meaning: '.str_replace(
+                    '{{ mandLang }}', 
+                    Adjective::getMandatoryLang(),
+                    Adjective::VALIDATION_ERR_MEANING[2]
+                )
             ],
             [
                 self::POST_INVALID_ADJECTIVES['group_adjective'],
-                'group: '.Adjective::VALIDATION_ERR_ENUM,
+                'group: '.str_replace(
+                    '{{ choices }}',
+                    '"'.implode('", "', Adjective::ALLOWED_GROUPS).'"',
+                    Adjective::VALIDATION_ERR_ENUM
+                )
             ],
             [
                 self::POST_INVALID_ADJECTIVES['jlpt_not_an_integer'],

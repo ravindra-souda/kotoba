@@ -8,6 +8,7 @@ use App\Document\{Adjective, Card, Noun, Verb};
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 trait KanjiTrait
 {
@@ -45,5 +46,21 @@ trait KanjiTrait
         $this->kanji = $this->shapeStr($kanji);
 
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateKanji(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        if ($this->isValidKanji($this->kanji)) {
+            return;
+        }
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_KANJI)
+            ->atPath('kanji')
+            ->addViolation();
     }
 }

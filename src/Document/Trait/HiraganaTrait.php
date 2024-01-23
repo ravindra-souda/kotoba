@@ -79,4 +79,20 @@ trait HiraganaTrait
             ->atPath('katakana')
             ->addViolation();
     }
+
+    #[Assert\Callback]
+    public function validateHiragana(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        if ($this->isValidHiragana($this->hiragana)) {
+            return;
+        }
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_HIRAGANA)
+            ->atPath('hiragana')
+            ->addViolation();
+    }
 }

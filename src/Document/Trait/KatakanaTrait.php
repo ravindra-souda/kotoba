@@ -8,6 +8,7 @@ use App\Document\{Adjective, Card, Kana, Noun, Verb};
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 trait KatakanaTrait
 {
@@ -48,5 +49,21 @@ trait KatakanaTrait
         $this->katakana = $this->shapeStr($katakana);
 
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateKatakana(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        if ($this->isValidKatakana($this->katakana)) {
+            return;
+        }
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_KATAKANA)
+            ->atPath('katakana')
+            ->addViolation();
     }
 }

@@ -79,6 +79,7 @@ class Adjective extends Card
         return $this;
     }
 
+    // TODO: Validation constraint on this
     public function isValidGroup(): bool
     {
         if ($this->group === self::NA_ADJECTIVE) {
