@@ -15,7 +15,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchDeckByCode;
-use App\State\DeckSaveProcessor;
+use App\State\SaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -52,7 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
-    processor: DeckSaveProcessor::class,
+    processor: SaveProcessor::class,
 )]
 #[MongoDB\Document(repositoryClass: 'App\Repository\DeckRepository')]
 #[Unique(fields: ['title'], message: self::VALIDATION_ERR_DUPLICATE)]
@@ -197,6 +197,12 @@ class Deck extends AbstractKotobaDocument
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    // called right before persist, see App\State\SaveProcessor
+    public function finalizeTasks(): static
+    {
+        return $this;
     }
 
     /**

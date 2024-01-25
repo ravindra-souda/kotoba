@@ -106,6 +106,12 @@ class Verb extends Card
     #[MongoDB\Field(type: 'bool')]
     protected bool $reviewed = false;
 
+    // called right before persist, see App\State\SaveProcessor
+    public function finalizeTasks(): static
+    {
+        return $this->conjugate();
+    }
+
     public function getInflections(): array
     {
         return $this->inflections;

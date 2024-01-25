@@ -143,6 +143,14 @@ class AdjectivesPostTest extends ApiTestCase
             ...self::POST_COMPLETE_VALID_ADJECTIVES['i_adjective'],
             'group' => 'dummy',
         ],
+        'group_invalid_hiragana' => [
+            ...self::POST_COMPLETE_VALID_ADJECTIVES['i_adjective'],
+            'hiragana' => 'すてき',
+        ],
+        'group_invalid_kanji' => [
+            ...self::POST_COMPLETE_VALID_ADJECTIVES['i_adjective'],
+            'kanji' => '素敵',
+        ],
         'jlpt_not_an_integer' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
             'jlpt' => 1.1,
@@ -317,6 +325,14 @@ class AdjectivesPostTest extends ApiTestCase
                     '"'.implode('", "', Adjective::ALLOWED_GROUPS).'"',
                     Adjective::VALIDATION_ERR_ENUM
                 )
+            ],
+            [
+                self::POST_INVALID_ADJECTIVES['group_invalid_hiragana'],
+                'group: '.Adjective::VALIDATION_ERR_I_ADJECTIVE[1]
+            ],
+            [
+                self::POST_INVALID_ADJECTIVES['group_invalid_kanji'],
+                'group: '.Adjective::VALIDATION_ERR_I_ADJECTIVE[2]
             ],
             [
                 self::POST_INVALID_ADJECTIVES['jlpt_not_an_integer'],

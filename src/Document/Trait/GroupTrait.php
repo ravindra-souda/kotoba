@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Document\Trait;
 
-use App\Document\Adjective;
 use App\Document\Card;
-use App\Document\Verb;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -27,7 +25,7 @@ trait GroupTrait
         return $this->group;
     }
 
-    public function setGroup(string $group): Adjective|Verb
+    public function setGroup(string $group): static
     {
         $this->group = $group;
 
@@ -39,7 +37,7 @@ trait GroupTrait
      */
     public static function getFields(): array
     {
-        $fields = Card::getFields();
+        $fields = parent::getFields();
         $fields['enum']['group'] = self::ALLOWED_GROUPS;
         
         return $fields;

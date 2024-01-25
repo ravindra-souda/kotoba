@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Document\Trait;
 
-use App\Document\{Adjective, Card, Kana, Noun, Verb};
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -44,11 +43,9 @@ trait KatakanaTrait
         ;
     }
 
-    public function setKatakana(?string $katakana): Adjective|Kana|Noun|Verb
+    public function setKatakana(?string $katakana): static
     {
-        $this->katakana = $this->shapeStr($katakana);
-
-        return $this;
+        return $this->setLowerAndTrimmedOrNull('katakana', $katakana);
     }
 
     #[Assert\Callback]

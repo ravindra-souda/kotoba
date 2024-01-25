@@ -6,9 +6,11 @@ namespace App\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiResource(
     operations: [
@@ -16,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
-    //processor: DeckSaveProcessor::class,
+    processor: SaveProcessor::class,
 )]
 #[MongoDB\Document(repositoryClass: 'App\Repository\AdjectiveRepository')]
 class Adjective extends Card
@@ -43,6 +45,12 @@ class Adjective extends Card
     public const ERR_INCORRECT_GROUP = 'Incorrect group set';
 
     public const ERR_NO_BASE = 'Kanji, hiragana or katakana must be set';
+
+    public const VALIDATION_ERR_I_ADJECTIVE = [
+        1 => 'i-adjective must have a hiragana field ending with い',
+        2 => 'i-adjective must have a kanji field ending with い',
+        3 => Card::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA
+    ];
 
     /** Filled by the API */
     #[Assert\Type(
@@ -79,31 +87,30 @@ class Adjective extends Card
         return $this;
     }
 
-    // TODO: Validation constraint on this
-    public function isValidGroup(): bool
+    public function isValidGroup(): int
     {
         if ($this->group === self::NA_ADJECTIVE) {
-            return true;
+            return 0;
         }
 
         if (!str_ends_with($this->hiragana ?? '', 'い')) {
-            return false;
+            return 1;
         }
 
         if ($this->kanji !== null && !str_ends_with($this->kanji, 'い')) {
-            return false;
+            return 2;
         }
         
         if ($this->hiragana === null && $this->katakana !== null) {
-            return false;
+            return 3;
         }
 
-        return true;
+        return 0;
     }
 
     public function conjugate(): Adjective
     {
-        if (!$this->isValidGroup()) {
+        if ($this->isValidGroup() !== 0) {
             throw new \Exception(self::ERR_INCORRECT_GROUP);
         }
 
@@ -120,7 +127,7 @@ class Adjective extends Card
                     'negative' => $base.'じゃない',
                 ],
                 'past' => [
-                    'affirmative' => $base.'でした',
+                    'affirmative' => $base.'だった',
                     'negative' => $base.'じゃなかった',
                 ],
             ];
@@ -148,5 +155,28 @@ class Adjective extends Card
 
         $this->setInflections($inflections);
         return $this;
+    }
+
+    // called right before persist, see App\State\SaveProcessor
+    public function finalizeTasks(): static
+    {
+        return $this->conjugate();
+    }
+
+    #[Assert\Callback]
+    public function validateGroup(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        $errCode = $this->isValidGroup();
+        if ($errCode === 0) {
+            return;
+        }
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_I_ADJECTIVE[$errCode])
+            ->atPath('group')
+            ->addViolation();
     }
 }

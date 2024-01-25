@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Document\Trait;
 
 use ApiPlatform\Metadata\ApiProperty;
-use App\Document\{Adjective, Card, Kanji, Noun, Verb};
+use App\Document\Card;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -77,11 +77,9 @@ trait MeaningTrait
         return empty($meaning[self::getMandatoryLang()]) ? 2 : 0;
     }
 
-    public function setMeaning(array $meaning): Adjective|Kanji|Noun|Verb
-    {        
-        $this->meaning = Card::trimArrayValues($meaning);
-
-        return $this;
+    public function setMeaning(array $meaning): static
+    {
+        return $this->setLowerAndTrimmedOrNull('meaning', $meaning);
     }
 
     #[Assert\Callback]
