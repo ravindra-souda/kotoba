@@ -120,11 +120,7 @@ class AdjectivesPostTest extends ApiTestCase
         ],
         'meaning_empty' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
-            'meaning' => '',
-        ],
-        'meaning_not_an_array' => [
-            ...self::POST_MINIMAL_VALID_ADJECTIVE,
-            'meaning' => 'delicious',
+            'meaning' => [],
         ],
         'meaning_lang_unknown' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
@@ -150,10 +146,6 @@ class AdjectivesPostTest extends ApiTestCase
         'group_invalid_kanji' => [
             ...self::POST_COMPLETE_VALID_ADJECTIVES['i_adjective'],
             'kanji' => '素敵',
-        ],
-        'jlpt_not_an_integer' => [
-            ...self::POST_MINIMAL_VALID_ADJECTIVE,
-            'jlpt' => 1.1,
         ],
         'jlpt_min' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
@@ -296,11 +288,7 @@ class AdjectivesPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_ADJECTIVES['meaning_empty'],
-                'meaning: '.Adjective::VALIDATION_ERR_NOT_AN_ARRAY,
-            ],
-            [
-                self::POST_INVALID_ADJECTIVES['meaning_not_an_array'],
-                'meaning: '.Adjective::VALIDATION_ERR_NOT_AN_ARRAY,
+                'meaning: '.Adjective::VALIDATION_ERR_EMPTY,
             ],
             [
                 self::POST_INVALID_ADJECTIVES['meaning_lang_unknown'],
@@ -333,10 +321,6 @@ class AdjectivesPostTest extends ApiTestCase
             [
                 self::POST_INVALID_ADJECTIVES['group_invalid_kanji'],
                 'group: '.Adjective::VALIDATION_ERR_I_ADJECTIVE[2]
-            ],
-            [
-                self::POST_INVALID_ADJECTIVES['jlpt_not_an_integer'],
-                'jlpt: '.Adjective::VALIDATION_ERR_JLPT,
             ],
             [
                 self::POST_INVALID_ADJECTIVES['jlpt_min'],

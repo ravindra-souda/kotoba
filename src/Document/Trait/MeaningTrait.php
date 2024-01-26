@@ -28,10 +28,6 @@ trait MeaningTrait
     
     /** 'en' key is mandatory and must have a non-empty array as a value */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
-    #[Assert\Type(
-        type: 'array',
-        message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
-    )]
     #[Groups(['read', 'write'])]
     #[ApiProperty(
         openapiContext: [

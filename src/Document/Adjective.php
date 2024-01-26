@@ -81,10 +81,8 @@ class Adjective extends Card
     }
 
     public function setInflections(array $inflections): Adjective
-    {        
-        $this->inflections = $this->trimArrayValues($inflections);
-
-        return $this;
+    {
+        return $this->setLowerAndTrimmedOrNull('inflections', $inflections);
     }
 
     public function isValidGroup(): int
