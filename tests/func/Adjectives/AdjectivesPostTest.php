@@ -221,10 +221,9 @@ class AdjectivesPostTest extends ApiTestCase
                         'a', Adjective::ROMAJI_MAXLENGTH + 1
                     ),
                 ],
-                'romaji: '.str_replace(
-                    '{{ limit }}', 
-                    (string) Adjective::ROMAJI_MAXLENGTH, 
-                    Adjective::VALIDATION_ERR_MAXLENGTH
+                'romaji: '.Adjective::formatMsg(
+                    Adjective::VALIDATION_ERR_MAXLENGTH, 
+                    Adjective::ROMAJI_MAXLENGTH
                 )
             ],
             [
@@ -249,10 +248,9 @@ class AdjectivesPostTest extends ApiTestCase
                     'hiragana' => 
                         str_repeat('あ', Adjective::HIRAGANA_MAXLENGTH + 1),
                 ],
-                'hiragana: '.str_replace(
-                    '{{ limit }}',
-                    (string) Adjective::HIRAGANA_MAXLENGTH,
-                    Adjective::VALIDATION_ERR_MAXLENGTH
+                'hiragana: '.Adjective::formatMsg(
+                    Adjective::VALIDATION_ERR_MAXLENGTH, 
+                    Adjective::HIRAGANA_MAXLENGTH
                 )
             ],
             [
@@ -265,10 +263,9 @@ class AdjectivesPostTest extends ApiTestCase
                     'katakana' => 
                         str_repeat('ア', Adjective::KATAKANA_MAXLENGTH + 1),
                 ],
-                'katakana: '.str_replace(
-                    '{{ limit }}',
-                    (string) Adjective::KATAKANA_MAXLENGTH,
-                    Adjective::VALIDATION_ERR_MAXLENGTH
+                'katakana: '.Adjective::formatMsg(
+                    Adjective::VALIDATION_ERR_MAXLENGTH, 
+                    Adjective::KATAKANA_MAXLENGTH
                 ),
             ],
             [
@@ -276,10 +273,9 @@ class AdjectivesPostTest extends ApiTestCase
                     ...self::POST_INVALID_ADJECTIVES['kanji_maxlength'],
                     'kanji' => str_repeat('字', Adjective::KANJI_MAXLENGTH + 1),
                 ],
-                'kanji: '.str_replace(
-                    '{{ limit }}',
-                    (string) Adjective::KANJI_MAXLENGTH,
-                    Adjective::VALIDATION_ERR_MAXLENGTH
+                'kanji: '.Adjective::formatMsg(
+                    Adjective::VALIDATION_ERR_MAXLENGTH, 
+                    Adjective::KANJI_MAXLENGTH
                 ),
             ],
             [
@@ -292,26 +288,23 @@ class AdjectivesPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_ADJECTIVES['meaning_lang_unknown'],
-                'meaning: '.str_replace(
-                    '{{ langList }}',
-                    '"'.implode('", "', Adjective::getAllowedLangs()).'"',
-                    Adjective::VALIDATION_ERR_MEANING[1]
+                'meaning: '.Adjective::formatMsg(
+                    Adjective::VALIDATION_ERR_MEANING[1], 
+                    Adjective::getAllowedLangs()
                 )
             ],
             [
                 self::POST_INVALID_ADJECTIVES['meaning_mandatory_lang_missing'],
-                'meaning: '.str_replace(
-                    '{{ mandLang }}', 
+                'meaning: '.Adjective::formatMsg(
+                    Adjective::VALIDATION_ERR_MEANING[2], 
                     Adjective::getMandatoryLang(),
-                    Adjective::VALIDATION_ERR_MEANING[2]
                 )
             ],
             [
                 self::POST_INVALID_ADJECTIVES['group_adjective'],
-                'group: '.str_replace(
-                    '{{ choices }}',
-                    '"'.implode('", "', Adjective::ALLOWED_GROUPS).'"',
-                    Adjective::VALIDATION_ERR_ENUM
+                'group: '.Adjective::formatMsg(
+                    Adjective::VALIDATION_ERR_ENUM, 
+                    Adjective::ALLOWED_GROUPS,
                 )
             ],
             [

@@ -15,15 +15,6 @@ abstract class AbstractKotobaDocument
 
     abstract public function getSlugReference(): string;
 
-    public final function trimFields(): static
-    {
-        foreach ($this->getFields()['string'] as $field) {
-            $this->{$field} = trim($this->{$field} ?? '');
-        }
-
-        return $this;
-    }
-
     protected function setLowerAndTrimmedOrNull(
         string $prop, 
         string|array|null $value
@@ -47,5 +38,25 @@ abstract class AbstractKotobaDocument
 
         $this->{$prop} = $value;
         return $this;
+    }
+
+    public final function trimFields(): static
+    {
+        foreach ($this->getFields()['string'] as $field) {
+            $this->{$field} = trim($this->{$field} ?? '');
+        }
+
+        return $this;
+    }
+
+    public static function formatMsg(
+        string $message, 
+        int|string|array $value
+    ): string
+    {
+        $replacement = (is_array($value)) ? 
+            '"'.implode('", "', $value).'"' : (string) $value;
+
+        return preg_replace("/{{ [a-z]+ }}/i", $replacement, $message, 1);
     }
 }

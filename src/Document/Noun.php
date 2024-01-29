@@ -6,6 +6,7 @@ namespace App\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,9 +17,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
-    //processor: DeckSaveProcessor::class,
+    processor: SaveProcessor::class,
 )]
-#[MongoDB\Document]
+#[MongoDB\Document(repositoryClass: 'App\Repository\NounRepository')]
 class Noun extends Card
 {
     use Trait\HiraganaTrait, 

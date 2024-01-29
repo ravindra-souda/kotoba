@@ -36,11 +36,11 @@ class NounsPostTest extends ApiTestCase
                 'fr' => ' cHat ',
             ],
         ],
-        'teneigo' => [
+        'bikago' => [
             'romaji' => ' oKane ',
             'hiragana' => ' おかね',
             'katakana' => '',
-            'kanji' => 'お金',
+            'kanji' => '金',
             'bikago' => 'お',
             'jlpt' => 5,
             'meaning' => [
@@ -69,8 +69,8 @@ class NounsPostTest extends ApiTestCase
                 'fr' => 'chat',
             ],
         ],
-        'teneigo' => [
-            ...self::POST_COMPLETE_VALID_NOUNS['teneigo'],
+        'bikago' => [
+            ...self::POST_COMPLETE_VALID_NOUNS['bikago'],
             'romaji' => 'okane',
             'hiragana' => 'おかね',
             'meaning' => [
@@ -130,16 +130,12 @@ class NounsPostTest extends ApiTestCase
             'kanji' => 'kanji',
         ],
         'bikago' => [
-            ...self::POST_COMPLETE_VALID_NOUNS['teneigo'],
+            ...self::POST_COMPLETE_VALID_NOUNS['bikago'],
             'bikago' => 'dummy',
         ],
         'meaning_empty' => [
             ...self::POST_MINIMAL_VALID_NOUN,
-            'meaning' => '',
-        ],
-        'meaning_not_an_array' => [
-            ...self::POST_MINIMAL_VALID_NOUN,
-            'meaning' => 'dog',
+            'meaning' => [],
         ],
         'meaning_lang_unknown' => [
             ...self::POST_MINIMAL_VALID_NOUN,
@@ -148,9 +144,11 @@ class NounsPostTest extends ApiTestCase
                 'dummy' => '🂡🂱🃁🃑',
             ],
         ],
-        'jlpt_not_an_integer' => [
+        'meaning_mandatory_lang_missing' => [
             ...self::POST_MINIMAL_VALID_NOUN,
-            'jlpt' => 1.1,
+            'meaning' => [
+                'fr' => 'chien',
+            ],
         ],
         'jlpt_min' => [
             ...self::POST_MINIMAL_VALID_NOUN,
@@ -224,7 +222,10 @@ class NounsPostTest extends ApiTestCase
                     ...self::POST_INVALID_NOUNS['romaji_maxlength'],
                     'romaji' => str_repeat('a', Noun::ROMAJI_MAXLENGTH + 1),
                 ],
-                'romaji: '.Noun::VALIDATION_ERR_MAXLENGTH,
+                'romaji: '.Noun::formatMsg(
+                    Noun::VALIDATION_ERR_MAXLENGTH, 
+                    Noun::ROMAJI_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_NOUNS['romaji_written_in_kana'],
@@ -232,8 +233,11 @@ class NounsPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_NOUNS['no_hiragana_nor_katakana'],
-                'hiragana, katakana: '.
-                Noun::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+                'hiragana: '.Noun::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+            ],
+            [
+                self::POST_INVALID_NOUNS['no_hiragana_nor_katakana'],
+                'katakana: '.Noun::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
             ],
             [
                 self::POST_INVALID_NOUNS['hiragana_written_in_katakana'],
@@ -245,7 +249,10 @@ class NounsPostTest extends ApiTestCase
                     'hiragana' => 
                         str_repeat('あ', Noun::HIRAGANA_MAXLENGTH + 1),
                 ],
-                'hiragana: '.Noun::VALIDATION_ERR_MAXLENGTH,
+                'hiragana: '.Noun::formatMsg(
+                    Noun::VALIDATION_ERR_MAXLENGTH, 
+                    Noun::HIRAGANA_MAXLENGTH
+                ),
             ],
             [
                 self::POST_INVALID_NOUNS['katakana_written_in_hiragana'],
@@ -257,38 +264,49 @@ class NounsPostTest extends ApiTestCase
                     'katakana' => 
                         str_repeat('ア', Noun::KATAKANA_MAXLENGTH + 1),
                 ],
-                'katakana: '.Noun::VALIDATION_ERR_MAXLENGTH,
+                'katakana: '.Noun::formatMsg(
+                    Noun::VALIDATION_ERR_MAXLENGTH, 
+                    Noun::KATAKANA_MAXLENGTH
+                )
             ],
             [
                 [
                     ...self::POST_INVALID_NOUNS['kanji_maxlength'],
                     'kanji' => str_repeat('字', Noun::KANJI_MAXLENGTH + 1),
                 ],
-                'kanji: '.Noun::VALIDATION_ERR_MAXLENGTH,
+                'kanji: '.Noun::formatMsg(
+                    Noun::VALIDATION_ERR_MAXLENGTH,
+                    Noun::KANJI_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_NOUNS['kanji_written_in_romaji'],
                 'kanji: '.Noun::VALIDATION_ERR_KANJI,
             ],
             [
-                self::POST_INVALID_NOUNS['teneigo'],
-                'bikago: '.Noun::VALIDATION_ERR_ENUM,
+                self::POST_INVALID_NOUNS['bikago'],
+                'bikago: '.Noun::formatMsg(
+                    Noun::VALIDATION_ERR_ENUM,
+                    Noun::ALLOWED_BIKAGO,
+                )
             ],
             [
                 self::POST_INVALID_NOUNS['meaning_empty'],
-                'meaning: '.Noun::VALIDATION_ERR_NOT_AN_ARRAY,
-            ],
-            [
-                self::POST_INVALID_NOUNS['meaning_not_an_array'],
-                'meaning: '.Noun::VALIDATION_ERR_NOT_AN_ARRAY,
+                'meaning: '.Noun::VALIDATION_ERR_EMPTY,
             ],
             [
                 self::POST_INVALID_NOUNS['meaning_lang_unknown'],
-                'meaning: '.Noun::VALIDATION_ERR_MEANING,
+                'meaning: '.Noun::formatMsg(
+                    Noun::VALIDATION_ERR_MEANING[1],
+                    Noun::getAllowedLangs(),
+                )
             ],
             [
-                self::POST_INVALID_NOUNS['jlpt_not_an_integer'],
-                'jlpt: '.Noun::VALIDATION_ERR_JLPT,
+                self::POST_INVALID_NOUNS['meaning_mandatory_lang_missing'],
+                'meaning: '.Noun::formatMsg(
+                    Noun::VALIDATION_ERR_MEANING[2], 
+                    Noun::getMandatoryLang(),
+                )
             ],
             [
                 self::POST_INVALID_NOUNS['jlpt_min'],

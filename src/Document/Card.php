@@ -66,7 +66,7 @@ abstract class Card extends AbstractKotobaDocument
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
-    protected string $romaji = '';
+    protected ?string $romaji = null;
 
     /** Slugified by the API from romaji */
     #[ApiProperty(identifier: true)]
@@ -210,11 +210,9 @@ abstract class Card extends AbstractKotobaDocument
         return $this;
     }
 
-    public function setRomaji(string $romaji): Card
+    public function setRomaji(?string $romaji): Card
     {
-        $this->romaji = $romaji;
-
-        return $this;
+        return $this->setLowerAndTrimmedOrNull('romaji', $romaji);
     }
 
     public function setType(string $type): Card
