@@ -25,14 +25,6 @@ abstract class Card extends AbstractKotobaDocument
 {
     public const ROMAJI_MAXLENGTH = 50;
 
-    public const ALLOWED_TYPES = [
-        'adjective',
-        'kana',
-        'kanji',
-        'noun',
-        'verb',
-    ];
-
     public const VALIDATION_ERR_EMPTY =
         'cannot be left empty';
     
@@ -73,14 +65,6 @@ abstract class Card extends AbstractKotobaDocument
     #[Groups('read')]
     #[MongoDB\Field(type: 'string')]
     protected string $code = '';
-
-    #[Assert\Choice(
-        choices: self::ALLOWED_TYPES,
-        message: self::VALIDATION_ERR_ENUM,
-    )]
-    #[Groups(['read', 'write'])]
-    #[MongoDB\Field]
-    protected string $type = '';
 
     #[Assert\Range(
         min: 1,
@@ -139,11 +123,6 @@ abstract class Card extends AbstractKotobaDocument
         return $this->romaji;
     }
 
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
@@ -162,9 +141,7 @@ abstract class Card extends AbstractKotobaDocument
     {
         return [
             'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
-            'enum' => [
-                'type' => self::ALLOWED_TYPES,
-            ],
+            'enum' => [],
         ];
     }
 
@@ -213,13 +190,6 @@ abstract class Card extends AbstractKotobaDocument
     public function setRomaji(?string $romaji): Card
     {
         return $this->setLowerAndTrimmedOrNull('romaji', $romaji);
-    }
-
-    public function setType(string $type): Card
-    {
-        $this->type = $type;
-
-        return $this;
     }
 
     // see App\EventListener\PreUpdateListener

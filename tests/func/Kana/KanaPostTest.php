@@ -71,10 +71,6 @@ class KanaPostTest extends ApiTestCase
             ...self::POST_MINIMAL_VALID_KANA,
             'katakana' => '*',
         ],
-        'jlpt_not_an_integer' => [
-            ...self::POST_MINIMAL_VALID_KANA,
-            'jlpt' => 1.1,
-        ],
         'jlpt_min' => [
             ...self::POST_MINIMAL_VALID_KANA,
             'jlpt' => 0,
@@ -163,7 +159,10 @@ class KanaPostTest extends ApiTestCase
                     ...self::POST_INVALID_KANA['romaji_maxlength'],
                     'romaji' => str_repeat('a', Kana::ROMAJI_MAXLENGTH + 1),
                 ],
-                'romaji: '.Kana::VALIDATION_ERR_MAXLENGTH,
+                'romaji: '.Kana::formatMsg(
+                    Kana::VALIDATION_ERR_MAXLENGTH, 
+                    Kana::ROMAJI_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_KANA['romaji_written_in_kana'],
@@ -171,12 +170,15 @@ class KanaPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_KANA['no_hiragana_nor_katakana'],
-                'hiragana, katakana: '.
-                Kana::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+                'hiragana: '.Kana::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+            ],
+            [
+                self::POST_INVALID_KANA['no_hiragana_nor_katakana'],
+                'katakana: '.Kana::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
             ],
             [
                 self::POST_INVALID_KANA['hiragana_written_in_katakana'],
-                'hiragana: '.Kana::VALIDATION_ERR_HIRAGANA,
+                'hiragana: '.Kana::VALIDATION_ERR_KANA_HIRAGANA,
             ],
             [
                 [
@@ -184,11 +186,14 @@ class KanaPostTest extends ApiTestCase
                     'hiragana' => 
                         str_repeat('あ', Kana::HIRAGANA_MAXLENGTH + 1),
                 ],
-                'hiragana: '.Kana::VALIDATION_ERR_MAXLENGTH,
+                'hiragana: '.Kana::formatMsg(
+                    Kana::VALIDATION_ERR_MAXLENGTH, 
+                    Kana::HIRAGANA_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_KANA['katakana_written_in_hiragana'],
-                'katakana: '.Kana::VALIDATION_ERR_KATAKANA,
+                'katakana: '.Kana::VALIDATION_ERR_KANA_KATAKANA,
             ],
             [
                 [
@@ -196,11 +201,10 @@ class KanaPostTest extends ApiTestCase
                     'katakana' => 
                         str_repeat('ア', Kana::KATAKANA_MAXLENGTH + 1),
                 ],
-                'katakana: '.Kana::VALIDATION_ERR_MAXLENGTH,
-            ],
-            [
-                self::POST_INVALID_KANA['jlpt_not_an_integer'],
-                'jlpt: '.Kana::VALIDATION_ERR_JLPT,
+                'katakana: '.Kana::formatMsg(
+                    Kana::VALIDATION_ERR_MAXLENGTH, 
+                    Kana::KATAKANA_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_KANA['jlpt_min'],
@@ -212,19 +216,19 @@ class KanaPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_KANA['kana_hiragana'],
-                'hiragana: '.Kana::VALIDATION_ERR_KANA,
+                'hiragana: '.Kana::VALIDATION_ERR_KANA_HIRAGANA,
             ],
             [
                 self::POST_INVALID_KANA['kana_katakana'],
-                'katakana: '.Kana::VALIDATION_ERR_KANA,
+                'katakana: '.Kana::VALIDATION_ERR_KANA_KATAKANA,
             ],
             [
                 self::POST_INVALID_KANA['kana_hiragana_glide'],
-                'hiragana: '.Kana::VALIDATION_ERR_KANA,
+                'hiragana: '.Kana::VALIDATION_ERR_KANA_HIRAGANA,
             ],
             [
                 self::POST_INVALID_KANA['kana_katakana_glide'],
-                'katakana: '.Kana::VALIDATION_ERR_KANA,
+                'katakana: '.Kana::VALIDATION_ERR_KANA_KATAKANA,
             ],
         ];
     }

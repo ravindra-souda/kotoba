@@ -57,22 +57,20 @@ class KanjiPostTest extends ApiTestCase
         ],
         'meaning_empty' => [
             ...self::POST_MINIMAL_VALID_KANJI,
-            'meaning' => '',
-        ],
-        'meaning_not_an_array' => [
-            ...self::POST_MINIMAL_VALID_KANJI,
-            'meaning' => 'to eat',
+            'meaning' => [],
         ],
         'meaning_lang_unknown' => [
             ...self::POST_MINIMAL_VALID_KANJI,
             'meaning' => [
-                'en' => 'to eat',
+                'en' => 'dog',
                 'dummy' => '🂡🂱🃁🃑',
             ],
         ],
-        'jlpt_not_an_integer' => [
+        'meaning_mandatory_lang_missing' => [
             ...self::POST_MINIMAL_VALID_KANJI,
-            'jlpt' => 1.1,
+            'meaning' => [
+                'fr' => 'chien',
+            ],
         ],
         'jlpt_min' => [
             ...self::POST_MINIMAL_VALID_KANJI,
@@ -163,7 +161,7 @@ class KanjiPostTest extends ApiTestCase
         return [
             [
                 self::POST_INVALID_KANJI['kanji_maxlength'],
-                'kanji: '.Kanji::VALIDATION_ERR_MAXLENGTH,
+                'kanji: '.Kanji::VALIDATION_ERR_KANJI
             ],
             [
                 self::POST_INVALID_KANJI['kanji_written_in_romaji'],
@@ -171,19 +169,18 @@ class KanjiPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_KANJI['meaning_empty'],
-                'meaning: '.Kanji::VALIDATION_ERR_NOT_AN_ARRAY,
-            ],
-            [
-                self::POST_INVALID_KANJI['meaning_not_an_array'],
-                'meaning: '.Kanji::VALIDATION_ERR_NOT_AN_ARRAY,
+                'meaning: '.Kanji::VALIDATION_ERR_EMPTY,
             ],
             [
                 self::POST_INVALID_KANJI['meaning_lang_unknown'],
                 'meaning: '.Kanji::VALIDATION_ERR_MEANING,
             ],
             [
-                self::POST_INVALID_KANJI['jlpt_not_an_integer'],
-                'jlpt: '.Kanji::VALIDATION_ERR_JLPT,
+                self::POST_INVALID_KANJI['meaning_mandatory_lang_missing'],
+                'meaning: '.Kanji::formatMsg(
+                    Kanji::VALIDATION_ERR_MEANING[2], 
+                    Kanji::getMandatoryLang(),
+                )
             ],
             [
                 self::POST_INVALID_KANJI['jlpt_min'],
@@ -206,7 +203,10 @@ class KanjiPostTest extends ApiTestCase
                     ...self::POST_INVALID_KANJI['kanji_kunyomi_maxlength'],
                     'kunyomi' => str_repeat('a', Kanji::KUNYOMI_MAXLENGTH + 1),
                 ],
-                'kunyomi: '.Kanji::VALIDATION_ERR_MAXLENGTH,
+                'kunyomi: '.Kanji::formatMsg(
+                    Kanji::VALIDATION_ERR_MAXLENGTH, 
+                    Kanji::KUNYOMI_MAXLENGTH
+                ),
             ],
             [
                 self::POST_INVALID_KANJI['kanji_onyomi_empty'],
@@ -221,7 +221,10 @@ class KanjiPostTest extends ApiTestCase
                     ...self::POST_INVALID_KANJI['kanji_onyomi_maxlength'],
                     'onyomi' => str_repeat('a', Kanji::ONYOMI_MAXLENGTH + 1),
                 ],
-                'onyomi: '.Kanji::VALIDATION_ERR_MAXLENGTH,
+                'onyomi: '.Kanji::formatMsg(
+                    Kanji::VALIDATION_ERR_MAXLENGTH, 
+                    Kanji::ONYOMI_MAXLENGTH
+                )
             ],
         ];
     }

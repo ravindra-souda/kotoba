@@ -6,7 +6,10 @@ namespace App\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiResource(
     operations: [
@@ -14,9 +17,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
-    //processor: DeckSaveProcessor::class,
+    processor: SaveProcessor::class,
 )]
-#[MongoDB\Document]
+#[MongoDB\Document(repositoryClass: 'App\Repository\KanaRepository')]
 class Kana extends Card
 {
     use Trait\HiraganaTrait,
@@ -26,7 +29,21 @@ class Kana extends Card
 
     public const KATAKANA_MAXLENGTH = 2;
 
-    public const VALIDATION_ERR_KANA = 'must be a mora long';
+    public const VALIDATION_ERR_KANA_HIRAGANA = 
+        'must be exactly one mora long and written using only hiragana';
+
+    public const VALIDATION_ERR_KANA_KATAKANA = 
+        'must be exactly one mora long and written using only katakana';
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getFields(): array
+    {
+        return [
+            'string' => ['romaji', 'hiragana', 'katakana'],
+        ];
+    }
 
     public static function isValidHiragana(?string $string): bool
     {
@@ -74,5 +91,37 @@ class Kana extends Card
         return preg_match($regularSizedKatakanaRegExp, $string) === 1 
             || preg_match($glidesRegExp, $string) === 1
             || preg_match($specialGlidesRegExp, $string) === 1;
+    }
+
+    #[Assert\Callback]
+    public function validateHiragana(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        if ($this->isValidHiragana($this->hiragana)) {
+            return;
+        }
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_KANA_HIRAGANA)
+            ->atPath('hiragana')
+            ->addViolation();
+    }
+
+    #[Assert\Callback]
+    public function validateKatakana(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        if ($this->isValidKatakana($this->katakana)) {
+            return;
+        }
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_KANA_KATAKANA)
+            ->atPath('katakana')
+            ->addViolation();
     }
 }

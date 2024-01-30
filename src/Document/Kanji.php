@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiResource(
     operations: [
@@ -27,14 +28,11 @@ class Kanji extends Card
 
     public const ONYOMI_MAXLENGTH = 100;
 
-    public const VALIDATION_ERR_KANJI = 'must be written using only kanji';
+    public const VALIDATION_ERR_KANJI = 
+        'must be written using exactly one kanji';
 
     /** Must be written using only kanji */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
-    #[Assert\Length(
-        max: 1,
-        maxMessage: Card::VALIDATION_ERR_MAXLENGTH,
-    )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected string $kanji;
@@ -112,5 +110,21 @@ class Kanji extends Card
         $fields['string'] = [...$fields['string'], 'kunyomi', 'onyomi'];
         
         return $fields;
+    }
+
+    #[Assert\Callback]
+    public function validateKanji(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        if ($this->isValidKanji($this->kanji)) {
+            return;
+        }
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_KANJI)
+            ->atPath('kanji')
+            ->addViolation();
     }
 }
