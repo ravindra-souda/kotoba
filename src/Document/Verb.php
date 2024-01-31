@@ -6,6 +6,7 @@ namespace App\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,9 +17,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
-    //processor: DeckSaveProcessor::class,
+    processor: SaveProcessor::class,
 )]
-#[MongoDB\Document]
+#[MongoDB\Document(repositoryClass: 'App\Repository\VerbRepository')]
 class Verb extends Card
 {
     use Trait\GroupTrait, 
@@ -169,10 +170,8 @@ class Verb extends Card
     }
 
     public function setInflections(array $inflections): Verb
-    {        
-        $this->inflections = $this->trimArrayValues($inflections);
-
-        return $this;
+    {
+        return $this->setLowerAndTrimmedOrNull('inflections', $inflections);
     }
 
     public function setReviewed(bool $reviewed): Verb
@@ -255,7 +254,23 @@ class Verb extends Card
             $inflections['dictionary'];
 
         return $this
-            ->setInflections($inflections)
+            ->fixIrregularities($inflections)
             ->setReviewed(false);
+    }
+
+    private function fixIrregularities(array $inflections): Verb
+    {
+        switch (trim($inflections['dictionary'])) {
+            case 'いく':
+                $inflections['past']['informal']['affirmative'] = 'いった';
+                $inflections['te']['affirmative'] = 'いって';
+                break;
+            case '行く':
+                $inflections['past']['informal']['affirmative'] = '行った';
+                $inflections['te']['affirmative'] = '行って';
+                break;
+        }
+
+        return $this->setInflections($inflections);
     }
 }

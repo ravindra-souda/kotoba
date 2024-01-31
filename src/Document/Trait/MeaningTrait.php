@@ -22,8 +22,8 @@ trait MeaningTrait
     ];
 
     public const VALIDATION_ERR_MEANING = [
-        1 => 'language unknown must be one of these: {{ langList }}',
-        2 => 'mandatory language "{{ mandLang }}" missing'
+        1 => 'mandatory language "{{ mandLang }}" missing',
+        2 => 'language unknown must be one of these: {{ langList }}',        
     ];
     
     /** 'en' key is mandatory and must have a non-empty array as a value */
@@ -64,13 +64,17 @@ trait MeaningTrait
             return 0;
         }
 
+        if (empty($meaning[self::getMandatoryLang()])) {
+            return 1;
+        }
+
         foreach(array_keys($meaning) as $userLang) {
             if (!in_array($userLang, self::ALLOWED_LANGS)) {
-                return 1;
+                return 2;
             }
         }
         
-        return empty($meaning[self::getMandatoryLang()]) ? 2 : 0;
+        return 0;
     }
 
     public function setMeaning(array $meaning): static

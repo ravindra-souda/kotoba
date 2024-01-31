@@ -59,17 +59,17 @@ class KanjiPostTest extends ApiTestCase
             ...self::POST_MINIMAL_VALID_KANJI,
             'meaning' => [],
         ],
+        'meaning_mandatory_lang_missing' => [
+            ...self::POST_MINIMAL_VALID_KANJI,
+            'meaning' => [
+                'fr' => 'chien',
+            ],
+        ],
         'meaning_lang_unknown' => [
             ...self::POST_MINIMAL_VALID_KANJI,
             'meaning' => [
                 'en' => 'dog',
                 'dummy' => '🂡🂱🃁🃑',
-            ],
-        ],
-        'meaning_mandatory_lang_missing' => [
-            ...self::POST_MINIMAL_VALID_KANJI,
-            'meaning' => [
-                'fr' => 'chien',
             ],
         ],
         'jlpt_min' => [
@@ -172,14 +172,18 @@ class KanjiPostTest extends ApiTestCase
                 'meaning: '.Kanji::VALIDATION_ERR_EMPTY,
             ],
             [
-                self::POST_INVALID_KANJI['meaning_lang_unknown'],
-                'meaning: '.Kanji::VALIDATION_ERR_MEANING,
-            ],
-            [
                 self::POST_INVALID_KANJI['meaning_mandatory_lang_missing'],
                 'meaning: '.Kanji::formatMsg(
-                    Kanji::VALIDATION_ERR_MEANING[2], 
+                    Kanji::VALIDATION_ERR_MEANING[1], 
                     Kanji::getMandatoryLang(),
+                )
+            ],
+
+            [
+                self::POST_INVALID_KANJI['meaning_lang_unknown'],
+                'meaning: '.Kanji::formatMsg(
+                    Kanji::VALIDATION_ERR_MEANING[2], 
+                    Kanji::getAllowedLangs()
                 )
             ],
             [

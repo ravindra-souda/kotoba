@@ -26,43 +26,45 @@ class MeaningTest extends TestCase
                 [
                     $mandatoryLang => 'to eat',
                 ], 
-                true
+                0
             ],
             [
                 [
                     $mandatoryLang => 'to eat',
                     $secondaryLang => 'manger',
                 ], 
-                true
+                0
             ],
             [
                 [
                     $secondaryLang => 'manger',
                     $mandatoryLang => 'to eat',
                 ], 
-                true
+                0
             ],
-            ['', false],
-            [null, false],
+            ['', 0],
+            [null, 0],
+            [[''], 1],
+            [[null], 1],
             [
                 [
                     $secondaryLang => 'manger',
                 ], 
-                false
+                1
             ],
             [
                 [
                     $secondaryLang => 'manger',
                     $mandatoryLang => '',
                 ], 
-                false
+                1
             ],
             [
                 [
                     $secondaryLang => 'manger',
                     $mandatoryLang => null,
                 ], 
-                false
+                1
             ],
             [
                 [
@@ -70,7 +72,7 @@ class MeaningTest extends TestCase
                     $mandatoryLang => 'to eat',
                     'dummy' => '???',
                 ], 
-                false
+                2
             ],
         ];
     }
@@ -79,11 +81,11 @@ class MeaningTest extends TestCase
      * @dataProvider isValidMeaningProvider
      *
      * @param string|array|null $meaning
-     * @param bool $expected
+     * @param int $expected
      */
     public function testIsValidMeaning(
         string|array|null $meaning,
-        bool $expected,
+        int $expected,
     ): void {
         $mock = $this->getMockForTrait(MeaningTrait::class);
         $this->assertEquals($mock->isValidMeaning($meaning), $expected);

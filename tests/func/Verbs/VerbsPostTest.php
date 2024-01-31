@@ -105,10 +105,9 @@ class VerbsPostTest extends ApiTestCase
                 ],
                 'past' => [
                     'informal' => [
-                        'affirmative' => '行かた', /* automatic conjugation 
-                        should be wrong since this an exception for this verb
-                        in the japanese langage, user can correct this 
-                        afterwards */
+                        'affirmative' => '行った', /* even though there's an
+                        exception for this verb, automatic conjugation should
+                        be fine */
                         'negative' => '行かなかった',
                     ],
                     'polite' => [
@@ -117,7 +116,7 @@ class VerbsPostTest extends ApiTestCase
                     ],
                 ],
                 'te' => [
-                    'affirmative' => '行って',
+                    'affirmative' => '行って', // same exception here
                     'negative' => '行かなくて',
                 ],
                 'potential' => [
@@ -199,7 +198,7 @@ class VerbsPostTest extends ApiTestCase
             ],
         ],
         'irregular' => [
-            ...self::POST_COMPLETE_VALID_VERBS['ichidan'],
+            ...self::POST_COMPLETE_VALID_VERBS['irregular'],
             /* automatic conjugation must be disabled for irregular verbs,
             leaving the completion to the user */
             'romaji' => 'kuru',
@@ -323,11 +322,13 @@ class VerbsPostTest extends ApiTestCase
         ],
         'meaning_empty' => [
             ...self::POST_MINIMAL_VALID_VERB,
-            'meaning' => '',
+            'meaning' => [],
         ],
-        'meaning_not_an_array' => [
+        'meaning_mandatory_lang_missing' => [
             ...self::POST_MINIMAL_VALID_VERB,
-            'meaning' => 'to eat',
+            'meaning' => [
+                'fr' => 'manger',
+            ],
         ],
         'meaning_lang_unknown' => [
             ...self::POST_MINIMAL_VALID_VERB,
@@ -339,10 +340,6 @@ class VerbsPostTest extends ApiTestCase
         'group_verb' => [
             ...self::POST_COMPLETE_VALID_VERBS['godan'],
             'group' => 'i',
-        ],
-        'jlpt_not_an_integer' => [
-            ...self::POST_MINIMAL_VALID_VERB,
-            'jlpt' => 1.1,
         ],
         'jlpt_min' => [
             ...self::POST_MINIMAL_VALID_VERB,
@@ -416,7 +413,10 @@ class VerbsPostTest extends ApiTestCase
                     ...self::POST_INVALID_VERBS['romaji_maxlength'],
                     'romaji' => str_repeat('a', Verb::ROMAJI_MAXLENGTH + 1),
                 ],
-                'romaji: '.Verb::VALIDATION_ERR_MAXLENGTH,
+                'romaji: '.Verb::formatMsg(
+                    Verb::VALIDATION_ERR_MAXLENGTH,
+                    Verb::ROMAJI_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_VERBS['romaji_written_in_kana'],
@@ -424,8 +424,11 @@ class VerbsPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_VERBS['no_hiragana_nor_katakana'],
-                'hiragana, katakana: '.
-                Verb::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+                'hiragana: '.Verb::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
+            ],
+            [
+                self::POST_INVALID_VERBS['no_hiragana_nor_katakana'],
+                'katakana: '.Verb::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA,
             ],
             [
                 self::POST_INVALID_VERBS['hiragana_written_in_katakana'],
@@ -437,7 +440,10 @@ class VerbsPostTest extends ApiTestCase
                     'hiragana' => 
                         str_repeat('あ', Verb::HIRAGANA_MAXLENGTH + 1),
                 ],
-                'hiragana: '.Verb::VALIDATION_ERR_MAXLENGTH,
+                'hiragana: '.Verb::formatMsg(
+                    Verb::VALIDATION_ERR_MAXLENGTH,
+                    Verb::HIRAGANA_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_VERBS['katakana_written_in_hiragana'],
@@ -449,14 +455,20 @@ class VerbsPostTest extends ApiTestCase
                     'katakana' => 
                         str_repeat('ア', Verb::KATAKANA_MAXLENGTH + 1),
                 ],
-                'katakana: '.Verb::VALIDATION_ERR_MAXLENGTH,
+                'katakana: '.Verb::formatMsg(
+                    Verb::VALIDATION_ERR_MAXLENGTH,
+                    Verb::KATAKANA_MAXLENGTH
+                )
             ],
             [
                 [
                     ...self::POST_INVALID_VERBS['kanji_maxlength'],
                     'kanji' => str_repeat('字', Verb::KANJI_MAXLENGTH + 1),
                 ],
-                'kanji: '.Verb::VALIDATION_ERR_MAXLENGTH,
+                'kanji: '.Verb::formatMsg(
+                    Verb::VALIDATION_ERR_MAXLENGTH,
+                    Verb::KANJI_MAXLENGTH
+                )
             ],
             [
                 self::POST_INVALID_VERBS['kanji_written_in_romaji'],
@@ -464,23 +476,28 @@ class VerbsPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_VERBS['meaning_empty'],
-                'meaning: '.Verb::VALIDATION_ERR_NOT_AN_ARRAY,
+                'meaning: '.Verb::VALIDATION_ERR_EMPTY,
             ],
             [
-                self::POST_INVALID_VERBS['meaning_not_an_array'],
-                'meaning: '.Verb::VALIDATION_ERR_NOT_AN_ARRAY,
+                self::POST_INVALID_VERBS['meaning_mandatory_lang_missing'],
+                'meaning: '.Verb::formatMsg(
+                    Verb::VALIDATION_ERR_MEANING[1], 
+                    Verb::getMandatoryLang(),
+                )
             ],
             [
                 self::POST_INVALID_VERBS['meaning_lang_unknown'],
-                'meaning: '.Verb::VALIDATION_ERR_MEANING,
+                'meaning: '.Verb::formatMsg(
+                    Verb::VALIDATION_ERR_MEANING[2], 
+                    Verb::getAllowedLangs()
+                )
             ],
             [
                 self::POST_INVALID_VERBS['group_verb'],
-                'group: '.Verb::VALIDATION_ERR_ENUM,
-            ],
-            [
-                self::POST_INVALID_VERBS['jlpt_not_an_integer'],
-                'jlpt: '.Verb::VALIDATION_ERR_JLPT,
+                'group: '.Verb::formatMsg(
+                    Verb::VALIDATION_ERR_ENUM,
+                    Verb::ALLOWED_GROUPS
+                )
             ],
             [
                 self::POST_INVALID_VERBS['jlpt_min'],

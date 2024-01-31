@@ -137,17 +137,17 @@ class NounsPostTest extends ApiTestCase
             ...self::POST_MINIMAL_VALID_NOUN,
             'meaning' => [],
         ],
+        'meaning_mandatory_lang_missing' => [
+            ...self::POST_MINIMAL_VALID_NOUN,
+            'meaning' => [
+                'fr' => 'chien',
+            ],
+        ],
         'meaning_lang_unknown' => [
             ...self::POST_MINIMAL_VALID_NOUN,
             'meaning' => [
                 'en' => 'dog',
                 'dummy' => '🂡🂱🃁🃑',
-            ],
-        ],
-        'meaning_mandatory_lang_missing' => [
-            ...self::POST_MINIMAL_VALID_NOUN,
-            'meaning' => [
-                'fr' => 'chien',
             ],
         ],
         'jlpt_min' => [
@@ -295,17 +295,17 @@ class NounsPostTest extends ApiTestCase
                 'meaning: '.Noun::VALIDATION_ERR_EMPTY,
             ],
             [
-                self::POST_INVALID_NOUNS['meaning_lang_unknown'],
+                self::POST_INVALID_NOUNS['meaning_mandatory_lang_missing'],
                 'meaning: '.Noun::formatMsg(
-                    Noun::VALIDATION_ERR_MEANING[1],
-                    Noun::getAllowedLangs(),
+                    Noun::VALIDATION_ERR_MEANING[1], 
+                    Noun::getMandatoryLang(),
                 )
             ],
             [
-                self::POST_INVALID_NOUNS['meaning_mandatory_lang_missing'],
+                self::POST_INVALID_NOUNS['meaning_lang_unknown'],
                 'meaning: '.Noun::formatMsg(
-                    Noun::VALIDATION_ERR_MEANING[2], 
-                    Noun::getMandatoryLang(),
+                    Noun::VALIDATION_ERR_MEANING[2],
+                    Noun::getAllowedLangs(),
                 )
             ],
             [

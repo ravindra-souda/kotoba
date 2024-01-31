@@ -61,7 +61,7 @@ class AdjectivesPostTest extends ApiTestCase
                     'negative' => '綺麗じゃない',
                 ],
                 'past' => [
-                    'affirmative' => '綺麗だった',
+                    'affirmative' => '綺麗でした',
                     'negative' => '綺麗じゃなかった',
                 ],
             ],
@@ -122,17 +122,17 @@ class AdjectivesPostTest extends ApiTestCase
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
             'meaning' => [],
         ],
+        'meaning_mandatory_lang_missing' => [
+            ...self::POST_MINIMAL_VALID_ADJECTIVE,
+            'meaning' => [
+                'fr' => 'delicieux',
+            ],
+        ],
         'meaning_lang_unknown' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
             'meaning' => [
                 'en' => 'delicious',
                 'dummy' => '🂡🂱🃁🃑',
-            ],
-        ],
-        'meaning_mandatory_lang_missing' => [
-            ...self::POST_MINIMAL_VALID_ADJECTIVE,
-            'meaning' => [
-                'fr' => 'delicieux',
             ],
         ],
         'group_adjective' => [
@@ -287,17 +287,17 @@ class AdjectivesPostTest extends ApiTestCase
                 'meaning: '.Adjective::VALIDATION_ERR_EMPTY,
             ],
             [
-                self::POST_INVALID_ADJECTIVES['meaning_lang_unknown'],
+                self::POST_INVALID_ADJECTIVES['meaning_mandatory_lang_missing'],
                 'meaning: '.Adjective::formatMsg(
                     Adjective::VALIDATION_ERR_MEANING[1], 
-                    Adjective::getAllowedLangs()
+                    Adjective::getMandatoryLang(),
                 )
             ],
             [
-                self::POST_INVALID_ADJECTIVES['meaning_mandatory_lang_missing'],
+                self::POST_INVALID_ADJECTIVES['meaning_lang_unknown'],
                 'meaning: '.Adjective::formatMsg(
                     Adjective::VALIDATION_ERR_MEANING[2], 
-                    Adjective::getMandatoryLang(),
+                    Adjective::getAllowedLangs()
                 )
             ],
             [

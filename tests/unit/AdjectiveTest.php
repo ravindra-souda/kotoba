@@ -198,59 +198,59 @@ class AdjectiveTest extends TestCase
                 [
                     'group' => Adjective::I_ADJECTIVE,
                     'hiragana' => '  おいしい  ',
-                ], true
+                ], 0
             ], 
             [
                 [
                     'group' => Adjective::I_ADJECTIVE,
                     'hiragana' => 'いそがしい',
                     'kanji' => '   忙しい ',
-                ], true
+                ], 0
             ], 
             [
                 [
                     'group' => Adjective::NA_ADJECTIVE,
                     'hiragana' => ' きれい  ',
-                ], true
+                ], 0
             ],
             [
                 [
                     'group' => Adjective::NA_ADJECTIVE,
                     'hiragana' => ' げんき  ',
                     'kanji' => '  元気  ',
-                ], true
+                ], 0
             ],
             [
                 [
                     'group' => Adjective::NA_ADJECTIVE,
                     'katakana' => ' オリジナル  ',
-                ], true
+                ], 0
             ],
             [
                 [
                     'group' => Adjective::I_ADJECTIVE,
                     'hiragana' => ' しずか  ',
-                ], false
-            ],
-            [
-                [
-                    'group' => Adjective::I_ADJECTIVE,
-                    'kanji' => '高', // spelling error 
-                    'hiragana' => ' たかい  ',
-                ], false
+                ], 1
             ],
             [
                 [
                     'group' => Adjective::I_ADJECTIVE,
                     'kanji' => '安い',
                     'hiragana' => ' やす  ', // spelling error
-                ], false
+                ], 1
             ],
             [
                 [
                     'group' => Adjective::I_ADJECTIVE,
                     'katakana' => ' クレージー  ',
-                ], false
+                ], 1
+            ],
+            [
+                [
+                    'group' => Adjective::I_ADJECTIVE,
+                    'kanji' => '高', // spelling error 
+                    'hiragana' => ' たかい  ',
+                ], 2
             ],
         ];
     }
@@ -259,12 +259,9 @@ class AdjectiveTest extends TestCase
      * @dataProvider isValidGroupProvider
      *
      * @param array $params
-     * @param bool $expected
+     * @param int $expected
      */
-    public function testIsValidGroup(
-        array $params,
-        bool $isValidGroup,
-    ): void 
+    public function testIsValidGroup(array $params, int $isValidGroup): void
     {    
         $adjective = new Adjective();
         $adjective

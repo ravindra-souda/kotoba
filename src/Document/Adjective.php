@@ -49,7 +49,6 @@ class Adjective extends Card
     public const VALIDATION_ERR_I_ADJECTIVE = [
         1 => 'i-adjective must have a hiragana field ending with い',
         2 => 'i-adjective must have a kanji field ending with い',
-        3 => Card::VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA
     ];
 
     /** Filled by the API */
@@ -98,10 +97,6 @@ class Adjective extends Card
         if ($this->kanji !== null && !str_ends_with($this->kanji, 'い')) {
             return 2;
         }
-        
-        if ($this->hiragana === null && $this->katakana !== null) {
-            return 3;
-        }
 
         return 0;
     }
@@ -125,7 +120,7 @@ class Adjective extends Card
                     'negative' => $base.'じゃない',
                 ],
                 'past' => [
-                    'affirmative' => $base.'だった',
+                    'affirmative' => $base.'でした',
                     'negative' => $base.'じゃなかった',
                 ],
             ];
