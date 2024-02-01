@@ -7,7 +7,7 @@ namespace App\State;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Document\{Adjective, Deck, Kana, Noun, Verb};
+use App\Document\{Adjective, Deck, Kana, Kanji, Noun, Verb};
 
 /**
  * @template T
@@ -30,7 +30,7 @@ final class SaveProcessor implements ProcessorInterface
         Operation $operation,
         array $uriVariables = [],
         array $context = [],
-    ): Adjective|Deck|Kana|Noun|Verb|null {
+    ): Adjective|Deck|Kana|Kanji|Noun|Verb|null {
         if ($operation instanceof DeleteOperationInterface) {
             return $this
                 ->removeProcessor

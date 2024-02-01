@@ -6,6 +6,7 @@ namespace App\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -17,12 +18,13 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
-    //processor: DeckSaveProcessor::class,
+    processor: SaveProcessor::class,
 )]
-#[MongoDB\Document]
+#[MongoDB\Document(repositoryClass: 'App\Repository\KanjiRepository')]
 class Kanji extends Card
 {
-    use Trait\MeaningTrait;
+    use Trait\MeaningTrait,
+        Trait\Script\ScriptTrait;
 
     public const KUNYOMI_MAXLENGTH = 100;
 
@@ -31,15 +33,27 @@ class Kanji extends Card
     public const VALIDATION_ERR_KANJI = 
         'must be written using exactly one kanji';
 
+    public const VALIDATION_ERR_ONYOMI =
+        'must be written using only lowercase roman characters, '.
+        'will be converted to katakana by the API';
+
+    public const VALIDATION_ERR_KUNYOMI =
+        'must be written using only lowercase roman characters, '.
+        'will be converted to hiragana by the API';
+
     /** Must be written using only kanji */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected string $kanji;
 
-    /** Must be written using only latin characters, 
+    /** Must be written using only lowercase roman characters, 
      *  will be converted to hiragana by the API */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
+    #[Assert\Regex(
+        pattern: '/^[a-z ,]+$/',
+        message: self::VALIDATION_ERR_KUNYOMI
+    )]
     #[Assert\Length(
         max: self::KUNYOMI_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
@@ -48,9 +62,13 @@ class Kanji extends Card
     #[MongoDB\Field(type: 'string')]
     protected string $kunyomi;
 
-    /** Must be written using only latin characters, 
+    /** Must be written using only lowercase roman characters, 
      *  will be converted to katakana by the API */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
+    #[Assert\Regex(
+        pattern: '/^[a-z ,]+$/',
+        message: self::VALIDATION_ERR_ONYOMI
+    )]
     #[Assert\Length(
         max: self::ONYOMI_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
@@ -101,15 +119,39 @@ class Kanji extends Card
         return $this;
     }
 
+    private function fillKunyomi(): Kanji
+    {
+        $this->kunyomi = $this->toHiragana($this->kunyomi);
+
+        return $this;
+    }
+
+    private function fillOnyomi(): Kanji
+    {
+        $this->onyomi = $this->toKatakana($this->onyomi);
+
+        return $this;
+    }
+
+    // called right before persist, see App\State\SaveProcessor
+    public function finalizeTasks(): static
+    {
+        return $this->fillKunyomi()->fillOnyomi();
+    }
+
     /**
      * @return array<string, mixed>
      */
     public static function getFields(): array
     {
-        $fields = parent::getFields();
-        $fields['string'] = [...$fields['string'], 'kunyomi', 'onyomi'];
-        
-        return $fields;
+        return [
+            'string' => ['kanji', 'kunyomi', 'onyomi'],
+        ];
+    }
+
+    public function getSlugReference(): string
+    {
+        return explode(',', $this->meaning['en'], 2)[0];
     }
 
     #[Assert\Callback]

@@ -27,6 +27,7 @@ class Verb extends Card
         Trait\KanjiTrait, 
         Trait\KatakanaTrait, 
         Trait\MeaningTrait,
+        Trait\RomajiTrait,
         Trait\Const\VerbTrait;
 
     public const GODAN = 'godan';
@@ -44,6 +45,8 @@ class Verb extends Card
     public const HIRAGANA_MAXLENGTH = 30;
 
     public const KATAKANA_MAXLENGTH = 30;
+
+    public const ROMAJI_MAXLENGTH = 50;
 
     /** dictionary must be filled, 
      *  any value left empty will be completed by automatic conjugation */
@@ -272,5 +275,20 @@ class Verb extends Card
         }
 
         return $this->setInflections($inflections);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getFields(): array
+    {
+        return [
+            'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
+        ];
+    }
+
+    public function getSlugReference(): string
+    {
+        return $this->romaji;
     }
 }

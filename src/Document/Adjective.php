@@ -27,7 +27,8 @@ class Adjective extends Card
         Trait\HiraganaTrait, 
         Trait\KanjiTrait, 
         Trait\KatakanaTrait, 
-        Trait\MeaningTrait;
+        Trait\MeaningTrait,
+        Trait\RomajiTrait;
 
     public const I_ADJECTIVE = 'i';
 
@@ -41,6 +42,8 @@ class Adjective extends Card
     public const HIRAGANA_MAXLENGTH = 30;
 
     public const KATAKANA_MAXLENGTH = 30;
+
+    public const ROMAJI_MAXLENGTH = 50;
 
     public const ERR_INCORRECT_GROUP = 'Incorrect group set';
 
@@ -82,23 +85,6 @@ class Adjective extends Card
     public function setInflections(array $inflections): Adjective
     {
         return $this->setLowerAndTrimmedOrNull('inflections', $inflections);
-    }
-
-    public function isValidGroup(): int
-    {
-        if ($this->group === self::NA_ADJECTIVE) {
-            return 0;
-        }
-
-        if (!str_ends_with($this->hiragana ?? '', 'い')) {
-            return 1;
-        }
-
-        if ($this->kanji !== null && !str_ends_with($this->kanji, 'い')) {
-            return 2;
-        }
-
-        return 0;
     }
 
     public function conjugate(): Adjective
@@ -154,6 +140,38 @@ class Adjective extends Card
     public function finalizeTasks(): static
     {
         return $this->conjugate();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getFields(): array
+    {
+        return [
+            'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
+        ];
+    }
+
+    public function getSlugReference(): string
+    {
+        return $this->romaji;
+    }
+
+    public function isValidGroup(): int
+    {
+        if ($this->group === self::NA_ADJECTIVE) {
+            return 0;
+        }
+
+        if (!str_ends_with($this->hiragana ?? '', 'い')) {
+            return 1;
+        }
+
+        if ($this->kanji !== null && !str_ends_with($this->kanji, 'い')) {
+            return 2;
+        }
+
+        return 0;
     }
 
     #[Assert\Callback]

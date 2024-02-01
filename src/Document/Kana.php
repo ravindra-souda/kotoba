@@ -23,11 +23,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class Kana extends Card
 {
     use Trait\HiraganaTrait,
-        Trait\KatakanaTrait;
+        Trait\KatakanaTrait,
+        Trait\RomajiTrait;
 
     public const HIRAGANA_MAXLENGTH = 2;
 
     public const KATAKANA_MAXLENGTH = 2;
+
+    public const ROMAJI_MAXLENGTH = 4;
 
     public const VALIDATION_ERR_KANA_HIRAGANA = 
         'must be exactly one mora long and written using only hiragana';
@@ -43,6 +46,11 @@ class Kana extends Card
         return [
             'string' => ['romaji', 'hiragana', 'katakana'],
         ];
+    }
+
+    public function getSlugReference(): string
+    {
+        return $this->romaji;
     }
 
     public static function isValidHiragana(?string $string): bool

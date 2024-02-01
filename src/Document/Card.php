@@ -23,13 +23,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 abstract class Card extends AbstractKotobaDocument
 {
-    public const ROMAJI_MAXLENGTH = 50;
-
     public const VALIDATION_ERR_EMPTY =
         'cannot be left empty';
-    
-    public const VALIDATION_ERR_ROMAJI =
-        'must be written using only roman characters';
     
     public const VALIDATION_ERR_NO_HIRAGANA_NOR_KATAKANA =
         'either hiragana or katakana must be filled';
@@ -46,21 +41,7 @@ abstract class Card extends AbstractKotobaDocument
     public const VALIDATION_ERR_JLPT =
         'must be an integer between 1 and 5';
 
-    /** Must be written using only latin characters */
-    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
-    #[Assert\Regex(
-        pattern: '/^[a-z]+$/i',
-        message: self::VALIDATION_ERR_ROMAJI
-    )]
-    #[Assert\Length(
-        max: self::ROMAJI_MAXLENGTH,
-        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
-    )]
-    #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $romaji = null;
-
-    /** Slugified by the API from romaji */
+    /** Slugified by the API from reference field (romaji or kanji) */
     #[ApiProperty(identifier: true)]
     #[Groups('read')]
     #[MongoDB\Field(type: 'string')]
@@ -118,11 +99,6 @@ abstract class Card extends AbstractKotobaDocument
         return $this->jlpt;
     }
 
-    public function getRomaji(): string
-    {
-        return $this->romaji;
-    }
-
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
@@ -132,22 +108,6 @@ abstract class Card extends AbstractKotobaDocument
     public function finalizeTasks(): static
     {
         return $this;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getFields(): array
-    {
-        return [
-            'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
-            'enum' => [],
-        ];
-    }
-
-    public function getSlugReference(): string
-    {
-        return $this->romaji;
     }
 
     public function setCode(string $code): Card
@@ -185,11 +145,6 @@ abstract class Card extends AbstractKotobaDocument
         $this->increment = $increment;
 
         return $this;
-    }
-
-    public function setRomaji(?string $romaji): Card
-    {
-        return $this->setLowerAndTrimmedOrNull('romaji', $romaji);
     }
 
     // see App\EventListener\PreUpdateListener

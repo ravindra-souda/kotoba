@@ -17,7 +17,7 @@ class KanjiPostTest extends ApiTestCase
         'kanji' => [
             'kanji' => '人',
             'meaning' => [
-                'en' => '    person ',
+                'en' => '    person, human ',
                 'fr' => '  personne, humain    '
             ],
             'kunyomi' => '   hito, hitori, hitoto  ',
@@ -27,13 +27,15 @@ class KanjiPostTest extends ApiTestCase
 
     private const POST_COMPLETE_EXPECTED_KANJI = [
         'kanji' => [
-            'kanji' => '人',
-            'meaning' => [
-                'en' => 'person',
-                'fr' => 'personne, humain'
-            ],
-            'kunyomi' => 'ひと, ひとり, ひとと',
-            'onyomi' => 'ジン, ニン',
+            [
+                'kanji' => '人',
+                'meaning' => [
+                    'en' => 'person, human',
+                    'fr' => 'personne, humain'
+                ],
+                'kunyomi' => 'ひと、ひとり、ひとと',
+                'onyomi' => 'ジン、ニン',
+            ], 'person'
         ],
     ];
 
@@ -98,7 +100,7 @@ class KanjiPostTest extends ApiTestCase
         ],
         'kanji_onyomi_not_in_romaji' => [
             ...self::POST_COMPLETE_VALID_KANJI['kanji'],
-            'kunyomi' => 'ジン, ニン',
+            'onyomi' => 'ジン, ニン',
         ],
         'kanji_onyomi_maxlength' => [
             ...self::POST_COMPLETE_VALID_KANJI['kanji'],
@@ -115,7 +117,7 @@ class KanjiPostTest extends ApiTestCase
 
         foreach(self::POST_COMPLETE_VALID_KANJI as $key => $value) {
             $expected = self::POST_COMPLETE_EXPECTED_KANJI[$key] ?? $value;
-            $provider[] = [$value, $expected];
+            $provider[] = [$value, ...$expected];
         }
         return $provider;
     }
@@ -129,6 +131,7 @@ class KanjiPostTest extends ApiTestCase
     public function testKanjiPostValid(
         array $payload,
         array $expected,
+        string $code,
     ): void {
         $response = static::createClient()->request(
             'POST',
@@ -148,7 +151,7 @@ class KanjiPostTest extends ApiTestCase
         $this->assertArrayHasKey('createdAt', $content);
         $this->assertStringStartsWith(date('Y-m-d'), $content['createdAt']);
         $this->assertMatchesRegularExpression(
-            '/\d+-'.$expected['romaji'].'/',
+            '/\d+-'.$code.'/',
             $content['code']
         );
     }
@@ -196,11 +199,11 @@ class KanjiPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_KANJI['kanji_kunyomi_empty'],
-                'kunyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
+                'kunyomi: '.Kanji::VALIDATION_ERR_EMPTY,
             ],
             [
                 self::POST_INVALID_KANJI['kanji_kunyomi_not_in_romaji'],
-                'kunyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
+                'kunyomi: '.Kanji::VALIDATION_ERR_KUNYOMI,
             ],
             [
                 [
@@ -214,11 +217,11 @@ class KanjiPostTest extends ApiTestCase
             ],
             [
                 self::POST_INVALID_KANJI['kanji_onyomi_empty'],
-                'onyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
+                'onyomi: '.Kanji::VALIDATION_ERR_EMPTY,
             ],
             [
                 self::POST_INVALID_KANJI['kanji_onyomi_not_in_romaji'],
-                'onyomi: '.Kanji::VALIDATION_ERR_ROMAJI,
+                'onyomi: '.Kanji::VALIDATION_ERR_ONYOMI,
             ],
             [
                 [

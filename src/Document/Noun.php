@@ -25,7 +25,8 @@ class Noun extends Card
     use Trait\HiraganaTrait, 
         Trait\KanjiTrait, 
         Trait\KatakanaTrait, 
-        Trait\MeaningTrait;
+        Trait\MeaningTrait,
+        Trait\RomajiTrait;
     
     public const ALLOWED_BIKAGO = [
         'お',
@@ -35,6 +36,8 @@ class Noun extends Card
     public const HIRAGANA_MAXLENGTH = 30;
 
     public const KATAKANA_MAXLENGTH = 30;
+
+    public const ROMAJI_MAXLENGTH = 50;
 
     /** Must be written using only hiragana */
     #[Assert\Choice(
@@ -67,9 +70,16 @@ class Noun extends Card
      */
     public static function getFields(): array
     {
-        $fields = parent::getFields();
-        $fields['enum']['bikago'] = self::ALLOWED_BIKAGO;
-        
-        return $fields;
+        return [
+            'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
+            'enum' => [
+                'bikago' => self::ALLOWED_BIKAGO
+            ],
+        ];
+    }
+
+    public function getSlugReference(): string
+    {
+        return $this->romaji;
     }
 }
