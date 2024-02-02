@@ -16,19 +16,50 @@ class KanaPostTest extends ApiTestCase
     private const POST_COMPLETE_VALID_KANA = [
         'kana_hiragana' => [
             'romaji' => '  a',
-            'hiragana' => 'あ',
+            'hiragana' => '   あ ',
         ],
         'kana_katakana' => [
             'romaji' => '  a ',
-            'katakana' => 'ア',
+            'katakana' => '   ア   ',
         ],
         'kana_hiragana_glide' => [
             'romaji' => '   kya ',
-            'hiragana' => 'きゃ',
+            'hiragana' => '   きゃ   ',
         ],
         'kana_katakana_glide' => [
             'romaji' => 'kya    ',
-            'katakana' => 'キャ',
+            'katakana' => '   キャ  ',
+        ],
+        'kana_hiragana_no_romaji' => [
+            'hiragana' => '   う   ',
+        ],
+        'kana_katakana_no_romaji' => [
+            'katakana' => '   ウ   ',
+        ],
+        'kana_hiragana_glide_no_romaji' => [
+            'hiragana' => '     にょ   ',
+        ],
+        'kana_katakana_glide_no_romaji' => [
+            'katakana' => ' シュ      ',
+        ],
+    ];
+
+    private const POST_COMPLETE_EXPECTED_KANA = [
+        'kana_hiragana_no_romaji' => [
+            'romaji' => 'u',
+            'hiragana' => 'う',
+        ],
+        'kana_katakana_no_romaji' => [
+            'romaji' => 'u',
+            'katakana' => 'ウ',
+        ],
+        'kana_hiragana_glide_no_romaji' => [
+            'romaji' => 'nyo',
+            'hiragana' => 'にょ',
+        ],
+        'kana_katakana_glide_no_romaji' => [
+            'romaji' => 'shu',
+            'katakana' => 'シュ',
         ],
     ];
 
@@ -38,10 +69,6 @@ class KanaPostTest extends ApiTestCase
     ];
 
     private const POST_INVALID_KANA = [
-        'romaji_empty' => [
-            ...self::POST_MINIMAL_VALID_KANA,
-            'romaji' => '',
-        ],
         'romaji_maxlength' => [
             ...self::POST_MINIMAL_VALID_KANA,
             'romaji' => '*',
@@ -104,8 +131,9 @@ class KanaPostTest extends ApiTestCase
     {
         $provider = [];
 
-        foreach(self::POST_COMPLETE_VALID_KANA as $payload) {
-            $provider[] = [$payload, array_map('trim', $payload)];
+        foreach(self::POST_COMPLETE_VALID_KANA as $key => $payload) {
+            $expected = self::POST_COMPLETE_EXPECTED_KANA[$key] ?? $payload;
+            $provider[] = [$payload, array_map('trim', $expected)];
         }
 
         return $provider;
@@ -150,10 +178,6 @@ class KanaPostTest extends ApiTestCase
     public function invalidKanaProvider(): array
     {
         return [
-            [
-                self::POST_INVALID_KANA['romaji_empty'],
-                'romaji: '.Kana::VALIDATION_ERR_EMPTY,
-            ],
             [
                 [
                     ...self::POST_INVALID_KANA['romaji_maxlength'],

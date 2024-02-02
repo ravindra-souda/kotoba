@@ -65,13 +65,22 @@ class Noun extends Card
         return $this;
     }
 
+    // called right before persist, see App\State\SaveProcessor
+    public function finalizeTasks(): static
+    {
+        return $this->fillRomaji();
+    }
+
     /**
      * @return array<string, mixed>
      */
     public static function getFields(): array
     {
         return [
-            'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
+            'string' => [
+                'trim' => ['hiragana', 'katakana', 'kanji'],
+                'lower+trim' => ['romaji'],
+            ],
             'enum' => [
                 'bikago' => self::ALLOWED_BIKAGO
             ],

@@ -211,7 +211,9 @@ class Deck extends AbstractKotobaDocument
     public static function getFields(): array
     {
         return [
-            'string' => ['title', 'description'],
+            'string' => [
+                'trim' => ['title', 'description'],
+            ],
             'enum' => [
                 'type' => self::ALLOWED_TYPES,
             ],

@@ -42,10 +42,15 @@ abstract class AbstractKotobaDocument
 
     public final function trimFields(): static
     {
-        foreach ($this->getFields()['string'] as $field) {
-            $this->{$field} = trim($this->{$field} ?? '');
+        foreach ($this->getFields()['string']['trim'] ?? [] as $field) {
+            // trim or null if empty string
+            $this->{$field} = trim($this->{$field} ?? '') ?: null;
         }
 
+        foreach ($this->getFields()['string']['lower+trim'] ?? [] as $field) {
+            $this->setLowerAndTrimmedOrNull($field, $this->{$field});
+        }
+        
         return $this;
     }
 

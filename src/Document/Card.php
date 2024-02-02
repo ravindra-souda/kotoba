@@ -104,12 +104,6 @@ abstract class Card extends AbstractKotobaDocument
         return $this->updatedAt;
     }
 
-    // called right before persist, see App\State\SaveProcessor
-    public function finalizeTasks(): static
-    {
-        return $this;
-    }
-
     public function setCode(string $code): Card
     {
         $this->code = $code;

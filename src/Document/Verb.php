@@ -113,7 +113,7 @@ class Verb extends Card
     // called right before persist, see App\State\SaveProcessor
     public function finalizeTasks(): static
     {
-        return $this->conjugate();
+        return $this->fillRomaji()->conjugate();
     }
 
     public function getInflections(): array
@@ -283,7 +283,10 @@ class Verb extends Card
     public static function getFields(): array
     {
         return [
-            'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
+            'string' => [
+                'trim' => ['hiragana', 'katakana', 'kanji'],
+                'lower+trim' => ['romaji'],
+            ],
         ];
     }
 

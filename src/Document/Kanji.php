@@ -145,7 +145,10 @@ class Kanji extends Card
     public static function getFields(): array
     {
         return [
-            'string' => ['kanji', 'kunyomi', 'onyomi'],
+            'string' => [
+                'trim' => ['kanji'],
+                'lower+trim' => ['kunyomi', 'onyomi'],
+            ],
         ];
     }
 

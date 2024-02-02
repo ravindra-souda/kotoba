@@ -38,13 +38,22 @@ class Kana extends Card
     public const VALIDATION_ERR_KANA_KATAKANA = 
         'must be exactly one mora long and written using only katakana';
 
+    // called right before persist, see App\State\SaveProcessor
+    public function finalizeTasks(): static
+    {
+        return $this->fillRomaji();
+    }
+
     /**
      * @return array<string, mixed>
      */
     public static function getFields(): array
     {
         return [
-            'string' => ['romaji', 'hiragana', 'katakana'],
+            'string' => [
+                'trim' => ['hiragana', 'katakana'],
+                'lower+trim' => ['romaji'],
+            ],
         ];
     }
 

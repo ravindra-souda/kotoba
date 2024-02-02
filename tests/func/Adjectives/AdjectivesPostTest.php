@@ -15,7 +15,6 @@ class AdjectivesPostTest extends ApiTestCase
 {    
     private const POST_COMPLETE_VALID_ADJECTIVES = [
         'i_adjective' => [
-            'romaji' => 'kawaii',
             'hiragana' => 'かわいい',
             'kanji' => '可愛い',
             'jlpt' => 5,
@@ -25,7 +24,6 @@ class AdjectivesPostTest extends ApiTestCase
             ],
         ],
         'na_adjective' => [
-            'romaji' => 'kirei',
             'hiragana' => 'きれい',
             'kanji' => '綺麗',
             'jlpt' => 5,
@@ -37,11 +35,35 @@ class AdjectivesPostTest extends ApiTestCase
                 ],
             ],
         ],
+        'na_adjective_katakana' => [
+            'katakana' => 'オリジナル',
+            'jlpt' => 5,
+            'group' => 'na',
+            'meaning' => [
+                'en' => [
+                    'original',
+                    'unique, exclusive',
+                ],
+            ],
+        ],
+        'romaji_filled' => [
+            'romaji' => 'original',
+            'katakana' => 'オリジナル',
+            'jlpt' => 5,
+            'group' => 'na',
+            'meaning' => [
+                'en' => [
+                    'original',
+                    'unique, exclusive',
+                ],
+            ],
+        ],
     ];
 
     private const POST_COMPLETE_EXPECTED_ADJECTIVES = [
         'i_adjective' => [
             ...self::POST_COMPLETE_VALID_ADJECTIVES['i_adjective'],
+            'romaji' => 'kawaii',
             'inflections' => [
                 'non-past' => [
                     'affirmative' => '可愛い',
@@ -55,6 +77,7 @@ class AdjectivesPostTest extends ApiTestCase
         ],
         'na_adjective' => [
             ...self::POST_COMPLETE_VALID_ADJECTIVES['na_adjective'],
+            'romaji' => 'kirei',
             'inflections' => [
                 'non-past' => [
                     'affirmative' => '綺麗',
@@ -63,6 +86,33 @@ class AdjectivesPostTest extends ApiTestCase
                 'past' => [
                     'affirmative' => '綺麗でした',
                     'negative' => '綺麗じゃなかった',
+                ],
+            ],
+        ],
+        'na_adjective_katakana' => [
+            ...self::POST_COMPLETE_VALID_ADJECTIVES['na_adjective_katakana'],
+            'romaji' => 'orijinaru',
+            'inflections' => [
+                'non-past' => [
+                    'affirmative' => 'オリジナル',
+                    'negative' => 'オリジナルじゃない',
+                ],
+                'past' => [
+                    'affirmative' => 'オリジナルでした',
+                    'negative' => 'オリジナルじゃなかった',
+                ],
+            ],
+        ],
+        'romaji_filled' => [
+            ...self::POST_COMPLETE_VALID_ADJECTIVES['romaji_filled'],
+            'inflections' => [
+                'non-past' => [
+                    'affirmative' => 'オリジナル',
+                    'negative' => 'オリジナルじゃない',
+                ],
+                'past' => [
+                    'affirmative' => 'オリジナルでした',
+                    'negative' => 'オリジナルじゃなかった',
                 ],
             ],
         ],
@@ -77,10 +127,6 @@ class AdjectivesPostTest extends ApiTestCase
     ];
 
     private const POST_INVALID_ADJECTIVES = [
-        'romaji_empty' => [
-            ...self::POST_MINIMAL_VALID_ADJECTIVE,
-            'romaji' => '',
-        ],
         'romaji_maxlength' => [
             ...self::POST_MINIMAL_VALID_ADJECTIVE,
             'romaji' => '*',
@@ -210,10 +256,6 @@ class AdjectivesPostTest extends ApiTestCase
     public function invalidAdjectivesProvider(): array
     {
         return [
-            [
-                self::POST_INVALID_ADJECTIVES['romaji_empty'],
-                'romaji: '.Adjective::VALIDATION_ERR_EMPTY,
-            ],
             [
                 [
                     ...self::POST_INVALID_ADJECTIVES['romaji_maxlength'],

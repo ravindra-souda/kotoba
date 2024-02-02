@@ -15,9 +15,7 @@ class NounsPostTest extends ApiTestCase
 {    
     private const POST_COMPLETE_VALID_NOUNS = [
         'hiragana' => [
-            'romaji' => '  gakKou       ',
             'hiragana' => '   がっこう ',
-            'katakana' => '',
             'kanji' => '学校',
             'jlpt' => 5,
             'meaning' => [
@@ -26,8 +24,6 @@ class NounsPostTest extends ApiTestCase
             ],
         ],
         'katakana' => [
-            'romaji' => '    Neko     ',
-            'hiragana' => '',
             'katakana' => '    ネコ ',
             'kanji' => ' 猫  ',
             'jlpt' => 5,
@@ -37,9 +33,17 @@ class NounsPostTest extends ApiTestCase
             ],
         ],
         'bikago' => [
-            'romaji' => ' oKane ',
             'hiragana' => ' おかね',
-            'katakana' => '',
+            'kanji' => '金',
+            'bikago' => 'お',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ' money   ',
+            ],
+        ],
+        'romaji_filled' => [
+            'romaji' => '    MoneY ',
+            'hiragana' => ' おかね',
             'kanji' => '金',
             'bikago' => 'お',
             'jlpt' => 5,
@@ -77,6 +81,14 @@ class NounsPostTest extends ApiTestCase
                 'en' => 'money',
             ],
         ],
+        'romaji_filled' => [
+            ...self::POST_COMPLETE_VALID_NOUNS['romaji_filled'],
+            'romaji' => 'money',
+            'hiragana' => 'おかね',
+            'meaning' => [
+                'en' => 'money',
+            ],
+        ],
     ];
 
     private const POST_MINIMAL_VALID_NOUN = [
@@ -88,10 +100,6 @@ class NounsPostTest extends ApiTestCase
     ];
 
     private const POST_INVALID_NOUNS = [
-        'romaji_empty' => [
-            ...self::POST_MINIMAL_VALID_NOUN,
-            'romaji' => '',
-        ],
         'romaji_maxlength' => [
             ...self::POST_MINIMAL_VALID_NOUN,
             'romaji' => '*',
@@ -213,10 +221,6 @@ class NounsPostTest extends ApiTestCase
     public function invalidNounsProvider(): array
     {
         return [
-            [
-                self::POST_INVALID_NOUNS['romaji_empty'],
-                'romaji: '.Noun::VALIDATION_ERR_EMPTY,
-            ],
             [
                 [
                     ...self::POST_INVALID_NOUNS['romaji_maxlength'],

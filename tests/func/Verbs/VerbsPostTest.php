@@ -15,7 +15,6 @@ class VerbsPostTest extends ApiTestCase
 {   
     private const POST_COMPLETE_VALID_VERBS = [
         'godan' => [
-            'romaji' => '   iKu  ',
             'hiragana' => '  いく   ',
             'kanji' => ' 行く   ',
             'jlpt' => 5,
@@ -28,7 +27,6 @@ class VerbsPostTest extends ApiTestCase
             ],
         ],
         'ichidan' => [
-            'romaji' => '  tabEru  ',
             'hiragana' => '      たべる',
             'kanji' => '食べる     ',
             'jlpt' => 5,
@@ -41,7 +39,6 @@ class VerbsPostTest extends ApiTestCase
             ],
         ],
         'irregular' => [
-            'romaji' => '  kuRu ',
             'hiragana' => '   くる ',
             'kanji' => ' 来る   ',
             'jlpt' => 5,
@@ -53,9 +50,20 @@ class VerbsPostTest extends ApiTestCase
                 'dictionary' => '    来る   ',
             ],
         ],
+        'romaji_filled' => [
+            'romaji' => '  coMe ',
+            'hiragana' => '   くる ',
+            'jlpt' => 5,
+            'group' => 'irregular',
+            'meaning' => [
+                'en' => '    to COME  ',
+            ],
+            'inflections' => [
+                'dictionary' => '    くる   ',
+            ],
+        ],
         'partial_inflections' => [
             /* only left out inflections should be filled by auto-conjugation */
-            'romaji' => '  maNaBu ',
             'hiragana' => '   まなぶ  ',
             'kanji' => ' 学ぶ   ',
             'jlpt' => 3,
@@ -199,8 +207,6 @@ class VerbsPostTest extends ApiTestCase
         ],
         'irregular' => [
             ...self::POST_COMPLETE_VALID_VERBS['irregular'],
-            /* automatic conjugation must be disabled for irregular verbs,
-            leaving the completion to the user */
             'romaji' => 'kuru',
             'hiragana' => 'くる',
             'kanji' => '来る',
@@ -209,6 +215,105 @@ class VerbsPostTest extends ApiTestCase
             ],
             'inflections' => [
                 'dictionary' => '来る',
+                'non-past' => [
+                    'informal' => [
+                        'affirmative' => '来る',
+                        'negative' => '来ない',
+                    ],
+                    'polite' => [
+                        'affirmative' => '来ます',
+                        'negative' => '来ません',
+                    ],
+                ],
+                'past' => [
+                    'informal' => [
+                        'affirmative' => '来た', 
+                        'negative' => '来なかった',
+                    ],
+                    'polite' => [
+                        'affirmative' => '来ました',
+                        'negative' => '来ませんでした',
+                    ],
+                ],
+                'te' => [
+                    'affirmative' => '来て',
+                    'negative' => '来なくて',
+                ],
+                'potential' => [
+                    'affirmative' => '来られる',
+                    'negative' => '来られない',
+                ],
+                'passive' => [
+                    'affirmative' => '来られる',
+                    'negative' => '来られない',
+                ],
+                'causative' => [
+                    'affirmative' => '来させる',
+                    'negative' => '来させない',
+                    'passive' => [
+                        'affirmative' => '来させられる',
+                        'negative' => '来させられない',
+                    ]
+                ],
+                'imperative' => [
+                    'affirmative' => '来い',
+                    'negative' => '来るな',
+                ],
+            ],
+        ],
+        'romaji_filled' => [
+            ...self::POST_COMPLETE_VALID_VERBS['romaji_filled'],
+            'romaji' => 'come',
+            'hiragana' => 'くる',
+            'meaning' => [
+                'en' => 'to come',
+            ],
+            'inflections' => [
+                'dictionary' => 'くる',
+                'non-past' => [
+                    'informal' => [
+                        'affirmative' => 'くる',
+                        'negative' => 'こない',
+                    ],
+                    'polite' => [
+                        'affirmative' => 'きます',
+                        'negative' => 'きません',
+                    ],
+                ],
+                'past' => [
+                    'informal' => [
+                        'affirmative' => 'きた', 
+                        'negative' => 'こなかった',
+                    ],
+                    'polite' => [
+                        'affirmative' => 'きました',
+                        'negative' => 'きませんでした',
+                    ],
+                ],
+                'te' => [
+                    'affirmative' => 'きて',
+                    'negative' => 'こなくて',
+                ],
+                'potential' => [
+                    'affirmative' => 'こられる',
+                    'negative' => 'こられない',
+                ],
+                'passive' => [
+                    'affirmative' => 'こられる',
+                    'negative' => 'こられない',
+                ],
+                'causative' => [
+                    'affirmative' => 'こさせる',
+                    'negative' => 'こさせない',
+                    'passive' => [
+                        'affirmative' => 'こさせられる',
+                        'negative' => 'こさせられない',
+                    ]
+                ],
+                'imperative' => [
+                    'affirmative' => 'こい',
+                    'negative' => 'くるな',
+                ],
             ],
         ],
         'partial_inflections' => [
@@ -279,10 +384,6 @@ class VerbsPostTest extends ApiTestCase
     ];
 
     private const POST_INVALID_VERBS = [
-        'romaji_empty' => [
-            ...self::POST_MINIMAL_VALID_VERB,
-            'romaji' => '',
-        ],
         'romaji_maxlength' => [
             ...self::POST_MINIMAL_VALID_VERB,
             'romaji' => '*',
@@ -404,10 +505,6 @@ class VerbsPostTest extends ApiTestCase
     public function invalidVerbsProvider(): array
     {
         return [
-            [
-                self::POST_INVALID_VERBS['romaji_empty'],
-                'romaji: '.Verb::VALIDATION_ERR_EMPTY,
-            ],
             [
                 [
                     ...self::POST_INVALID_VERBS['romaji_maxlength'],

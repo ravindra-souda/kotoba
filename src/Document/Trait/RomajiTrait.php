@@ -10,11 +10,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 trait RomajiTrait
 {
+    use Script\ScriptTrait;
+
     public const VALIDATION_ERR_ROMAJI =
         'must be written using only roman characters';
 
     /** Must be written using only roman characters */
-    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Regex(
         pattern: '/^[a-z]+$/i',
         message: self::VALIDATION_ERR_ROMAJI
@@ -27,7 +28,7 @@ trait RomajiTrait
     #[MongoDB\Field(type: 'string')]
     protected ?string $romaji = null;
 
-    public function getRomaji(): string
+    public function getRomaji(): ?string
     {
         return $this->romaji;
     }
@@ -35,5 +36,12 @@ trait RomajiTrait
     public function setRomaji(?string $romaji): static
     {
         return $this->setLowerAndTrimmedOrNull('romaji', $romaji);
+    }
+
+    private function fillRomaji(): static
+    {
+        $this->romaji ??= $this->toRomaji($this->hiragana ?? $this->katakana);
+
+        return $this;
     }
 }

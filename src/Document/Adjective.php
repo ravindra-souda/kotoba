@@ -72,11 +72,6 @@ class Adjective extends Card
         ]
     ];
 
-    /** Should be set to 'adjective' to create an Adjective flashcard */
-    #[Groups(['read', 'write'])]
-    #[MongoDB\Field]
-    protected string $type = 'adjective';
-
     public function getInflections(): array
     {
         return $this->inflections;
@@ -139,7 +134,7 @@ class Adjective extends Card
     // called right before persist, see App\State\SaveProcessor
     public function finalizeTasks(): static
     {
-        return $this->conjugate();
+        return $this->fillRomaji()->conjugate();
     }
 
     /**
@@ -148,7 +143,10 @@ class Adjective extends Card
     public static function getFields(): array
     {
         return [
-            'string' => ['romaji', 'hiragana', 'katakana', 'kanji'],
+            'string' => [
+                'trim' => ['hiragana', 'katakana', 'kanji'],
+                'lower+trim' => ['romaji'],
+            ],
         ];
     }
 
