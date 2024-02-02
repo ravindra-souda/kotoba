@@ -92,4 +92,47 @@ class ScriptTest extends TestCase
         $mock = $this->getMockForTrait(ScriptTrait::class);
         $this->assertEquals($mock->toKatakana($string), $expected);
     }
+
+        /**
+     * @return array<array<<string|bool>>
+     */
+    public function toRomajiProvider(): array
+    {
+        return [
+            ['', null],
+            [null, null],
+            ['あ', 'a'],
+            ['ア', 'a'],
+            ['a', 'a'],
+            ['だいがくせい', 'daigakusei'],
+            ['がっこうきゅうしょく', 'gakkoukyuushoku'],
+            ['アーマードコア', 'aamaadokoa'],
+            ['コーヒー', 'kouhii'],
+            ['ケチャップ', 'kechappu'],
+            ['ハッピー', 'happii'],
+            ['スーパーマーケット', 'suupaamaaketto'],
+            ['コンビニ', 'konbini'],
+            ['ニュージーランド', 'nyuujiirando'],
+            ['ひ、び、か', 'hi,bi,ka'],
+            ['ニチ、ジツ', 'nichi,jitsu'],
+            ['字', false],
+            ['食べる', false],
+            ['1', false],
+            ['merii kurisumas', false],
+        ];
+    }
+
+    /**
+     * @dataProvider toRomajiProvider
+     *
+     * @param ?string $string
+     * @param ?string\bool $expected
+     */
+    public function testToRomaji(
+        ?string $string,
+        string|null|bool $expected,
+    ): void {
+        $mock = $this->getMockForTrait(ScriptTrait::class);
+        $this->assertEquals($mock->toRomaji($string), $expected);
+    }
 }
