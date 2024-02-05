@@ -34,7 +34,7 @@ class NounsPostTest extends ApiTestCase
         ],
         'bikago' => [
             'hiragana' => ' おかね',
-            'kanji' => '金',
+            'kanji' => 'お金',
             'bikago' => 'お',
             'jlpt' => 5,
             'meaning' => [
@@ -44,11 +44,21 @@ class NounsPostTest extends ApiTestCase
         'romaji_filled' => [
             'romaji' => '    MoneY ',
             'hiragana' => ' おかね',
-            'kanji' => '金',
+            'kanji' => 'お金',
             'bikago' => 'お',
             'jlpt' => 5,
             'meaning' => [
                 'en' => ' money   ',
+            ],
+        ],
+        'romaji_long_wovel' => [
+            'romaji' => '    OnEesan ',
+            'hiragana' => ' おねえさん',
+            'kanji' => '   お姉さん  ',
+            'bikago' => 'お',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => '  big sister  ',
             ],
         ],
     ];
@@ -87,6 +97,15 @@ class NounsPostTest extends ApiTestCase
             'hiragana' => 'おかね',
             'meaning' => [
                 'en' => 'money',
+            ],
+        ],
+        'romaji_long_wovel' => [
+            ...self::POST_COMPLETE_VALID_NOUNS['romaji_long_wovel'],
+            'romaji' => 'onēsan',
+            'hiragana' => 'おねえさん',
+            'kanji' => 'お姉さん',
+            'meaning' => [
+                'en' => 'big sister',
             ],
         ],
     ];
@@ -209,9 +228,12 @@ class NounsPostTest extends ApiTestCase
         $content = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('createdAt', $content);
         $this->assertStringStartsWith(date('Y-m-d'), $content['createdAt']);
+
+        $expectedCode = str_replace(
+            ['ā','ū','ē','ō'], ['a','u','e','o'], $expected['romaji']
+        );
         $this->assertMatchesRegularExpression(
-            '/\d+-'.$expected['romaji'].'/',
-            $content['code']
+            '/\d+-'.$expectedCode.'/', $content['code']
         );
     }
 
@@ -224,7 +246,7 @@ class NounsPostTest extends ApiTestCase
             [
                 [
                     ...self::POST_INVALID_NOUNS['romaji_maxlength'],
-                    'romaji' => str_repeat('a', Noun::ROMAJI_MAXLENGTH + 1),
+                    'romaji' => str_repeat('x', Noun::ROMAJI_MAXLENGTH + 1),
                 ],
                 'romaji: '.Noun::formatMsg(
                     Noun::VALIDATION_ERR_MAXLENGTH, 

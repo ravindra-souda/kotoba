@@ -181,7 +181,7 @@ class KanaPostTest extends ApiTestCase
             [
                 [
                     ...self::POST_INVALID_KANA['romaji_maxlength'],
-                    'romaji' => str_repeat('a', Kana::ROMAJI_MAXLENGTH + 1),
+                    'romaji' => str_repeat('x', Kana::ROMAJI_MAXLENGTH + 1),
                 ],
                 'romaji: '.Kana::formatMsg(
                     Kana::VALIDATION_ERR_MAXLENGTH, 

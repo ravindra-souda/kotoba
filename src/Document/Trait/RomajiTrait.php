@@ -17,7 +17,7 @@ trait RomajiTrait
 
     /** Must be written using only roman characters */
     #[Assert\Regex(
-        pattern: '/^[a-z]+$/i',
+        pattern: '/^[a-zāūēō]+$/i',
         message: self::VALIDATION_ERR_ROMAJI
     )]
     #[Assert\Length(
@@ -35,6 +35,9 @@ trait RomajiTrait
 
     public function setRomaji(?string $romaji): static
     {
+        $romaji = str_ireplace(
+            ['aa','uu','ee','oo'], ['ā', 'ū', 'ē', 'ō'], $romaji
+        );
         return $this->setLowerAndTrimmedOrNull('romaji', $romaji);
     }
 

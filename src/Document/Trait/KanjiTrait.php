@@ -38,7 +38,7 @@ trait KanjiTrait
         }
 
         // must be kanji only or kanji with hiragana ending
-        return preg_match('/^\p{Han}+\p{Hiragana}*$/um', $string) === 1;
+        return preg_match('/^[おご]?\p{Han}+\p{Hiragana}*$/um', $string) === 1;
     }
 
     public function setKanji(?string $kanji): static

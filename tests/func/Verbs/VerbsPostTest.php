@@ -508,7 +508,7 @@ class VerbsPostTest extends ApiTestCase
             [
                 [
                     ...self::POST_INVALID_VERBS['romaji_maxlength'],
-                    'romaji' => str_repeat('a', Verb::ROMAJI_MAXLENGTH + 1),
+                    'romaji' => str_repeat('x', Verb::ROMAJI_MAXLENGTH + 1),
                 ],
                 'romaji: '.Verb::formatMsg(
                     Verb::VALIDATION_ERR_MAXLENGTH,

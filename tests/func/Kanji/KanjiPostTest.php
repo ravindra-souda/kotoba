@@ -23,6 +23,20 @@ class KanjiPostTest extends ApiTestCase
             'kunyomi' => '   hito, hitori, hitoto  ',
             'onyomi' => '  jin, nin  ',
         ],
+        'long_wovel' => [
+            'kanji' => '週',
+            'meaning' => [
+                'en' => '    week ',
+            ],
+            'onyomi' => '  shū  ',
+        ],
+        'kokuji_without_onyomi' => [
+            'kanji' => '込',
+            'meaning' => [
+                'en' => '    crowded, mixture, in bulk, included ',
+            ],
+            'kunyomi' => '  ko  ',
+        ],
     ];
 
     private const POST_COMPLETE_EXPECTED_KANJI = [
@@ -36,6 +50,24 @@ class KanjiPostTest extends ApiTestCase
                 'kunyomi' => 'ひと、ひとり、ひとと',
                 'onyomi' => 'ジン、ニン',
             ], 'person'
+        ],
+        'long_wovel' => [
+            [
+                'kanji' => '週',
+                'meaning' => [
+                    'en' => 'week',
+                ],
+                'onyomi' => 'シュウ',
+            ], 'week'
+        ],
+        'kokuji_without_onyomi' => [
+            [
+                'kanji' => '込',
+                'meaning' => [
+                    'en' => 'crowded, mixture, in bulk, included',
+                ],
+                'kunyomi' => 'こ',
+            ], 'crowded'
         ],
     ];
 
@@ -82,9 +114,10 @@ class KanjiPostTest extends ApiTestCase
             ...self::POST_MINIMAL_VALID_KANJI,
             'jlpt' => 6,
         ],
-        'kanji_kunyomi_empty' => [
-            ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+        'kanji_kunyomi_onyomi_empty' => [
+            ...self::POST_MINIMAL_VALID_KANJI,
             'kunyomi' => '',
+            'onyomi' => '',
         ],
         'kanji_kunyomi_not_in_romaji' => [
             ...self::POST_COMPLETE_VALID_KANJI['kanji'],
@@ -93,10 +126,6 @@ class KanjiPostTest extends ApiTestCase
         'kanji_kunyomi_maxlength' => [
             ...self::POST_COMPLETE_VALID_KANJI['kanji'],
             'kunyomi' => '*',
-        ],
-        'kanji_onyomi_empty' => [
-            ...self::POST_COMPLETE_VALID_KANJI['kanji'],
-            'onyomi' => '',
         ],
         'kanji_onyomi_not_in_romaji' => [
             ...self::POST_COMPLETE_VALID_KANJI['kanji'],
@@ -198,8 +227,12 @@ class KanjiPostTest extends ApiTestCase
                 'jlpt: '.Kanji::VALIDATION_ERR_JLPT,
             ],
             [
-                self::POST_INVALID_KANJI['kanji_kunyomi_empty'],
-                'kunyomi: '.Kanji::VALIDATION_ERR_EMPTY,
+                self::POST_INVALID_KANJI['kanji_kunyomi_onyomi_empty'],
+                'kunyomi: '.Kanji::VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI,
+            ],
+            [
+                self::POST_INVALID_KANJI['kanji_kunyomi_onyomi_empty'],
+                'onyomi: '.Kanji::VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI,
             ],
             [
                 self::POST_INVALID_KANJI['kanji_kunyomi_not_in_romaji'],
@@ -214,10 +247,6 @@ class KanjiPostTest extends ApiTestCase
                     Kanji::VALIDATION_ERR_MAXLENGTH, 
                     Kanji::KUNYOMI_MAXLENGTH
                 ),
-            ],
-            [
-                self::POST_INVALID_KANJI['kanji_onyomi_empty'],
-                'onyomi: '.Kanji::VALIDATION_ERR_EMPTY,
             ],
             [
                 self::POST_INVALID_KANJI['kanji_onyomi_not_in_romaji'],

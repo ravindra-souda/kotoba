@@ -22,12 +22,17 @@ class KanjiTest extends TestCase
             [null, true],
             ['字', true],
             ['食べる', true],
+            ['お母さん', true],
+            ['ご飯', true],
             ['あ', false],
             ['ア', false],
             ['a', false],
             ['1', false],
             ['食ベル', false],
             ['たべる', false],
+            ['こ飯', false],
+            ['おご飯', false],
+            ['ごお飯', false],
         ];
     }
 

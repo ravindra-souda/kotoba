@@ -126,6 +126,31 @@ trait ScriptTrait
         ]
     ];
 
+    private const GLIDES_TO_FIX = ['shy', 'chy', 'dy', 'jy'];
+
+    private const GLIDES_FIXED = ['sh', 'ch', 'dj', 'j'];
+
+    private const GLIDES_ROMAJI = [
+        'romaji' => [
+            'sha', 'shu', 'sho', 'shā', 'shū', 'shō',
+            'cha', 'chu', 'cho', 'chā', 'chū', 'chō',
+            'dja', 'dju', 'djo', 'djā', 'djū', 'djō',
+            'ja', 'ju', 'jo', 'jā', 'jū', 'jō',
+        ],
+        'hiragana' => [
+            'しゃ', 'しゅ', 'しょ', 'しゃあ', 'しゅう', 'しょお',
+            'ちゃ', 'ちゅ', 'ちょ', 'ちゃあ', 'ちゅう', 'ちょお',
+            'ぢゃ', 'ぢゅ', 'ぢょ', 'ぢゃあ', 'ぢゅう', 'ぢょお',
+            'じゃ', 'じゅ', 'じょ', 'じゃあ', 'じゅう', 'じょお',
+        ],
+        'katakana' => [
+            'シャ', 'シュ', 'ショ', 'シャー', 'シュー', 'ショー',
+            'チャ', 'チュ', 'チョ', 'チャー', 'チュー', 'チョー',
+            'ヂャ', 'ヂュ', 'ヂョ', 'ヂャー', 'ヂュー', 'ヂョー',
+            'ジャ', 'ジュ', 'ジョ', 'ジャー', 'ジュー', 'ジョー',
+        ]
+    ];
+
     private const CHIISAI_TSU = [
         'hiragana' => 'っ', 
         'katakana' => 'ッ', 
@@ -143,13 +168,15 @@ trait ScriptTrait
         return self::isHiragana($hiragana) ? $hiragana : false;
     }
 
-    public static function toKatakana(?string $string): string|null|bool
+    public static function toKatakana(
+        ?string $string, bool $longKatakana = true
+    ): string|null|bool
     {
         if (empty($string)) {
             return null;
         }
 
-        $katakana = self::convert($string, self::KATAKANA);
+        $katakana = self::convert($string, self::KATAKANA, $longKatakana);
 
         return self::isKatakana($katakana) ? $katakana : false;
     }
@@ -165,7 +192,9 @@ trait ScriptTrait
         return self::isRomaji($romaji) ? $romaji : false;
     }
 
-    private static function convert(string $string, string $to): ?string
+    private static function convert(
+        string $string, string $to, bool $longKatakana = true
+    ): ?string
     {
         $from = self::detect($string);
 
@@ -175,7 +204,21 @@ trait ScriptTrait
 
         $string = self::convertChiisaiTsu($string, $from, $to);
 
-        $string = str_replace(self::LONG[$from], self::LONG[$to], $string);
+        if ($from === self::ROMAJI && !$longKatakana) {
+            $string = str_replace(
+                ['ā', 'ū', 'ē', 'ō'], ['aa', 'uu', 'ee', 'oo'], $string
+            );
+        }
+
+        if ($from === self::ROMAJI) {
+            $string = str_replace(
+                self::GLIDES_ROMAJI['romaji'], self::GLIDES_ROMAJI[$to], $string
+            );
+        }
+
+        if ($longKatakana) {
+            $string = str_replace(self::LONG[$from], self::LONG[$to], $string);
+        }
         $string = str_replace(self::SHORT[$from], self::SHORT[$to], $string);
 
         if ($to === self::ROMAJI) {
@@ -201,8 +244,8 @@ trait ScriptTrait
         }
 
         $search = [
-            'kk', 'ss', 'tt', 'cc', 'hh', 'ff', 'mm', 'yy', 'rr',
-            'gg', 'zz', 'jj', 'dd', 'bb', 'pp'
+            'kk', 'ss', 'tt', 'hh', 'ff', 'mm', 'yy', 'rr',
+            'gg', 'zz', 'jj', 'dd', 'bb', 'pp', 'tch'
         ];
         $replacements = [];
         
@@ -222,20 +265,18 @@ trait ScriptTrait
             $offset = strpos($string, '*', $offset);
         }
 
-        return $string;
+        return str_replace('cch', 'tch', $string);
     }
 
     private static function convertGlides(string $string): string
     {
         $offset = strpos($string, '%');
-        while ($offset !== false) {            
-            $previousKana = substr($string, $offset - 3, 3);
-            $charsToDelete = in_array($previousKana, ['shi', 'chi']) ? 3 : 2;
-            $string = substr_replace($string, '', $offset - 1, $charsToDelete);
+        while ($offset !== false) {
+            $string = substr_replace($string, '', $offset - 1, 2);
             $offset = strpos($string, '%', $offset);
         }
 
-        return $string;
+        return str_replace(self::GLIDES_TO_FIX, self::GLIDES_FIXED, $string);
     }
 
     private static function detect(string $string): string

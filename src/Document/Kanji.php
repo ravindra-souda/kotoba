@@ -41,6 +41,9 @@ class Kanji extends Card
         'must be written using only lowercase roman characters, '.
         'will be converted to hiragana by the API';
 
+    public const VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI =
+        'either kunyomi or onyomi must be filled';
+
     /** Must be written using only kanji */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
     #[Groups(['read', 'write'])]
@@ -49,9 +52,8 @@ class Kanji extends Card
 
     /** Must be written using only lowercase roman characters, 
      *  will be converted to hiragana by the API */
-    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Regex(
-        pattern: '/^[a-z ,]+$/',
+        pattern: '/^[a-zāūēō ,]+$/',
         message: self::VALIDATION_ERR_KUNYOMI
     )]
     #[Assert\Length(
@@ -60,13 +62,12 @@ class Kanji extends Card
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
-    protected string $kunyomi;
+    protected ?string $kunyomi = null;
 
     /** Must be written using only lowercase roman characters, 
      *  will be converted to katakana by the API */
-    #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Regex(
-        pattern: '/^[a-z ,]+$/',
+        pattern: '/^[a-zāūēō ,]+$/',
         message: self::VALIDATION_ERR_ONYOMI
     )]
     #[Assert\Length(
@@ -75,19 +76,19 @@ class Kanji extends Card
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
-    protected string $onyomi;
+    protected ?string $onyomi = null;
 
     public function getKanji(): string
     {
         return $this->kanji;
     }
 
-    public function getKunyomi(): string
+    public function getKunyomi(): ?string
     {
         return $this->kunyomi;
     }
 
-    public function getOnyomi(): string
+    public function getOnyomi(): ?string
     {
         return $this->onyomi;
     }
@@ -105,18 +106,14 @@ class Kanji extends Card
         return $this;
     }
 
-    public function setKunyomi(string $kunyomi): Kanji
+    public function setKunyomi(?string $kunyomi): Kanji
     {
-        $this->kunyomi = $kunyomi;
-
-        return $this;
+        return $this->setLowerAndTrimmedOrNull('kunyomi', $kunyomi);
     }
 
-    public function setOnyomi(string $onyomi): Kanji
+    public function setOnyomi(?string $onyomi): Kanji
     {
-        $this->onyomi = $onyomi;
-
-        return $this;
+        return $this->setLowerAndTrimmedOrNull('onyomi', $onyomi);
     }
 
     private function fillKunyomi(): Kanji
@@ -128,7 +125,7 @@ class Kanji extends Card
 
     private function fillOnyomi(): Kanji
     {
-        $this->onyomi = $this->toKatakana($this->onyomi);
+        $this->onyomi = $this->toKatakana($this->onyomi, false);
 
         return $this;
     }
@@ -157,6 +154,11 @@ class Kanji extends Card
         return explode(',', $this->meaning['en'], 2)[0];
     }
 
+    public function hasKunyomiOrOnyomi(): bool
+    {
+        return $this->kunyomi !== null || $this->onyomi !== null;
+    }
+
     #[Assert\Callback]
     public function validateKanji(
         ExecutionContextInterface $context, 
@@ -170,6 +172,27 @@ class Kanji extends Card
         $context
             ->buildViolation(self::VALIDATION_ERR_KANJI)
             ->atPath('kanji')
+            ->addViolation();
+    }
+
+    #[Assert\Callback]
+    public function validateHasKunyomiOrOnyomi(
+        ExecutionContextInterface $context, 
+        mixed $payload
+    ): void
+    {
+        if ($this->hasKunyomiOrOnyomi()) {
+            return;
+        }
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI)
+            ->atPath('kunyomi')
+            ->addViolation();
+
+        $context
+            ->buildViolation(self::VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI)
+            ->atPath('onyomi')
             ->addViolation();
     }
 }

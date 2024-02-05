@@ -260,7 +260,7 @@ class AdjectivesPostTest extends ApiTestCase
                 [
                     ...self::POST_INVALID_ADJECTIVES['romaji_maxlength'],
                     'romaji' => str_repeat(
-                        'a', Adjective::ROMAJI_MAXLENGTH + 1
+                        'x', Adjective::ROMAJI_MAXLENGTH + 1
                     ),
                 ],
                 'romaji: '.Adjective::formatMsg(
