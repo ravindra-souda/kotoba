@@ -119,7 +119,7 @@ class DecksPutTest extends ApiTestCase
                 'type' => 'dummy',
             ],
             'message' => [
-                'text' => 'type: '.Deck::VALIDATION_ERR_TYPE,
+                'text' => 'type: '.Deck::VALIDATION_ERR_ENUM,
                 'values' => Deck::ALLOWED_TYPES,
             ],
         ],
