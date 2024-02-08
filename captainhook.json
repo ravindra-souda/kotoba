@@ -19,7 +19,7 @@
         "enabled": true,
         "actions": [
             {
-                "action": "docker compose exec app vendor/bin/phpstan"
+                "action": "docker compose exec app vendor/bin/phpstan --memory-limit=512M"
             },
             {
                 "action": "docker compose exec app php bin/phpunit"

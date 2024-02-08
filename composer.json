@@ -70,7 +70,7 @@
             "@auto-scripts"
         ],
         "test": "php bin/phpunit --testdox",
-        "stan": "phpstan",
+        "stan": "phpstan --memory-limit=512M",
         "cs": "php-cs-fixer fix src tests --config=.php-cs-fixer.dist.php --allow-risky=yes --path-mode=intersection",
         "lint": ["@stan", "@cs"]
     },
