@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Document\Deck;
+use App\Document\AbstractKotobaDocument as Doc;
 use Doctrine\Bundle\MongoDBBundle\Attribute\AsDocumentListener;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
@@ -26,7 +26,7 @@ class PrePersistListener
     {
         $dm = $args->getDocumentManager();
 
-        /** @var Deck $doc */
+        /** @var Doc $doc */
         $doc = $args->getDocument();
 
         $this
@@ -36,14 +36,14 @@ class PrePersistListener
         ;
     }
 
-    private function setCreatedAt(Deck $doc): static
+    private function setCreatedAt(Doc $doc): static
     {
         $doc->setCreatedAt(new \DateTimeImmutable());
 
         return $this;
     }
 
-    private function setIncrement(Deck $doc, DocumentManager $dm): static
+    private function setIncrement(Doc $doc, DocumentManager $dm): static
     {
         $className = get_class($doc);
 

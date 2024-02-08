@@ -7,14 +7,19 @@ namespace App\State;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Document\Adjective;
 use App\Document\Deck;
+use App\Document\Kana;
+use App\Document\Kanji;
+use App\Document\Noun;
+use App\Document\Verb;
 
 /**
  * @template T
  *
  * @template-implements ProcessorInterface<T>
  */
-final class DeckSaveProcessor implements ProcessorInterface
+final class SaveProcessor implements ProcessorInterface
 {
     /**
      * @param ProcessorInterface<T> $persistProcessor
@@ -30,7 +35,7 @@ final class DeckSaveProcessor implements ProcessorInterface
         Operation $operation,
         array $uriVariables = [],
         array $context = [],
-    ): ?Deck {
+    ): Adjective|Deck|Kana|Kanji|Noun|Verb|null {
         if ($operation instanceof DeleteOperationInterface) {
             return $this
                 ->removeProcessor
@@ -38,7 +43,10 @@ final class DeckSaveProcessor implements ProcessorInterface
             ;
         }
 
-        $data->trimFields();
+        $data
+            ->trimFields()
+            ->finalizeTasks()
+        ;
 
         return $this
             ->persistProcessor
