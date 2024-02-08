@@ -15,7 +15,7 @@ trait SlugifyCodeTrait
         $doc
             ->setCode(
                 $this->slugify->slugify(
-                    $doc->getIncrement().'-'.$doc->getTitle()
+                    $doc->getIncrement().'-'.$doc->getSlugReference()
                 )
             )
         ;

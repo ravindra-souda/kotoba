@@ -231,7 +231,7 @@ class DecksPutTest extends ApiTestCase
                 'type: '.str_replace(
                     '{{ choices }}',
                     '"'.implode('", "', Deck::ALLOWED_TYPES).'"',
-                    Deck::VALIDATION_ERR_TYPE
+                    Deck::VALIDATION_ERR_ENUM
                 ),
             ], [
                 [
