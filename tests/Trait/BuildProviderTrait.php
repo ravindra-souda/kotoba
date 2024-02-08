@@ -8,6 +8,7 @@ use App\Document\AbstractKotobaDocument as Doc;
 use App\Tests\Types;
 
 /**
+ * @phpstan-import-type AdjectiveType from Types
  * @phpstan-import-type DeckType from Types
  *
  * @phpstan-type Message string|array{
@@ -15,13 +16,13 @@ use App\Tests\Types;
  *      values:string|int|array<string>
  * }
  * @phpstan-type PostTest array{
- *      payload: DeckType,
+ *      payload: AdjectiveType|DeckType,
  *      message: Message,
  *      maxlength?: array<string,string>,
  * }
  * @phpstan-type PutTest array{
  *      fixture: string,
- *      payload?: DeckType,
+ *      payload?: AdjectiveType|DeckType,
  *      message: Message,
  *      maxlength?: array<string,string>,
  * }
@@ -31,7 +32,7 @@ trait BuildProviderTrait
     /**
      * @param array<string,PostTest> $tests
      *
-     * @return array<string,array<DeckType|string>>
+     * @return array<string,array<AdjectiveType|DeckType|string>>
      */
     final protected function buildPostProvider(array $tests): array
     {
@@ -50,10 +51,10 @@ trait BuildProviderTrait
     }
 
     /**
-     * @param array<string,PutTest>  $tests
-     * @param array<string,DeckType> $fixtures
+     * @param array<string,PutTest>                $tests
+     * @param array<string,AdjectiveType|DeckType> $fixtures
      *
-     * @return array<string,array<DeckType|string>>
+     * @return array<string,array<AdjectiveType|DeckType|string>>
      */
     final protected function buildPutProvider(
         array $tests,
@@ -68,6 +69,8 @@ trait BuildProviderTrait
             $fixture = $fixtures[$fixture_key];
 
             $payload = $test['payload'] ?? [];
+
+            /** @var AdjectiveType|DeckType $payload */
             $payload = array_merge($fixture, $payload);
 
             $payload = $this->generateMaxlengthValues($test, $payload);
@@ -80,10 +83,10 @@ trait BuildProviderTrait
     }
 
     /**
-     * @param PostTest|PutTest $test
-     * @param DeckType         $payload
+     * @param PostTest|PutTest       $test
+     * @param AdjectiveType|DeckType $payload
      *
-     * @return DeckType
+     * @return AdjectiveType|DeckType
      */
     private function generateMaxlengthValues(
         array $test,
@@ -96,7 +99,7 @@ trait BuildProviderTrait
             $maxlength = $test['maxlength'];
             $prop = array_key_first($maxlength);
 
-            /** @var DeckType $payload */
+            /** @var AdjectiveType|DeckType $payload */
             $payload[$prop] =
                 str_repeat(
                     $maxlength[$prop],
