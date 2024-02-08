@@ -15,7 +15,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchDeckByCode;
-use App\State\DeckSaveProcessor;
+use App\State\SaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -52,7 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
-    processor: DeckSaveProcessor::class,
+    processor: SaveProcessor::class,
 )]
 #[MongoDB\Document(repositoryClass: 'App\Repository\DeckRepository')]
 #[Unique(fields: ['title'], message: self::VALIDATION_ERR_DUPLICATE)]
@@ -69,15 +69,6 @@ class Deck extends AbstractKotobaDocument
         'nouns',
         'verbs',
     ];
-
-    public const VALIDATION_ERR_EMPTY =
-        'cannot be left empty';
-
-    public const VALIDATION_ERR_MAXLENGTH =
-        'cannot not be longer than {{ limit }} characters';
-
-    public const VALIDATION_ERR_TYPE =
-        'must be one of these: {{ choices }}';
 
     public const VALIDATION_ERR_COLOR =
         'must be a 8-character hexadecimal color (rgba)';
@@ -113,7 +104,7 @@ class Deck extends AbstractKotobaDocument
     /** 'any' removes restrictions */
     #[Assert\Choice(
         choices: self::ALLOWED_TYPES,
-        message: self::VALIDATION_ERR_TYPE,
+        message: self::VALIDATION_ERR_ENUM,
     )]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field]
@@ -128,26 +119,8 @@ class Deck extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'string')]
     protected ?string $color = '#ffffffff';
 
-    /** set by MongoDB */
-    #[Groups('read')]
-    #[MongoDB\Field(type: 'date_immutable')]
-    protected ?\DateTimeImmutable $createdAt = null;
-
-    /** set by MongoDB */
-    #[Groups('read')]
-    #[MongoDB\Field(type: 'date_immutable')]
-    protected ?\DateTimeImmutable $updatedAt = null;
-
     /** @var array<string> */
     protected iterable $words;
-
-    #[ApiProperty(identifier: false)]
-    #[Groups('read')]
-    #[MongoDB\Id(strategy: 'AUTO', type: 'object_id')]
-    private string $id;
-
-    #[MongoDB\Field(type: 'int')]
-    private int $increment;
 
     public function __construct()
     {
@@ -164,24 +137,9 @@ class Deck extends AbstractKotobaDocument
         return $this->color;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
-    }
-
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
-
-    public function getIncrement(): int
-    {
-        return $this->increment;
     }
 
     public function getTitle(): ?string
@@ -194,22 +152,30 @@ class Deck extends AbstractKotobaDocument
         return $this->type;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    // called right before persist, see App\State\SaveProcessor
+    public function finalizeTasks(): self
     {
-        return $this->updatedAt;
+        return $this;
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string,array<string,array<string>>>
      */
     public static function getFields(): array
     {
         return [
-            'string' => ['title', 'description'],
+            'string' => [
+                'trim' => ['title', 'description'],
+            ],
             'enum' => [
                 'type' => self::ALLOWED_TYPES,
             ],
         ];
+    }
+
+    public function getSlugReference(): string
+    {
+        return $this->title;
     }
 
     public function setCode(string $code): Deck
@@ -226,32 +192,9 @@ class Deck extends AbstractKotobaDocument
         return $this;
     }
 
-    // see App\EventListener\PrePersistListener
-    public function setCreatedAt(\DateTimeImmutable $date): Deck
-    {
-        $this->createdAt = $date;
-
-        return $this;
-    }
-
     public function setDescription(string $description): Deck
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function setId(string $id): Deck
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    // see App\EventListener\PrePersistListener
-    public function setIncrement(int $increment): Deck
-    {
-        $this->increment = $increment;
 
         return $this;
     }
@@ -266,14 +209,6 @@ class Deck extends AbstractKotobaDocument
     public function setType(string $type): Deck
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    // see App\EventListener\PreUpdateListener
-    public function setUpdatedAt(\DateTimeImmutable $date): Deck
-    {
-        $this->updatedAt = $date;
 
         return $this;
     }
