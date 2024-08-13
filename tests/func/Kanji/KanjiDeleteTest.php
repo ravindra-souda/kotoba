@@ -29,7 +29,6 @@ class KanjiDeleteTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
-        var_dump(json_decode($response->getContent(), true));
 
         // delete once and be happy
         static::createClient()->request(
