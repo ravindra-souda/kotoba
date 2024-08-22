@@ -11,3 +11,4 @@ api_platform:
         pagination_items_per_page: '%env(int:ITEMS_PER_PAGE)%'
     exception_to_status:
         App\Exception\NotFoundException: 404
+    path_segment_name_generator: 'App\Operation\KotobaPathSegmentNameGenerator'
