@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Document;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -13,8 +14,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiResource(
+    routePrefix: '/cards',
     operations: [
-        new Post(uriTemplate: '/cards/verbs'),
+        new Post(),
+        new Delete(),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
