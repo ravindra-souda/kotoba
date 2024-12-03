@@ -21,4 +21,10 @@ class DeckRepository extends AbstractKotobaRepository
 
         parent::__construct($registry, $className);
     }
+
+    public function getDeckByCode(string $code): Deck
+    {
+        /** @var Deck */
+        return $this->getDocByCode($code, Deck::class);
+    }
 }

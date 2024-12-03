@@ -21,4 +21,10 @@ class NounRepository extends AbstractKotobaRepository
 
         parent::__construct($registry, $className);
     }
+
+    public function getNounByCode(string $code): Noun
+    {
+        /** @var Noun */
+        return $this->getDocByCode($code, Noun::class);
+    }
 }

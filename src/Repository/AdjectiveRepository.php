@@ -21,4 +21,10 @@ class AdjectiveRepository extends AbstractKotobaRepository
 
         parent::__construct($registry, $className);
     }
+
+    public function getAdjectiveByCode(string $code): Adjective
+    {
+        /** @var Adjective */
+        return $this->getDocByCode($code, Adjective::class);
+    }
 }

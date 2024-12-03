@@ -48,10 +48,11 @@ namespace App\Tests;
  *     onyomi?: list<string>,
  * }
  * @phpstan-type NounType array{
- *     hiragana?: string,
- *     katakana?: string,
+ *     hiragana?: string|null,
+ *     katakana?: string|null,
  *     kanji?: string,
  *     romaji?: string,
+ *     bikago?: string,
  *     jlpt?: int,
  *     meaning?: array<string,list<string>>,
  * }
@@ -60,6 +61,7 @@ namespace App\Tests;
  *     katakana: string,
  *     kanji: string,
  *     romaji: string,
+ *     bikago: string,
  *     jlpt: int,
  *     meaning: array<string,list<string>>,
  * }
