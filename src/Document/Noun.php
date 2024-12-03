@@ -7,6 +7,8 @@ namespace App\Document;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Controller\FetchNounByCode;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -17,6 +19,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Post(),
         new Delete(),
+        new Put(
+            controller: FetchNounByCode::class,
+            uriTemplate: '/nouns/{code}',
+            /* bypassing faulty internal document fetching with our custom
+               controller */
+            read: false
+        ),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],

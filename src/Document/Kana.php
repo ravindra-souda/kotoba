@@ -7,6 +7,8 @@ namespace App\Document;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Controller\FetchKanaByCode;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -17,6 +19,13 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     operations: [
         new Post(),
         new Delete(),
+        new Put(
+            controller: FetchKanaByCode::class,
+            uriTemplate: '/kana/{code}',
+            /* bypassing faulty internal document fetching with our custom
+               controller */
+            read: false
+        ),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
