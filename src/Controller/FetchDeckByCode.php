@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Document\Deck;
-use App\Exception\NotFoundException;
 use App\Repository\DeckRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -23,11 +22,6 @@ class FetchDeckByCode extends AbstractController
 
     public function __invoke(string $code): Deck
     {
-        $deck = $this->repository->findOneBy(['code' => $code]);
-        if (!$deck instanceof Deck) {
-            throw new NotFoundException();
-        }
-
-        return $deck;
+        return $this->repository->getDeckByCode($code);
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Document\Deck;
+use App\Document\AbstractKotobaDocument as Doc;
 use Doctrine\Bundle\MongoDBBundle\Attribute\AsDocumentListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use Doctrine\ODM\MongoDB\Events;
@@ -25,7 +25,7 @@ class PreUpdateListener
     {
         $dm = $args->getDocumentManager();
 
-        /** @var Deck $doc */
+        /** @var Doc $doc */
         $doc = $args->getDocument();
         $class = $dm->getClassMetadata(get_class($doc));
 
@@ -41,7 +41,7 @@ class PreUpdateListener
         ;
     }
 
-    private function setUpdatedAt(Deck $doc): static
+    private function setUpdatedAt(Doc $doc): static
     {
         $doc->setUpdatedAt(new \DateTimeImmutable());
 

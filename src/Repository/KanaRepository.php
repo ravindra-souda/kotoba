@@ -21,4 +21,10 @@ class KanaRepository extends AbstractKotobaRepository
 
         parent::__construct($registry, $className);
     }
+
+    public function getKanaByCode(string $code): Kana
+    {
+        /** @var Kana */
+        return $this->getDocByCode($code, Kana::class);
+    }
 }

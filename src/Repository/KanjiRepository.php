@@ -21,4 +21,10 @@ class KanjiRepository extends AbstractKotobaRepository
 
         parent::__construct($registry, $className);
     }
+
+    public function getKanjiByCode(string $code): Kanji
+    {
+        /** @var Kanji */
+        return $this->getDocByCode($code, Kanji::class);
+    }
 }

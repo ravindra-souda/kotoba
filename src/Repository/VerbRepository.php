@@ -21,4 +21,10 @@ class VerbRepository extends AbstractKotobaRepository
 
         parent::__construct($registry, $className);
     }
+
+    public function getVerbByCode(string $code): Verb
+    {
+        /** @var Verb */
+        return $this->getDocByCode($code, Verb::class);
+    }
 }

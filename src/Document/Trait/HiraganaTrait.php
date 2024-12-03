@@ -41,6 +41,11 @@ trait HiraganaTrait
 
     public function setHiragana(?string $hiragana): static
     {
+        // reset romaji when hiragana is updated
+        if (null !== $this->hiragana) {
+            $this->romaji = null;
+        }
+
         return $this->setLowerAndTrimmedOrNull('hiragana', $hiragana);
     }
 
