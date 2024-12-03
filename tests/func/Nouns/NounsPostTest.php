@@ -39,6 +39,7 @@ class NounsPostTest extends ApiTestCase
         'bikago' => [
             'hiragana' => ' おかね',
             'kanji' => 'お金',
+            'romaji' => 'okane',
             'bikago' => 'お',
             'jlpt' => 5,
             'meaning' => [

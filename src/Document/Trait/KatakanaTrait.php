@@ -45,6 +45,11 @@ trait KatakanaTrait
 
     public function setKatakana(?string $katakana): static
     {
+        // reset romaji when katakana is updated
+        if (null !== $this->katakana) {
+            $this->romaji = null;
+        }
+
         return $this->setLowerAndTrimmedOrNull('katakana', $katakana);
     }
 
