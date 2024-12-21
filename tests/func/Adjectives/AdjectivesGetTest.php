@@ -20,6 +20,13 @@ class AdjectivesGetTest extends ApiTestCase
                 'en' => ['fun'],
             ],
         ],
+        'hiragana_2' => [
+            'hiragana' => 'たいくつ',
+            'group' => 'na',
+            'meaning' => [
+                'en' => ['tedious; boring'],
+            ],
+        ],
         'kanji' => [
             'hiragana' => 'ねむい',
             'kanji' => '眠い',
@@ -28,11 +35,26 @@ class AdjectivesGetTest extends ApiTestCase
                 'en' => ['sleepy'],
             ],
         ],
+        'kanji_2' => [
+            'hiragana' => 'ねむそう',
+            'kanji' => '眠そう',
+            'group' => 'na',
+            'meaning' => [
+                'en' => ['sleepy-looking; sleepy-sounding'],
+            ],
+        ],
         'katakana' => [
             'katakana' => 'ユニーク',
             'group' => 'na',
             'meaning' => [
                 'en' => ['unique'],
+            ],
+        ],
+        'katakana_2' => [
+            'katakana' => 'ユニバーサル',
+            'group' => 'na',
+            'meaning' => [
+                'en' => ['universal'],
             ],
         ],
         'meaning' => [
@@ -149,17 +171,61 @@ class AdjectivesGetTest extends ApiTestCase
     public function searchDeckProvider(): array
     {
         return [
-            'title' => [
-                'url' => '?title=rch me',
-                'expected' => self::GET_SEARCH_FIXTURES['title'],
+            'hiragana' => [
+                'url' => '?hiragana=たの',
+                'expected' => self::GET_SEARCH_FIXTURES['hiragana'],
             ],
-            'description' => [
-                'url' => '?description=rCh Me',
-                'expected' => self::GET_SEARCH_FIXTURES['description'],
+            'hiragana_partial' => [
+                'url' => '?hiragana=た',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['hiragana_2'],
+                ],
             ],
-            'type' => [
-                'url' => '?type=NouNS',
-                'expected' => self::GET_SEARCH_FIXTURES['type'],
+            'kanji' => [
+                'url' => '?kanji=眠い',
+                'expected' => self::GET_SEARCH_FIXTURES['kanji'],
+            ],
+            'kanji_partial' => [
+                'url' => '?kanji=眠',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji'],
+                    self::GET_SEARCH_FIXTURES['kanji_2'],
+                ],
+            ],
+            'katakana' => [
+                'url' => '?katakana=ユニー',
+                'expected' => self::GET_SEARCH_FIXTURES['katakana'],
+            ],
+            'katakana_partial' => [
+                'url' => '?katakana=ユニ',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                ],
+            ],
+            'meaning' => [
+                'url' => '?meaning=qui',
+                'expected' => self::GET_SEARCH_FIXTURES['meaning'],
+            ],
+            'meaning_partial' => [
+                'url' => '?meaning=un',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['meaning'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                ],
+            ],
+            'romaji' => [
+                'url' => '?romaji=To',
+                'expected' => self::GET_SEARCH_FIXTURES['romaji'],
+            ],
+            'romaji_partial' => [
+                'url' => '?romaji=TaNo',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['hiragana_2'],
+                ],
             ],
         ];
     }
@@ -175,7 +241,7 @@ class AdjectivesGetTest extends ApiTestCase
     ): void {
         $response = static::createClient()->request(
             'GET',
-            '/api/decks'.$url,
+            '/api/cards/adjectives'.$url,
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -184,9 +250,9 @@ class AdjectivesGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertSame($content['hydra:totalItems'], 1);
+        $this->assertSame($content['hydra:totalItems'], count($expected));
         $this->assertArraySubset($expected, $content['hydra:member'][0]);
-        $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
+        $this->assertMatchesResourceCollectionJsonSchema(Adjective::class);
     }
 
     /**
