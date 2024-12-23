@@ -77,38 +77,50 @@ class AdjectivesGetTest extends ApiTestCase
         ],
     ];
     private const GET_SORT_FIXTURES = [
-        'title_asc' => [
+        'romaji_asc' => [
             [
-                'title' => 'title_sort alpha',
-                'description' => '(get pagination)',
-                'type' => 'any',
+                'hiragana' => 'らく',
+                'group' => 'na',
+                'meaning' => [
+                    'comfort; ease; relief;'
+                ],
             ],
             [
-                'title' => 'title_sort beta',
-                'description' => '(get pagination)',
-                'type' => 'any',
+                'hiragana' => 'らっかんてき',
+                'group' => 'na',
+                'meaning' => [
+                    'optimistic; hopeful'
+                ],
             ],
             [
-                'title' => 'title_sort gamma',
-                'description' => '(get pagination)',
-                'type' => 'any',
+                'katakana' => 'ラッキー',
+                'group' => 'na',
+                'meaning' => [
+                    'lucky'
+                ],
             ],
         ],
-        'description_desc' => [
+        'romaji_desc' => [
             [
-                'title' => 'desc 1',
-                'description' => 'alpha 1 (get pagination)',
-                'type' => 'any',
+                'hiragana' => 'しずか',
+                'group' => 'na',
+                'meaning' => [
+                    'quiet; silent'
+                ],
             ],
             [
-                'title' => 'desc 2',
-                'description' => 'alpha 2 (get pagination)',
-                'type' => 'any',
+                'hiragana' => 'しろい',
+                'group' => 'i',
+                'meaning' => [
+                    'white'
+                ],
             ],
             [
-                'title' => 'desc 3',
-                'description' => 'alpha 3 (get pagination)',
-                'type' => 'any',
+                'hiragana' => 'しょうじき',
+                'group' => 'na',
+                'meaning' => [
+                    'honest; frank; candid; straightforward'
+                ],
             ],
         ],
         'description_asc, title_desc' => [
@@ -261,20 +273,20 @@ class AdjectivesGetTest extends ApiTestCase
     public function sortDeckProvider(): array
     {
         return [
-            'order_asc' => [
-                'url' => '?title=title_sort&order[title]=asc',
+            'romaji_asc' => [
+                'url' => '?romaji=ra&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['title_asc'][0],
-                    self::GET_SORT_FIXTURES['title_asc'][1],
-                    self::GET_SORT_FIXTURES['title_asc'][2],
+                    self::GET_SORT_FIXTURES['romaji_asc'][1],
+                    self::GET_SORT_FIXTURES['romaji_asc'][2],
+                    self::GET_SORT_FIXTURES['romaji_asc'][0],
                 ],
             ],
-            'order_desc' => [
-                'url' => '?title=desc&order[description]=desc',
+            'romaji_desc' => [
+                'url' => '?romaji=shi&order[romaji]=desc',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['description_desc'][2],
-                    self::GET_SORT_FIXTURES['description_desc'][1],
-                    self::GET_SORT_FIXTURES['description_desc'][0],
+                    self::GET_SORT_FIXTURES['romaji_desc'][2],
+                    self::GET_SORT_FIXTURES['romaji_desc'][0],
+                    self::GET_SORT_FIXTURES['romaji_desc'][1],
                 ],
             ],
             'order_asc_then_desc' => [
