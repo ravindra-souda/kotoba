@@ -123,38 +123,30 @@ class AdjectivesGetTest extends ApiTestCase
                 ],
             ],
         ],
-        'description_asc, title_desc' => [
-            [
-                'title' => 'two fields 1',
-                'description' => 'alpha (get pagination)',
-                'type' => 'any',
-            ],
-            [
-                'title' => 'two fields 2',
-                'description' => 'beta (get pagination)',
-                'type' => 'any',
-            ],
-            [
-                'title' => 'two fields 3',
-                'description' => 'alpha (get pagination)',
-                'type' => 'any',
-            ],
-        ],
         'search and sort' => [
             [
-                'title' => 'hiragana K-column',
-                'description' => 'initiation to hiragana (get pagination)',
-                'type' => 'kana',
+                'hiragana' => 'まるい',
+                'kanji' => '丸い',
+                'group' => 'i',
+                'meaning' => [
+                    'round; circular; spherical'
+                ],
             ],
             [
-                'title' => 'hiragana S-column',
-                'description' => 'initiation to hiragana (get pagination)',
-                'type' => 'kana',
+                'hiragana' => 'まずい',
+                'group' => 'i',
+                'meaning' => [
+                    'bad(-tasting); awful; terrible',
+                    'poor; unskillful'
+                ],
             ],
             [
-                'title' => 'hiragana T-column',
-                'description' => 'initiation to hiragana (get pagination)',
-                'type' => 'kana',
+                'hiragana' => 'まんぞく',
+                'kanji' => '満足',
+                'group' => 'na',
+                'meaning' => [
+                    'sufficient; satisfactory; enough; adequate'
+                ],
             ],
         ],
     ];
@@ -168,19 +160,19 @@ class AdjectivesGetTest extends ApiTestCase
         foreach ($fixtures as $payload) {
             static::createClient()->request(
                 'POST',
-                '/api/decks',
+                '/api/cards/adjectives',
                 ['json' => $payload]
             );
 
             static::assertResponseStatusCodeSame(201);
-            static::assertMatchesResourceItemJsonSchema(Deck::class);
+            static::assertMatchesResourceItemJsonSchema(Adjective::class);
         }
     }
 
     /**
      * @return array<array<array<string>>>
      */
-    public function searchDeckProvider(): array
+    public function searchAdjectiveProvider(): array
     {
         return [
             'hiragana' => [
@@ -270,7 +262,7 @@ class AdjectivesGetTest extends ApiTestCase
     /**
      * @return array<array<string, array<array<string, string>>|string>>
      */
-    public function sortDeckProvider(): array
+    public function sortAdjectiveProvider(): array
     {
         return [
             'romaji_asc' => [
@@ -289,48 +281,29 @@ class AdjectivesGetTest extends ApiTestCase
                     self::GET_SORT_FIXTURES['romaji_desc'][1],
                 ],
             ],
-            'order_asc_then_desc' => [
-                'url' => '?title=two fields&order[description]=asc'.
-                    '&order[title]=desc',
-                'expected' => [
-                    self::GET_SORT_FIXTURES['description_asc, title_desc'][2],
-                    self::GET_SORT_FIXTURES['description_asc, title_desc'][0],
-                    self::GET_SORT_FIXTURES['description_asc, title_desc'][1],
-                ],
-            ],
             'search_and_order' => [
-                'url' => '?title=hiRAg&order[description]=asc'.
-                    '&order[title]=desc',
+                'url' => '?hiragana=ま&order[romaji]=desc',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['search and sort'][2],
                     self::GET_SORT_FIXTURES['search and sort'][1],
                     self::GET_SORT_FIXTURES['search and sort'][0],
-                ],
-            ],
-            'enum_and_order' => [
-                'url' => '?type[]=nouNs&type[]=kaNa&order[title]=desc',
-                'expected' => [
-                    self::GET_SEARCH_FIXTURES['type'],
                     self::GET_SORT_FIXTURES['search and sort'][2],
-                    self::GET_SORT_FIXTURES['search and sort'][1],
-                    self::GET_SORT_FIXTURES['search and sort'][0],
                 ],
             ],
         ];
     }
 
     /**
-     * @dataProvider sortDeckProvider
+     * @dataProvider sortAdjectiveProvider
      *
      * @param array<array<string>> $expected
      */
-    public function testDecksGetSort(
+    public function testAdjectivesGetSort(
         string $url,
         array $expected,
     ): void {
         $response = static::createClient()->request(
             'GET',
-            '/api/decks'.$url,
+            '/api/cards/adjectives'.$url,
         );
 
         $this->assertResponseStatusCodeSame(200);
@@ -347,15 +320,15 @@ class AdjectivesGetTest extends ApiTestCase
                 $content['hydra:member'][$i]
             );
         }
-        $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
+        $this->assertMatchesResourceCollectionJsonSchema(Adjective::class);
     }
 
-    public function testDecksGetOneDeck(): string
+    public function testAdjectivesGetOneAdjective(): string
     {
         $response = static::createClient()->request(
             'GET',
-            'api/decks?title='.
-            self::GET_SORT_FIXTURES['search and sort'][1]['title']
+            'api/cards/adjectives?kanji='.
+            self::GET_SORT_FIXTURES['search and sort'][0]['kanji']
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -366,16 +339,16 @@ class AdjectivesGetTest extends ApiTestCase
         $content = json_decode($response->getContent(), true);
         $this->assertSame($content['hydra:totalItems'], 1);
         $this->assertArraySubset(
-            self::GET_SORT_FIXTURES['search and sort'][1],
+            self::GET_SORT_FIXTURES['search and sort'][0],
             $content['hydra:member'][0]
         );
-        $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
+        $this->assertMatchesResourceCollectionJsonSchema(Adjective::class);
 
         return $content['hydra:member'][0]['@id'];
     }
 
     /**
-     * @depends testDecksGetOneDeck
+     * @depends testAdjectivesGetOneAdjective
      */
     public function testDecksGetOneDeckByCode(string $code): void
     {
@@ -392,17 +365,17 @@ class AdjectivesGetTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hydra:totalItems', $content);
         $this->assertJsonContains(
-            self::GET_SORT_FIXTURES['search and sort'][1]
+            self::GET_SORT_FIXTURES['search and sort'][0]
         );
 
-        $this->assertMatchesResourceItemJsonSchema(Deck::class);
+        $this->assertMatchesResourceItemJsonSchema(Adjective::class);
     }
 
-    public function testDecksGetUnknown(): void
+    public function testAdjectivesGetUnknown(): void
     {
         static::createClient()->request(
             'GET',
-            '/api/decks/dummy',
+            '/api/cards/adjectives/dummy',
         );
 
         $this->assertResponseStatusCodeSame(404);
@@ -414,18 +387,18 @@ class AdjectivesGetTest extends ApiTestCase
     public function emptyCollectionProvider(): array
     {
         return [
-            'field' => ['?title=dummy'], 'enum' => ['?type=kan'],
+            'field' => ['?romaji=dummy'],
         ];
     }
 
     /**
      * @dataProvider emptyCollectionProvider
      */
-    public function testDecksGetEmptyCollection(string $url): void
+    public function testAdjectivesGetEmptyCollection(string $url): void
     {
         static::createClient()->request(
             'GET',
-            '/api/decks'.$url,
+            '/api/cards/adjectives'.$url,
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
