@@ -82,21 +82,21 @@ class AdjectivesGetTest extends ApiTestCase
                 'hiragana' => 'らく',
                 'group' => 'na',
                 'meaning' => [
-                    'comfort; ease; relief;'
+                    'en' => ['comfort; ease; relief']
                 ],
             ],
             [
                 'hiragana' => 'らっかんてき',
                 'group' => 'na',
                 'meaning' => [
-                    'optimistic; hopeful'
+                    'en' => ['optimistic; hopeful']
                 ],
             ],
             [
                 'katakana' => 'ラッキー',
                 'group' => 'na',
                 'meaning' => [
-                    'lucky'
+                    'en' => ['lucky']
                 ],
             ],
         ],
@@ -105,21 +105,21 @@ class AdjectivesGetTest extends ApiTestCase
                 'hiragana' => 'しずか',
                 'group' => 'na',
                 'meaning' => [
-                    'quiet; silent'
+                    'en' => ['quiet; silent']
                 ],
             ],
             [
                 'hiragana' => 'しろい',
                 'group' => 'i',
                 'meaning' => [
-                    'white'
+                    'en' => ['white']
                 ],
             ],
             [
                 'hiragana' => 'しょうじき',
                 'group' => 'na',
                 'meaning' => [
-                    'honest; frank; candid; straightforward'
+                    'en' => ['honest; frank; candid; straightforward']
                 ],
             ],
         ],
@@ -129,15 +129,17 @@ class AdjectivesGetTest extends ApiTestCase
                 'kanji' => '丸い',
                 'group' => 'i',
                 'meaning' => [
-                    'round; circular; spherical'
+                    'en' => ['round; circular; spherical']
                 ],
             ],
             [
                 'hiragana' => 'まずい',
                 'group' => 'i',
                 'meaning' => [
-                    'bad(-tasting); awful; terrible',
-                    'poor; unskillful'
+                    'en' => [
+                        'bad(-tasting); awful; terrible',
+                        'poor; unskillful'
+                    ],
                 ],
             ],
             [
@@ -145,7 +147,7 @@ class AdjectivesGetTest extends ApiTestCase
                 'kanji' => '満足',
                 'group' => 'na',
                 'meaning' => [
-                    'sufficient; satisfactory; enough; adequate'
+                    'en' => ['sufficient; satisfactory; enough; adequate']
                 ],
             ],
         ],
@@ -156,6 +158,9 @@ class AdjectivesGetTest extends ApiTestCase
         $fixtures = array_merge_recursive(
             array_values(self::GET_SEARCH_FIXTURES),
             ...array_values(self::GET_SORT_FIXTURES),
+        );
+        array_walk($fixtures, fn(&$fixture) => 
+            $fixture['romaji'] = 'pagination'.Adjective::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
@@ -412,11 +417,11 @@ class AdjectivesGetTest extends ApiTestCase
         ]);
     }
 
-    public function testDecksGetPagination(): void
+    public function testAdjectivesGetPagination(): void
     {
         $response = static::createClient()->request(
             'GET',
-            '/api/decks?description=pagination',
+            '/api/cards/adjectives?romaji=pagination',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -428,9 +433,9 @@ class AdjectivesGetTest extends ApiTestCase
             'hydra:totalItems' => 15,
             'hydra:view' => [
                 '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/api/decks?description=pagination&page=1',
-                'hydra:last' => '/api/decks?description=pagination&page=3',
-                'hydra:next' => '/api/decks?description=pagination&page=2',
+                'hydra:first' => '/api/cards/adjectives?romaji=pagination&page=1',
+                'hydra:last' => '/api/cards/adjectives?romaji=pagination&page=3',
+                'hydra:next' => '/api/cards/adjectives?romaji=pagination&page=2',
             ],
         ]);
         $content = json_decode($response->getContent(), true);
@@ -438,7 +443,7 @@ class AdjectivesGetTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'GET',
-            '/api/decks?description=pagination&order[title]=desc&page=3',
+            '/api/cards/adjectives?romaji=pagination&order[romaji]=desc&page=2',
         );
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($response->getContent(), true);
@@ -451,7 +456,7 @@ class AdjectivesGetTest extends ApiTestCase
         // client-side pagination options should be disabled
         $response = static::createClient()->request(
             'GET',
-            '/api/decks?description=pagination&pagination=false',
+            '/api/cards/adjectives?romaji=pagination&pagination=false',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -463,7 +468,7 @@ class AdjectivesGetTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'GET',
-            '/api/decks?description=pagination&itemsPerPage=1',
+            '/api/cards/adjectives?romaji=pagination&itemsPerPage=1',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
