@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchAdjectiveByCode;
@@ -15,6 +21,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'group' => 'iexact',
+        'hiragana' => 'start',
+        'kanji' => 'partial',
+        'katakana' => 'start',
+        'meaning.en' => 'ipartial',
+        'romaji' => 'istart',
+    ],
+)]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: ['romaji'],
+    arguments: ['orderParameterName' => 'order'],
+)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -27,6 +49,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                controller */
             read: false
         ),
+        new Get(),
+        new GetCollection(),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
@@ -77,6 +101,13 @@ class Adjective extends Card
     )]
     #[Groups(['read'])]
     #[MongoDB\Field(type: 'hash')]
+    #[ApiProperty(
+        /* needed for unit-testing 
+        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification */
+        jsonSchemaContext: [
+            'type' => 'object',
+        ]
+    )]
     protected array $inflections = [
         'non-past' => [
             'affirmative' => '',

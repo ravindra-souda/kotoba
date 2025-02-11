@@ -28,19 +28,19 @@ class AdjectivesGetTest extends ApiTestCase
             ],
         ],
         'kanji' => [
-            'hiragana' => 'ねむい',
-            'kanji' => '眠い',
+            'hiragana' => 'おとなしい',
+            'kanji' => '大人しい',
             'group' => 'i',
             'meaning' => [
-                'en' => ['sleepy'],
+                'en' => ['gentle; quiet'],
             ],
         ],
         'kanji_2' => [
-            'hiragana' => 'ねむそう',
-            'kanji' => '眠そう',
+            'hiragana' => 'じんこうてき',
+            'kanji' => '人工的',
             'group' => 'na',
             'meaning' => [
-                'en' => ['sleepy-looking; sleepy-sounding'],
+                'en' => ['artificial; unnatural'],
             ],
         ],
         'katakana' => [
@@ -69,7 +69,7 @@ class AdjectivesGetTest extends ApiTestCase
         ],
         'romaji' => [
             'hiragana' => 'とおい',
-            'romaji' => 'tooi',
+            'romaji' => 'paginationtōi',
             'group' => 'i',
             'meaning' => [
                 'en' => ['far'],
@@ -123,7 +123,7 @@ class AdjectivesGetTest extends ApiTestCase
                 ],
             ],
         ],
-        'search and sort' => [
+        'search_and_sort' => [
             [
                 'hiragana' => 'まるい',
                 'kanji' => '丸い',
@@ -174,77 +174,117 @@ class AdjectivesGetTest extends ApiTestCase
         }
     }
 
+    private function getItemsPerPage(): int 
+    {
+        return (int) $_ENV["ITEMS_PER_PAGE"];
+    }
+
     /**
      * @return array<array<array<string>>>
      */
     public function searchAdjectiveProvider(): array
     {
         return [
-            'hiragana' => [
-                'url' => '?hiragana=たの',
-                'expected' => self::GET_SEARCH_FIXTURES['hiragana'],
+            'group_i' => [
+                'url' => '?group=i&romaji=pagination&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['search_and_sort'][0],
+                    self::GET_SORT_FIXTURES['search_and_sort'][1],
+                    self::GET_SEARCH_FIXTURES['kanji'],
+                    self::GET_SORT_FIXTURES['romaji_desc'][1],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
+                ],
             ],
-            'hiragana_partial' => [
-                'url' => '?hiragana=た',
+            'group_na' => [
+                'url' => '?group=na&romaji=pagination&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji_2'],
+                    self::GET_SEARCH_FIXTURES['meaning'],
+                    self::GET_SORT_FIXTURES['search_and_sort'][2],
+                    self::GET_SORT_FIXTURES['romaji_asc'][1],
+                    self::GET_SORT_FIXTURES['romaji_asc'][2],
+                    self::GET_SORT_FIXTURES['romaji_asc'][0],
+                    self::GET_SORT_FIXTURES['romaji_desc'][0],
+                    self::GET_SORT_FIXTURES['romaji_desc'][2],
+                    self::GET_SEARCH_FIXTURES['hiragana_2'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                ],
+            ],
+            'hiragana' => [
+                'url' => '?hiragana=たの&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['hiragana']
+                ],
+            ],
+            'hiragana_start' => [
+                'url' => '?hiragana=た&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana'],
                     self::GET_SEARCH_FIXTURES['hiragana_2'],
                 ],
             ],
             'kanji' => [
-                'url' => '?kanji=眠い',
-                'expected' => self::GET_SEARCH_FIXTURES['kanji'],
+                'url' => '?kanji=大人しい&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji']
+                ],
             ],
             'kanji_partial' => [
-                'url' => '?kanji=眠',
+                'url' => '?kanji=人&romaji=pagination&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji'],
                     self::GET_SEARCH_FIXTURES['kanji_2'],
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ],
             ],
             'katakana' => [
-                'url' => '?katakana=ユニー',
-                'expected' => self::GET_SEARCH_FIXTURES['katakana'],
-            ],
-            'katakana_partial' => [
-                'url' => '?katakana=ユニ',
+                'url' => '?katakana=ユニ&romaji=pagination&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['katakana'],
                     self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
+            'katakana_start' => [
+                'url' => '?katakana=ニ&romaji=pagination',
+                'expected' => [],
+            ],
             'meaning' => [
-                'url' => '?meaning=qui',
-                'expected' => self::GET_SEARCH_FIXTURES['meaning'],
+                'url' => '?meaning.en=qui&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['meaning']
+                ],
             ],
             'meaning_partial' => [
-                'url' => '?meaning=un',
+                'url' => '?meaning.en=un&romaji=pagination&order[romaji]=asc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['meaning'],
-                    self::GET_SEARCH_FIXTURES['katakana'],
                     self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
             'romaji' => [
-                'url' => '?romaji=To',
-                'expected' => self::GET_SEARCH_FIXTURES['romaji'],
-            ],
-            'romaji_partial' => [
-                'url' => '?romaji=TaNo',
+                'url' => '?romaji=paginationTō',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['romaji']
+                ],
+            ],
+            'romaji_start' => [
+                'url' => '?romaji=paginationTa&order[romaji]=asc',
+                'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana_2'],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
         ];
     }
 
     /**
-     * @dataProvider searchDeckProvider
+     * @dataProvider searchAdjectiveProvider
      *
      * @param array<string> $expected
      */
-    public function testDecksGetSearch(
+    public function testAdjectivesGetSearch(
         string $url,
         array $expected,
     ): void {
@@ -259,8 +299,12 @@ class AdjectivesGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
+        //var_dump($content['hydra:member']);
         $this->assertSame($content['hydra:totalItems'], count($expected));
-        $this->assertArraySubset($expected, $content['hydra:member'][0]);
+        $this->assertArraySubset(
+            array_slice($expected, 0, $this->getItemsPerPage()),
+            $content['hydra:member']
+        );
         $this->assertMatchesResourceCollectionJsonSchema(Adjective::class);
     }
 
@@ -289,9 +333,9 @@ class AdjectivesGetTest extends ApiTestCase
             'search_and_order' => [
                 'url' => '?hiragana=ま&order[romaji]=desc',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['search and sort'][1],
-                    self::GET_SORT_FIXTURES['search and sort'][0],
-                    self::GET_SORT_FIXTURES['search and sort'][2],
+                    self::GET_SORT_FIXTURES['search_and_sort'][1],
+                    self::GET_SORT_FIXTURES['search_and_sort'][0],
+                    self::GET_SORT_FIXTURES['search_and_sort'][2],
                 ],
             ],
         ];
@@ -333,7 +377,7 @@ class AdjectivesGetTest extends ApiTestCase
         $response = static::createClient()->request(
             'GET',
             'api/cards/adjectives?kanji='.
-            self::GET_SORT_FIXTURES['search and sort'][0]['kanji']
+            self::GET_SORT_FIXTURES['search_and_sort'][0]['kanji']
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -344,7 +388,7 @@ class AdjectivesGetTest extends ApiTestCase
         $content = json_decode($response->getContent(), true);
         $this->assertSame($content['hydra:totalItems'], 1);
         $this->assertArraySubset(
-            self::GET_SORT_FIXTURES['search and sort'][0],
+            self::GET_SORT_FIXTURES['search_and_sort'][0],
             $content['hydra:member'][0]
         );
         $this->assertMatchesResourceCollectionJsonSchema(Adjective::class);
@@ -355,7 +399,7 @@ class AdjectivesGetTest extends ApiTestCase
     /**
      * @depends testAdjectivesGetOneAdjective
      */
-    public function testDecksGetOneDeckByCode(string $code): void
+    public function testAdjectivesGetOneAdjectiveByCode(string $code): void
     {
         $response = static::createClient()->request(
             'GET',
@@ -370,7 +414,7 @@ class AdjectivesGetTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hydra:totalItems', $content);
         $this->assertJsonContains(
-            self::GET_SORT_FIXTURES['search and sort'][0]
+            self::GET_SORT_FIXTURES['search_and_sort'][0]
         );
 
         $this->assertMatchesResourceItemJsonSchema(Adjective::class);

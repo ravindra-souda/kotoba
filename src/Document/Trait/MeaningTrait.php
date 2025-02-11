@@ -39,6 +39,11 @@ trait MeaningTrait
                 'en' => ['high; tall', 'expensive; high-priced'],
                 'fr' => ['haut; grand', 'coûteux; cher'],
             ],
+        ],
+        /* needed for unit-testing 
+        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification */
+        jsonSchemaContext: [
+            'type' => 'object',
         ]
     )]
     #[MongoDB\Field(type: 'hash')]
