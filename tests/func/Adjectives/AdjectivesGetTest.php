@@ -315,7 +315,7 @@ class AdjectivesGetTest extends ApiTestCase
     {
         return [
             'romaji_asc' => [
-                'url' => '?romaji=ra&order[romaji]=asc',
+                'url' => '?romaji=paginationra&order[romaji]=asc',
                 'expected' => [
                     self::GET_SORT_FIXTURES['romaji_asc'][1],
                     self::GET_SORT_FIXTURES['romaji_asc'][2],
@@ -323,7 +323,7 @@ class AdjectivesGetTest extends ApiTestCase
                 ],
             ],
             'romaji_desc' => [
-                'url' => '?romaji=shi&order[romaji]=desc',
+                'url' => '?romaji=paginationsh&order[romaji]=desc',
                 'expected' => [
                     self::GET_SORT_FIXTURES['romaji_desc'][2],
                     self::GET_SORT_FIXTURES['romaji_desc'][0],
@@ -463,6 +463,14 @@ class AdjectivesGetTest extends ApiTestCase
 
     public function testAdjectivesGetPagination(): void
     {
+        $totalItems = count(array_merge_recursive(
+                array_values(self::GET_SEARCH_FIXTURES),
+                ...array_values(self::GET_SORT_FIXTURES),
+            )
+        );
+        $itemsPerPage = $this->getItemsPerPage();
+        $lastPage = ceil($totalItems / $itemsPerPage);
+        
         $response = static::createClient()->request(
             'GET',
             '/api/cards/adjectives?romaji=pagination',
@@ -474,16 +482,16 @@ class AdjectivesGetTest extends ApiTestCase
         );
         $this->assertJsonContains([
             '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 15,
+            'hydra:totalItems' => $totalItems,
             'hydra:view' => [
                 '@type' => 'hydra:PartialCollectionView',
                 'hydra:first' => '/api/cards/adjectives?romaji=pagination&page=1',
-                'hydra:last' => '/api/cards/adjectives?romaji=pagination&page=3',
+                'hydra:last' => '/api/cards/adjectives?romaji=pagination&page='.$lastPage,
                 'hydra:next' => '/api/cards/adjectives?romaji=pagination&page=2',
             ],
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount(5, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['hydra:member']);
 
         $response = static::createClient()->request(
             'GET',
@@ -491,9 +499,9 @@ class AdjectivesGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount(5, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['hydra:member']);
         $this->assertArraySubset(
-            self::GET_SORT_FIXTURES['description_desc'][2],
+            self::GET_SORT_FIXTURES['romaji_desc'][1],
             $content['hydra:member'][2]
         );
 
@@ -505,10 +513,10 @@ class AdjectivesGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 15,
+            'hydra:totalItems' => $totalItems,
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount(5, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['hydra:member']);
 
         $response = static::createClient()->request(
             'GET',
@@ -517,9 +525,9 @@ class AdjectivesGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 15,
+            'hydra:totalItems' => $totalItems,
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount(5, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['hydra:member']);
     }
 }

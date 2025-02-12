@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         'hiragana' => 'start',
         'kanji' => 'partial',
         'katakana' => 'start',
-        'meaning.en' => 'ipartial',
+        'meaning' => 'ipartial',
         'romaji' => 'istart',
     ],
 )]
