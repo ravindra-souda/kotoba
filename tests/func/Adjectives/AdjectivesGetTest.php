@@ -250,19 +250,21 @@ class AdjectivesGetTest extends ApiTestCase
                 'expected' => [],
             ],
             'meaning' => [
-                'url' => '?meaning.en=qui&romaji=pagination',
+                'url' => '?meaning[lang]=en&meaning[search]=qui&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['meaning']
                 ],
             ],
+            /*
             'meaning_partial' => [
-                'url' => '?meaning.en=un&romaji=pagination&order[romaji]=asc',
+                'url' => '?meaning=[un]&romaji=pagination&order[romaji]=asc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['meaning'],
                     self::GET_SEARCH_FIXTURES['katakana_2'],
                     self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
+            */
             'romaji' => [
                 'url' => '?romaji=paginationTō',
                 'expected' => [

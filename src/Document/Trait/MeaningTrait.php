@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Document\Trait;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use App\Document\Card;
+use App\Filter\MeaningFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -47,6 +49,7 @@ trait MeaningTrait
         ]
     )]
     #[MongoDB\Field(type: 'hash')]
+    #[ApiFilter(MeaningFilter::class)]
     protected array $meaning = [
         'en' => [''],
         'fr' => [''],
