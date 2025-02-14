@@ -19,17 +19,23 @@ final class MeaningFilter extends AbstractFilter
             return;
         }
 
-        //$parameterName = $queryNameGenerator->generateParameterName($property); // Generate a unique parameter name to avoid collisions with other filters
+        if ($property !== 'meaning') {
+            return;
+        }
+
+        if (!array_key_exists('lang', $value) || !array_key_exists('search', $value)) {
+            return;
+        }
+
         ['lang' => $lang, 'search' => $search] = $value;
-        var_dump($lang, $search);
+
+        // $elemMatch is needed to search in nested arrays
+        $obj = (object) ['$elemMatch' => ['$in' => [trim(strtolower($search))]]];
+
         $aggregationBuilder
             ->match()
                 ->field('meaning.'.$lang)
-                //->field('meaning.en')
-                //->in([$search]);
-                //->in(['/$search/']);
-                ->in(['brief; quick; light']);
-                //->in(['/qui/']);
+                ->elemMatch($obj);
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
@@ -39,21 +45,28 @@ final class MeaningFilter extends AbstractFilter
             return [];
         }
 
-        $description = [];
-        foreach ($this->properties as $property => $strategy) {
-            $description["regexp_$property"] = [
-                'property' => $property,
-                'type' => Type::BUILTIN_TYPE_STRING,
-                'required' => false,
-                'description' => 'Filter using a regex. This will appear in the OpenApi documentation!',
-                'openapi' => [
-                    'example' => 'Custom example that will be in the documentation and be the default value of the sandbox',
-                    'allowReserved' => false,// if true, query parameters will be not percent-encoded
-                    'allowEmptyValue' => true,
-                    'explode' => false, // to be true, the type must be Type::BUILTIN_TYPE_ARRAY, ?product=blue,green will be ?product=blue&product=green
-                ],
-            ];
-        }
+        $description["meaning[lang]"] = [
+            'property' => 'meaning[lang]',
+            'type' => Type::BUILTIN_TYPE_STRING,
+            'required' => false,
+            'openapi' => [
+                'example' => 'en',
+                'allowReserved' => false,
+                'allowEmptyValue' => false,
+                'explode' => false, 
+            ],
+        ];
+        $description["meaning[search]"] = [
+            'property' => 'meaning[search]',
+            'type' => Type::BUILTIN_TYPE_STRING,
+            'required' => false,
+            'openapi' => [
+                'example' => 'school',
+                'allowReserved' => false,
+                'allowEmptyValue' => false,
+                'explode' => false,
+            ],
+        ];
 
         return $description;
     }

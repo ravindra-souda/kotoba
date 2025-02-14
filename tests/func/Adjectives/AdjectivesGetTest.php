@@ -40,7 +40,7 @@ class AdjectivesGetTest extends ApiTestCase
             'kanji' => '人工的',
             'group' => 'na',
             'meaning' => [
-                'en' => ['artificial; unnatural'],
+                'en' => ['artificial; unnatural; search-me'],
             ],
         ],
         'katakana' => [
@@ -54,7 +54,7 @@ class AdjectivesGetTest extends ApiTestCase
             'katakana' => 'ユニバーサル',
             'group' => 'na',
             'meaning' => [
-                'en' => ['universal'],
+                'en' => ['universal; search-me'],
             ],
         ],
         'meaning' => [
@@ -62,7 +62,7 @@ class AdjectivesGetTest extends ApiTestCase
             'group' => 'na',
             'meaning' => [
                 'en' => [
-                    'simple; easy; uncomplicated',
+                    'simple; easy; uncomplicated; loin',
                     'brief; quick; light',
                 ],
             ],
@@ -73,6 +73,7 @@ class AdjectivesGetTest extends ApiTestCase
             'group' => 'i',
             'meaning' => [
                 'en' => ['far'],
+                'fr' => ['loin'],
             ],
         ],
     ];
@@ -138,7 +139,7 @@ class AdjectivesGetTest extends ApiTestCase
                 'meaning' => [
                     'en' => [
                         'bad(-tasting); awful; terrible',
-                        'poor; unskillful'
+                        'poor; unskillful; search-me'
                     ],
                 ],
             ],
@@ -249,22 +250,39 @@ class AdjectivesGetTest extends ApiTestCase
                 'url' => '?katakana=ニ&romaji=pagination',
                 'expected' => [],
             ],
+
             'meaning' => [
-                'url' => '?meaning[lang]=en&meaning[search]=qui&romaji=pagination',
+                'url' => '?meaning[lang]=en&meaning[search]=search-me&romaji=pagination&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji_2'],
+                    self::GET_SORT_FIXTURES['search_and_sort'][1],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                ],
+            ],
+            'meaning_insensitive' => [
+                'url' => '?meaning[lang]=en&meaning[search]=quiCk&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['meaning']
                 ],
             ],
-            /*
-            'meaning_partial' => [
-                'url' => '?meaning=[un]&romaji=pagination&order[romaji]=asc',
+            'meaning_lang' => [
+                'url' => '?meaning[lang]=fr&meaning[search]=loin&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['meaning'],
-                    self::GET_SEARCH_FIXTURES['katakana_2'],
-                    self::GET_SEARCH_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['romaji']
                 ],
             ],
-            */
+            'meaning_lang_unknown' => [
+                'url' => '?meaning[lang]=dummy&[search]=round&romaji=paginationma',
+                'expected' => self::GET_SORT_FIXTURES['search_and_sort'],
+            ],
+            'meaning_lang_missing' => [
+                'url' => '?meaning[search]=round&romaji=paginationma',
+                'expected' => self::GET_SORT_FIXTURES['search_and_sort'],
+            ],
+            'meaning_search_missing' => [
+                'url' => '?meaning[lang]=en&romaji=paginationma',
+                'expected' => self::GET_SORT_FIXTURES['search_and_sort'],
+            ],
             'romaji' => [
                 'url' => '?romaji=paginationTō',
                 'expected' => [
