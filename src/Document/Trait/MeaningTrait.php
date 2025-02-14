@@ -43,7 +43,8 @@ trait MeaningTrait
             ],
         ],
         /* needed for unit-testing 
-        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification */
+        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification 
+        */
         jsonSchemaContext: [
             'type' => 'object',
         ]
@@ -73,7 +74,16 @@ trait MeaningTrait
      */
     public function getMeaning(): array
     {
-        return $this->meaning;
+        /*  displayed as 'en' => ['high; tall', 'expensive; high-priced'],
+            persisted as 'en' => [['high', 'tall'], ['expensive', 'high-priced']] 
+        */
+        $displayedMeaning = [];
+        foreach ($this->meaning as $userLang => $userMeanings) {
+            foreach ($userMeanings as $userMeaning) {
+                $displayedMeaning[$userLang][] = implode('; ', $userMeaning);
+            }
+        }
+        return $displayedMeaning;
     }
 
     /**
@@ -89,7 +99,7 @@ trait MeaningTrait
             return 1;
         }
 
-        foreach ($meaning as $userLang => $userMeaning) {
+        foreach ($meaning as $userLang => [$userMeaning]) {
             if (!in_array($userLang, self::ALLOWED_LANGS)) {
                 return 2;
             }
@@ -106,6 +116,12 @@ trait MeaningTrait
      */
     public function setMeaning(array $meaning): static
     {
+        /*  words will be persisted in arrays for easy search
+            displayed as 'en' => ['high; tall', 'expensive; high-priced'],
+            persisted as 'en' => [['high', 'tall'], ['expensive', 'high-priced']]
+        */
+        array_walk_recursive($meaning, fn (&$v) => $v = explode(';', $v));
+
         return $this->setLowerAndTrimmedOrNull('meaning', $meaning);
     }
 
