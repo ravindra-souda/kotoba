@@ -38,19 +38,15 @@ class Kanji extends Card
     use Trait\MeaningTrait;
     use Trait\Script\ScriptTrait;
 
-    public const KUNYOMI_MAXLENGTH = 100;
-
-    public const ONYOMI_MAXLENGTH = 100;
-
     public const VALIDATION_ERR_KANJI =
         'must be written using exactly one kanji';
 
     public const VALIDATION_ERR_ONYOMI =
-        'must be written using only lowercase roman characters, '.
+        'must be written using only lowercase roman or katakana characters, '.
         'will be converted to katakana by the API';
 
     public const VALIDATION_ERR_KUNYOMI =
-        'must be written using only lowercase roman characters, '.
+        'must be written using only lowercase roman or hiragana characters, '.
         'will be converted to hiragana by the API';
 
     public const VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI =
@@ -60,47 +56,43 @@ class Kanji extends Card
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
-    protected string $kanji;
+    protected string $kanji = '';
 
-    /** Must be written using only lowercase roman characters,
+    /** Must be written using only lowercase roman or hiragana characters,
      *  will be converted to hiragana by the API */
-    #[Assert\Regex(
-        pattern: '/^[a-zāūēō ,]+$/',
-        message: self::VALIDATION_ERR_KUNYOMI
-    )]
-    #[Assert\Length(
-        max: self::KUNYOMI_MAXLENGTH,
-        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
-    )]
+    #[Assert\All([
+        new Assert\Regex(
+            pattern: '/^\s*[a-zāūēō]+\s*$|^\s*\p{Hiragana}+\s*$/um',
+            message: self::VALIDATION_ERR_KUNYOMI
+        )
+    ])]
     #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $kunyomi = null;
+    #[MongoDB\Field(type: 'hash')]
+    protected ?array $kunyomi = null;
 
-    /** Must be written using only lowercase roman characters,
+    /** Must be written using only lowercase roman or katakana characters,
      *  will be converted to katakana by the API */
-    #[Assert\Regex(
-        pattern: '/^[a-zāūēō ,]+$/',
-        message: self::VALIDATION_ERR_ONYOMI
-    )]
-    #[Assert\Length(
-        max: self::ONYOMI_MAXLENGTH,
-        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
-    )]
+    #[Assert\All([
+        new Assert\Regex(
+            pattern: '/^\s*[a-zāūēō]+\s*$|^\s*\p{Katakana}+\s*$/um',
+            message: self::VALIDATION_ERR_ONYOMI
+        )
+    ])]
     #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $onyomi = null;
+    #[MongoDB\Field(type: 'hash')]
+    protected ?array $onyomi = null;
 
     public function getKanji(): string
     {
         return $this->kanji;
     }
 
-    public function getKunyomi(): ?string
+    public function getKunyomi(): ?array
     {
         return $this->kunyomi;
     }
 
-    public function getOnyomi(): ?string
+    public function getOnyomi(): ?array
     {
         return $this->onyomi;
     }
@@ -116,12 +108,12 @@ class Kanji extends Card
         return $this->setLowerAndTrimmedOrNull('kanji', $kanji);
     }
 
-    public function setKunyomi(?string $kunyomi): Kanji
+    public function setKunyomi(?array $kunyomi): Kanji
     {
         return $this->setLowerAndTrimmedOrNull('kunyomi', $kunyomi);
     }
 
-    public function setOnyomi(?string $onyomi): Kanji
+    public function setOnyomi(?array $onyomi): Kanji
     {
         return $this->setLowerAndTrimmedOrNull('onyomi', $onyomi);
     }
@@ -195,14 +187,16 @@ class Kanji extends Card
 
     private function fillKunyomi(): Kanji
     {
-        $this->kunyomi = $this->toHiragana($this->kunyomi);
+        $this->kunyomi = array_map([$this, 'toHiragana'], $this->kunyomi ?? []);
 
         return $this;
     }
 
     private function fillOnyomi(): Kanji
     {
-        $this->onyomi = $this->toKatakana($this->onyomi, false);
+        $this->onyomi = array_map(
+            fn($v) => $this->toKatakana($v, false), $this->onyomi ?? []
+        );
 
         return $this;
     }

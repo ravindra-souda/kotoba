@@ -169,10 +169,10 @@ class ScriptTest extends TestCase
             ['ホッチキス', 'hotchikisu'],
             ['ひ、び、か', 'hi,bi,ka'],
             ['ニチ、ジツ', 'nichi,jitsu'],
+            ['merii kurisumas', 'merii kurisumas'],
             ['字', false],
             ['食べる', false],
             'integer' => ['1', false],
-            ['merii kurisumas', false],
         ];
 
         return $this->setProviderKeys($tests);

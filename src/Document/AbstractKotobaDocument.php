@@ -129,22 +129,33 @@ abstract class AbstractKotobaDocument
      */
     final protected function setLowerAndTrimmedOrNull(
         string $prop,
-        string|array|null $value
+        string|array|null $value,
+        bool $nullable = true,
     ): static {
         if (!property_exists($this, $prop)) {
             throw new \Exception("property {$prop} not found");
         }
 
         if (is_string($value)) {
-            // null if empty string
-            $value = trim(strtolower($value)) ?: null;
+            // lower and trimmed or null if nullable for empty strings
+            $value = trim(strtolower($value)) ?: ($nullable ? null : '');
         }
 
         if (is_array($value)) {
+            $isEmpty = true;
             array_walk_recursive(
                 $value,
-                fn (&$v) => $v = trim(strtolower($v)),
+                function (&$v) use (&$isEmpty) {
+                    $v = trim(strtolower($v));
+                    if ($isEmpty && $v !== '') {
+                        $isEmpty = false;
+                    }
+                }
             );
+            // null if there are only empty values
+            if ($nullable && $isEmpty) {
+                $value = null;
+            }
         }
 
         $this->{$prop} = $value;

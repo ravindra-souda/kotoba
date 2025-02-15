@@ -98,7 +98,7 @@ trait MeaningTrait
      */
     public function setMeaning(array $meaning): static
     {
-        return $this->setLowerAndTrimmedOrNull('meaning', $meaning);
+        return $this->setLowerAndTrimmedOrNull('meaning', $meaning, false);
     }
 
     #[Assert\Callback]

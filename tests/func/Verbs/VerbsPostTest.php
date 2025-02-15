@@ -54,6 +54,17 @@ class VerbsPostTest extends ApiTestCase
                 'dictionary' => '    来る   ',
             ],
         ],
+        'katakana' => [
+            'katakana' => 'ググる ',
+            'jlpt' => 5,
+            'group' => 'godan',
+            'meaning' => [
+                'en' => ['    to GooGle; to do an online search (FOR)'],
+            ],
+            'inflections' => [
+                'dictionary' => ' ググる ',
+            ],
+        ],
         'romaji_filled' => [
             'romaji' => '  coMe ',
             'hiragana' => '   くる ',
@@ -262,6 +273,61 @@ class VerbsPostTest extends ApiTestCase
                 'imperative' => [
                     'affirmative' => '来い',
                     'negative' => '来るな',
+                ],
+            ],
+        ],
+        'katakana' => [
+            ...self::POST_COMPLETE_VALID_VERBS['katakana'],
+            'romaji' => 'guguru',
+            'katakana' => 'ググる',
+            'meaning' => [
+                'en' => ['to google; to do an online search (for)'],
+            ],
+            'inflections' => [
+                'dictionary' => 'ググる',
+                'non-past' => [
+                    'informal' => [
+                        'affirmative' => 'ググる',
+                        'negative' => 'ググらない',
+                    ],
+                    'polite' => [
+                        'affirmative' => 'ググります',
+                        'negative' => 'ググりません',
+                    ],
+                ],
+                'past' => [
+                    'informal' => [
+                        'affirmative' => 'ググった',
+                        'negative' => 'ググらなかった',
+                    ],
+                    'polite' => [
+                        'affirmative' => 'ググりました',
+                        'negative' => 'ググりませんでした',
+                    ],
+                ],
+                'te' => [
+                    'affirmative' => 'ググって',
+                    'negative' => 'ググらなくて',
+                ],
+                'potential' => [
+                    'affirmative' => 'ググれる',
+                    'negative' => 'ググれない',
+                ],
+                'passive' => [
+                    'affirmative' => 'ググられる',
+                    'negative' => 'ググられない',
+                ],
+                'causative' => [
+                    'affirmative' => 'ググらせる',
+                    'negative' => 'ググらせない',
+                    'passive' => [
+                        'affirmative' => 'ググらせられる',
+                        'negative' => 'ググらせられない',
+                    ],
+                ],
+                'imperative' => [
+                    'affirmative' => 'ググれ',
+                    'negative' => 'ググるな',
                 ],
             ],
         ],
