@@ -21,8 +21,8 @@ class KanjiPostTest extends ApiTestCase
         'kanji' => [
             'kanji' => '人',
             'meaning' => [
-                'en' => ['    person, human '],
-                'fr' => ['  personne, humain    '],
+                'en' => ['    person; human '],
+                'fr' => ['  personne; humain    '],
             ],
             'kunyomi' => '   hito, hitori, hitoto  ',
             'onyomi' => '  jin, nin  ',
@@ -37,7 +37,7 @@ class KanjiPostTest extends ApiTestCase
         'kokuji_without_onyomi' => [
             'kanji' => '込',
             'meaning' => [
-                'en' => ['    crowded, mixture, in bulk, included '],
+                'en' => ['    crowded; mixture; in bulk; included '],
             ],
             'kunyomi' => '  ko  ',
         ],
@@ -48,8 +48,8 @@ class KanjiPostTest extends ApiTestCase
             [
                 'kanji' => '人',
                 'meaning' => [
-                    'en' => ['person, human'],
-                    'fr' => ['personne, humain'],
+                    'en' => ['person; human'],
+                    'fr' => ['personne; humain'],
                 ],
                 'kunyomi' => 'ひと、ひとり、ひとと',
                 'onyomi' => 'ジン、ニン',
@@ -68,7 +68,7 @@ class KanjiPostTest extends ApiTestCase
             [
                 'kanji' => '込',
                 'meaning' => [
-                    'en' => ['crowded, mixture, in bulk, included'],
+                    'en' => ['crowded; mixture; in bulk; included'],
                 ],
                 'kunyomi' => 'こ',
             ], 'crowded',
