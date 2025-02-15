@@ -22,11 +22,11 @@ class KanjiPutTest extends ApiTestCase
             'kanji' => '日',
             'meaning' => [
                 'en' => [
-                    'day, daytime, daylight',
-                    'sun, sunshine, sunlight',
+                    'day; daytime; daylight',
+                    'sun; sunshine; sunlight',
                 ],
                 'fr' => [
-                    'jour, lumière du jour',
+                    'jour; lumière du jour',
                     'soleil',
                 ],
             ],
