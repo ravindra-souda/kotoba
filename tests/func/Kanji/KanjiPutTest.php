@@ -22,16 +22,16 @@ class KanjiPutTest extends ApiTestCase
             'kanji' => '日',
             'meaning' => [
                 'en' => [
-                    'day, daytime, daylight',
-                    'sun, sunshine, sunlight',
+                    'day; daytime; daylight',
+                    'sun; sunshine; sunlight',
                 ],
                 'fr' => [
-                    'jour, lumière du jour',
+                    'jour; lumière du jour',
                     'soleil',
                 ],
             ],
-            'kunyomi' => 'hi, bi, ka',
-            'onyomi' => 'nichi, jitsu',
+            'kunyomi' => ['hi', 'bi', 'ka'],
+            'onyomi' => ['nichi', 'jitsu'],
         ],
     ];
 
@@ -54,10 +54,22 @@ class KanjiPutTest extends ApiTestCase
             ],
         ],
         'kunyomi' => [
-            'kunyomi' => ' tsuki  ',
+            'kunyomi' => [' tsuki  '],
+        ],
+        'kunyomi_kana' => [
+            'kunyomi' => [' つ ', ' き   '],
+        ],
+        'kunyomi_mixed' => [
+            'kunyomi' => [' つ', 'ka'],
         ],
         'onyomi' => [
-            'onyomi' => ' getsu, gatsu    ',
+            'onyomi' => [' getsu', 'gatsu    '],
+        ],
+        'onyomi_kana' => [
+            'onyomi' => [' ゲ', '  ガ ',  'ツ '],
+        ],
+        'onyomi_mixed' => [
+            'onyomi' => ['mu', ' ヌ'],
         ],
     ];
 
@@ -65,8 +77,8 @@ class KanjiPutTest extends ApiTestCase
         'kanji' => [
             'doc' => [
                 'kanji' => '月',
-                'kunyomi' => 'ひ、び、か',
-                'onyomi' => 'ニチ、ジツ',
+                'kunyomi' => ['ひ', 'び', 'か'],
+                'onyomi' => ['ニチ', 'ジツ'],
             ],
             'code' => 'day',
         ],
@@ -84,22 +96,50 @@ class KanjiPutTest extends ApiTestCase
                         'clair de lune',
                     ],
                 ],
-                'kunyomi' => 'ひ、び、か',
-                'onyomi' => 'ニチ、ジツ',
+                'kunyomi' => ['ひ', 'び', 'か'],
+                'onyomi' => ['ニチ', 'ジツ'],
             ],
             'code' => 'moon',
         ],
         'kunyomi' => [
             'doc' => [
-                'kunyomi' => 'つき',
-                'onyomi' => 'ニチ、ジツ',
+                'kunyomi' => ['つき'],
+                'onyomi' => ['ニチ', 'ジツ'],
+            ],
+            'code' => 'day',
+        ],
+        'kunyomi_kana' => [
+            'doc' => [
+                'kunyomi' => ['つ', 'き'],
+                'onyomi' => ['ニチ', 'ジツ'],
+            ],
+            'code' => 'day',
+        ],
+        'kunyomi_mixed' => [
+            'doc' => [
+                'kunyomi' => ['つ', 'か'],
+                'onyomi' => ['ニチ', 'ジツ'],
             ],
             'code' => 'day',
         ],
         'onyomi' => [
             'doc' => [
-                'onyomi' => 'ゲツ、ガツ',
-                'kunyomi' => 'ひ、び、か',
+                'onyomi' => ['ゲツ', 'ガツ'],
+                'kunyomi' => ['ひ', 'び', 'か'],
+            ],
+            'code' => 'day',
+        ],
+        'onyomi_kana' => [
+            'doc' => [
+                'onyomi' => ['ゲ', 'ガ',  'ツ'],
+                'kunyomi' => ['ひ', 'び', 'か'],
+            ],
+            'code' => 'day',
+        ],
+        'onyomi_mixed' => [
+            'doc' => [
+                'onyomi' => ['ム', 'ヌ'],
+                'kunyomi' => ['ひ', 'び', 'か'],
             ],
             'code' => 'day',
         ],
@@ -166,45 +206,81 @@ class KanjiPutTest extends ApiTestCase
             ],
             'message' => 'meaning: '.Kanji::VALIDATION_ERR_MEANING[3],
         ],
-        'kunyomi_not_written_in_romaji' => [
+        'kunyomi_in_katakana' => [
             'fixture' => 'default',
             'payload' => [
-                'kunyomi' => 'つき',
+                'kunyomi' => ['つき', 'ツキ'],
             ],
-            'message' => 'kunyomi: '.Kanji::VALIDATION_ERR_KUNYOMI,
+            'message' => 'kunyomi[1]: '.Kanji::VALIDATION_ERR_KUNYOMI,
         ],
-        'kunyomi_maxlength' => [
-            'fixture' => 'default',
-            'maxlength' => [
-                'kunyomi' => 'h',
-            ],
-            'message' => [
-                'text' => 'kunyomi: '.Kanji::VALIDATION_ERR_MAXLENGTH,
-                'values' => Kanji::KUNYOMI_MAXLENGTH,
-            ],
-        ],
-        'onyomi_not_written_in_romaji' => [
+        'kunyomi_in_kanji' => [
             'fixture' => 'default',
             'payload' => [
-                'onyomi' => 'ゲツ',
+                'kunyomi' => ['月', 'つき'],
             ],
-            'message' => 'onyomi: '.Kanji::VALIDATION_ERR_ONYOMI,
+            'message' => 'kunyomi[0]: '.Kanji::VALIDATION_ERR_KUNYOMI,
         ],
-        'onyomi_maxlength' => [
+        'kunyomi_romaji_mixed' => [
             'fixture' => 'default',
-            'maxlength' => [
-                'onyomi' => 'k',
+            'payload' => [
+                'kunyomi' => ['つき', 'つki'],
             ],
-            'message' => [
-                'text' => 'onyomi: '.Kanji::VALIDATION_ERR_MAXLENGTH,
-                'values' => Kanji::ONYOMI_MAXLENGTH,
+            'message' => 'kunyomi[1]: '.Kanji::VALIDATION_ERR_KUNYOMI,
+        ],
+        'kunyomi_katakana_mixed' => [
+            'fixture' => 'default',
+            'payload' => [
+                'kunyomi' => ['ツき', 'つき'],
             ],
+            'message' => 'kunyomi[0]: '.Kanji::VALIDATION_ERR_KUNYOMI,
+        ],
+        'kunyomi_kanji_mixed' => [
+            'fixture' => 'default',
+            'payload' => [
+                'kunyomi' => ['つき', '月き'],
+            ],
+            'message' => 'kunyomi[1]: '.Kanji::VALIDATION_ERR_KUNYOMI,
+        ],
+        'onyomi_in_hiragana' => [
+            'fixture' => 'default',
+            'payload' => [
+                'onyomi' => ['がつ', 'ゲツ'],
+            ],
+            'message' => 'onyomi[0]: '.Kanji::VALIDATION_ERR_ONYOMI,
+        ],
+        'onyomi_in_kanji' => [
+            'fixture' => 'default',
+            'payload' => [
+                'onyomi' => ['ゲツ', '月'],
+            ],
+            'message' => 'onyomi[1]: '.Kanji::VALIDATION_ERR_ONYOMI,
+        ],
+        'onyomi_romaji_mixed' => [
+            'fixture' => 'default',
+            'payload' => [
+                'onyomi' => ['ゲツ', 'ガツu'],
+            ],
+            'message' => 'onyomi[1]: '.Kanji::VALIDATION_ERR_ONYOMI,
+        ],
+        'onyomi_hiragana_mixed' => [
+            'fixture' => 'default',
+            'payload' => [
+                'onyomi' => ['げゲツ', 'ガツ'],
+            ],
+            'message' => 'onyomi[0]: '.Kanji::VALIDATION_ERR_ONYOMI,
+        ],
+        'onyomi_kanji_mixed' => [
+            'fixture' => 'default',
+            'payload' => [
+                'onyomi' => ['ゲツ', 'ガツ月'],
+            ],
+            'message' => 'onyomi[1]: '.Kanji::VALIDATION_ERR_ONYOMI,
         ],
         'no_kunyomi_nor_onyomi' => [
             'fixture' => 'default',
             'payload' => [
-                'kunyomi' => '',
-                'onyomi' => '     ',
+                'kunyomi' => [''],
+                'onyomi' => ['     '],
             ],
             'message' => 'kunyomi: '.
                 Kanji::VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI.

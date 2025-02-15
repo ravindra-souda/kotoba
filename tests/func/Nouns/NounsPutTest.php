@@ -52,6 +52,9 @@ class NounsPutTest extends ApiTestCase
             'romaji' => '  juusho   ',
         ],
         'bikago' => [
+            'hiragana' => '  ごじゅうしょ',
+            'kanji' => 'ご住所  ',
+            'romaji' => '  gojuusho  ',
             'bikago' => 'ご',
         ],
         'meaning' => [
@@ -99,9 +102,12 @@ class NounsPutTest extends ApiTestCase
         ],
         'bikago' => [
             'doc' => [
+                'hiragana' => 'じゅうしょ',
+                'kanji' => '住所',
+                'romaji' => 'jūsho',
                 'bikago' => 'ご',
             ],
-            'code' => 'namae',
+            'code' => 'jusho',
         ],
         'meaning' => [
             'doc' => [
