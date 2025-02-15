@@ -147,7 +147,7 @@ class Kanji extends Card
 
     public function getSlugReference(): string
     {
-        return explode(',', $this->meaning['en'][0], 2)[0];
+        return $this->meaning['en'][0][0];
     }
 
     public function hasKunyomiOrOnyomi(): bool

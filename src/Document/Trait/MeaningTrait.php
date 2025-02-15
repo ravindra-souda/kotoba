@@ -99,12 +99,17 @@ trait MeaningTrait
             return 1;
         }
 
-        foreach ($meaning as $userLang => [$userMeaning]) {
+        foreach ($meaning as $userLang => $userMeanings) {
             if (!in_array($userLang, self::ALLOWED_LANGS)) {
                 return 2;
             }
-            if (!is_array($userMeaning) || '' === trim($userMeaning[0] ?? '')) {
+            if (!is_array($userMeanings) || empty($userMeanings[0])) {
                 return 3;
+            }
+            foreach ($userMeanings as $userMeaning) {
+                if (!is_array($userMeaning) || '' === trim($userMeaning[0] ?? '')) {
+                    return 3;
+                }
             }
         }
 
