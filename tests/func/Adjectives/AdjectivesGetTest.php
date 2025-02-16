@@ -319,7 +319,6 @@ class AdjectivesGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        //var_dump($content['hydra:member']);
         $this->assertSame($content['hydra:totalItems'], count($expected));
         $this->assertArraySubset(
             array_slice($expected, 0, $this->getItemsPerPage()),
