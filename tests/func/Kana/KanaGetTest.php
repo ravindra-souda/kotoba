@@ -26,13 +26,41 @@ class KanaGetTest extends ApiTestCase
             'katakana' => 'キャ',
         ],
         'romaji' => [
-            'hiragana' => 'きや',
+            'hiragana' => 'く',
+        ],
+    ];
+    private const GET_SORT_FIXTURES = [
+        'romaji_asc' => [
+            [
+                'hiragana' => 'り',
+            ],
+            [
+                'katakana' => 'ル',
+            ],
+            [
+                'hiragana' => 'ら',
+            ],
+        ],
+        'romaji_desc' => [
+            [
+                'katakana' => 'シ',
+            ],
+            [
+                'katakana' => 'ス',
+            ],
+            [
+                'hiragana' => 'そ',
+            ],
         ],
     ];
 
     public static function setUpBeforeClass(): void
     {
-        array_walk(self::GET_SEARCH_FIXTURES, fn(&$fixture) => 
+        $fixtures = array_merge_recursive(
+            array_values(self::GET_SEARCH_FIXTURES),
+            ...array_values(self::GET_SORT_FIXTURES),
+        );
+        array_walk($fixtures, fn(&$fixture) => 
             $fixture['romaji'] = substr('x'.Kana::toRomaji($fixture['hiragana'] ?? $fixture['katakana']), 0, 4)
         );
         foreach ($fixtures as $payload) {
@@ -45,6 +73,11 @@ class KanaGetTest extends ApiTestCase
             static::assertResponseStatusCodeSame(201);
             static::assertMatchesResourceItemJsonSchema(Kana::class);
         }
+    }
+
+    private function getItemsPerPage(): int 
+    {
+        return (int) $_ENV["ITEMS_PER_PAGE"];
     }
 
     /**
@@ -78,7 +111,7 @@ class KanaGetTest extends ApiTestCase
                 ],
             ],
             'romaji' => [
-                'url' => '?romaji=xkiy',
+                'url' => '?romaji=xku',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['romaji']
                 ],
@@ -91,9 +124,13 @@ class KanaGetTest extends ApiTestCase
                 ],
             ],
             'romaji_start' => [
-                'url' => '?romaji=xk',
+                'url' => '?romaji=xK&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
+                    self::GET_SEARCH_FIXTURES['hiragana_glide'],
+                    self::GET_SEARCH_FIXTURES['katakana_glide'],  
                 ],
             ],
         ];
@@ -124,6 +161,62 @@ class KanaGetTest extends ApiTestCase
             array_slice($expected, 0, $this->getItemsPerPage()),
             $content['hydra:member']
         );
+        $this->assertMatchesResourceCollectionJsonSchema(Kana::class);
+    }
+
+    /**
+     * @return array<array<string, array<array<string, string>>|string>>
+     */
+    public function sortKanaProvider(): array
+    {
+        return [
+            'romaji_asc' => [
+                'url' => '?romaji=xr&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['romaji_asc'][2],
+                    self::GET_SORT_FIXTURES['romaji_asc'][0],
+                    self::GET_SORT_FIXTURES['romaji_asc'][1],
+                ],
+            ],
+            'romaji_desc' => [
+                'url' => '?romaji=xs&order[romaji]=desc',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['romaji_desc'][1],
+                    self::GET_SORT_FIXTURES['romaji_desc'][2],
+                    self::GET_SORT_FIXTURES['romaji_desc'][0],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider sortKanaProvider
+     *
+     * @param array<array<string>> $expected
+     */
+    public function testKanaGetSort(
+        string $url,
+        array $expected,
+    ): void {
+        $response = static::createClient()->request(
+            'GET',
+            '/api/cards/kana'.$url,
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame(
+            'content-type',
+            'application/ld+json; charset=utf-8'
+        );
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertSame($content['hydra:totalItems'], count($expected));
+        for ($i = 0; $i < count($expected); ++$i) {
+            $this->assertArraySubset(
+                $expected[$i],
+                $content['hydra:member'][$i]
+            );
+        }
         $this->assertMatchesResourceCollectionJsonSchema(Kana::class);
     }
 
@@ -216,7 +309,7 @@ class KanaGetTest extends ApiTestCase
         ]);
     }
 
-    public function testAdjectivesGetPagination(): void
+    public function testKanaGetPagination(): void
     {
         $totalItems = count(array_merge_recursive(
                 array_values(self::GET_SEARCH_FIXTURES),
@@ -228,7 +321,7 @@ class KanaGetTest extends ApiTestCase
         
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/adjectives?romaji=pagination',
+            '/api/cards/kana?romaji=x',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -240,9 +333,9 @@ class KanaGetTest extends ApiTestCase
             'hydra:totalItems' => $totalItems,
             'hydra:view' => [
                 '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/api/cards/adjectives?romaji=pagination&page=1',
-                'hydra:last' => '/api/cards/adjectives?romaji=pagination&page='.$lastPage,
-                'hydra:next' => '/api/cards/adjectives?romaji=pagination&page=2',
+                'hydra:first' => '/api/cards/kana?romaji=x&page=1',
+                'hydra:last' => '/api/cards/kana?romaji=x&page='.$lastPage,
+                'hydra:next' => '/api/cards/kana?romaji=x&page=2',
             ],
         ]);
         $content = json_decode($response->getContent(), true);
@@ -250,20 +343,20 @@ class KanaGetTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/adjectives?romaji=pagination&order[romaji]=desc&page=2',
+            '/api/cards/kana?romaji=x&order[romaji]=desc&page=2',
         );
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($response->getContent(), true);
         $this->assertCount($itemsPerPage, $content['hydra:member']);
         $this->assertArraySubset(
-            self::GET_SORT_FIXTURES['romaji_desc'][1],
-            $content['hydra:member'][2]
+            self::GET_SORT_FIXTURES['romaji_asc'][2],
+            $content['hydra:member'][0]
         );
 
         // client-side pagination options should be disabled
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/adjectives?romaji=pagination&pagination=false',
+            '/api/cards/kana?romaji=x&pagination=false',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -275,7 +368,7 @@ class KanaGetTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/adjectives?romaji=pagination&itemsPerPage=1',
+            '/api/cards/kana?romaji=x&itemsPerPage=1',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
