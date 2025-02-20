@@ -60,47 +60,55 @@ class Kanji extends Card
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'string')]
-    protected string $kanji;
+    protected string $kanji = '';
 
     /** Must be written using only lowercase roman characters,
      *  will be converted to hiragana by the API */
-    #[Assert\Regex(
-        pattern: '/^[a-zāūēō ,]+$/',
-        message: self::VALIDATION_ERR_KUNYOMI
-    )]
+    #[Assert\All([
+        new Assert\Regex(
+            pattern: '/^[a-zāūēō]+$/',
+            message: self::VALIDATION_ERR_KUNYOMI
+        )
+    ])]
+    /*
     #[Assert\Length(
         max: self::KUNYOMI_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
     )]
+    */
     #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $kunyomi = null;
+    #[MongoDB\Field(type: 'hash')]
+    protected ?array $kunyomi = null;
 
     /** Must be written using only lowercase roman characters,
      *  will be converted to katakana by the API */
-    #[Assert\Regex(
-        pattern: '/^[a-zāūēō ,]+$/',
-        message: self::VALIDATION_ERR_ONYOMI
-    )]
+    #[Assert\All([
+        new Assert\Regex(
+            pattern: '/^[a-zāūēō]+$/',
+            message: self::VALIDATION_ERR_ONYOMI
+        )
+    ])]
+    /*
     #[Assert\Length(
         max: self::ONYOMI_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
     )]
+    */
     #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'string')]
-    protected ?string $onyomi = null;
+    #[MongoDB\Field(type: 'hash')]
+    protected ?array $onyomi = null;
 
     public function getKanji(): string
     {
         return $this->kanji;
     }
 
-    public function getKunyomi(): ?string
+    public function getKunyomi(): ?array
     {
         return $this->kunyomi;
     }
 
-    public function getOnyomi(): ?string
+    public function getOnyomi(): ?array
     {
         return $this->onyomi;
     }
@@ -116,12 +124,12 @@ class Kanji extends Card
         return $this->setLowerAndTrimmedOrNull('kanji', $kanji);
     }
 
-    public function setKunyomi(?string $kunyomi): Kanji
+    public function setKunyomi(?array $kunyomi): Kanji
     {
         return $this->setLowerAndTrimmedOrNull('kunyomi', $kunyomi);
     }
 
-    public function setOnyomi(?string $onyomi): Kanji
+    public function setOnyomi(?array $onyomi): Kanji
     {
         return $this->setLowerAndTrimmedOrNull('onyomi', $onyomi);
     }
@@ -195,14 +203,16 @@ class Kanji extends Card
 
     private function fillKunyomi(): Kanji
     {
-        $this->kunyomi = $this->toHiragana($this->kunyomi);
+        $this->kunyomi = array_map([$this, 'toHiragana'], $this->kunyomi ?? []);
 
         return $this;
     }
 
     private function fillOnyomi(): Kanji
     {
-        $this->onyomi = $this->toKatakana($this->onyomi, false);
+        $this->onyomi = array_map(
+            fn($v) => $this->toKatakana($v, false), $this->onyomi ?? []
+        );
 
         return $this;
     }
