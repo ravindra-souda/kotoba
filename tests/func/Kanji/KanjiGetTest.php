@@ -46,20 +46,14 @@ class KanjiGetTest extends ApiTestCase
                 'fr' => ['gras; dodu; gros'],
             ],
         ],
-    ];
-
-    private const GET_PAGINATION_FIXTURES = [
-        self::GET_SEARCH_FIXTURES['kunyomi'],
-        self::GET_SEARCH_FIXTURES['onyomi'],
-        self::GET_SEARCH_FIXTURES['meaning'],
-        [
+        'same_onyomi_1' => [
             'kanji' => '隊',
             'onyomi' => ['tai'],
             'meaning' => [
                 'en' => ['party; company; squad'],
             ],
         ],
-        [
+        'same_onyomi_2' => [
             'kanji' => '袋',
             'kunyomi' => ['fukuro'],
             'onyomi' => ['tai'],
@@ -68,7 +62,7 @@ class KanjiGetTest extends ApiTestCase
                 'fr' => ['sac; sacoche; pochette']
             ],
         ],
-        [
+        'same_onyomi_3' => [
             'kanji' => '帯',
             'kunyomi' => ['o', 'obi'],
             'onyomi' => ['tai'],
@@ -78,13 +72,18 @@ class KanjiGetTest extends ApiTestCase
         ],
     ];
 
+    private const GET_PAGINATION_FIXTURES = [
+        self::GET_SEARCH_FIXTURES['kunyomi'],
+        self::GET_SEARCH_FIXTURES['onyomi'],
+        self::GET_SEARCH_FIXTURES['meaning'],
+        self::GET_SEARCH_FIXTURES['same_onyomi_1'],
+        self::GET_SEARCH_FIXTURES['same_onyomi_2'],
+        self::GET_SEARCH_FIXTURES['same_onyomi_3'],
+    ];
+
     public static function setUpBeforeClass(): void
     {
-        $fixtures = array_merge_recursive(
-            array_values(self::GET_SEARCH_FIXTURES),
-            ...array_values(self::GET_PAGINATION_FIXTURES),
-        );
-        foreach ($fixtures as $payload) {
+        foreach (self::GET_SEARCH_FIXTURES as $payload) {
             static::createClient()->request(
                 'POST',
                 '/api/cards/kanji',
