@@ -273,7 +273,7 @@ class AdjectivesGetTest extends ApiTestCase
             ],
             'meaning_lang_unknown' => [
                 'url' => '?meaning[lang]=dummy&meaning[search]=round&romaji=paginationma',
-                'expected' => self::GET_SORT_FIXTURES['search_and_sort'],
+                'expected' => [],
             ],
             'meaning_lang_missing' => [
                 'url' => '?meaning[search]=round&romaji=paginationma',
