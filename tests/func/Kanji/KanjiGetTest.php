@@ -72,13 +72,73 @@ class KanjiGetTest extends ApiTestCase
         ],
     ];
 
+    private const GET_EXPECTED_KANJI = [
+        'kanji' => [
+            'kanji' => '天',
+            'kunyomi' => ['あまつ', 'あめ', 'あま'],
+            'onyomi' => ['テン'],
+            'meaning' => [
+                'en' => ['heavens', 'sky', 'imperial'],
+            ],
+        ],
+        'kunyomi' => [
+            'kanji' => '体',
+            'kunyomi' => ['からだ', 'かたち'],
+            'onyomi' => ['タイ', 'テイ'],
+            'meaning' => [
+                'en' => ['body', 'substance', 'object', 'reality', 'counter for images'],
+            ],
+        ],
+        'onyomi' => [
+            'kanji' => '大',
+            'kunyomi' => ['おお'],
+            'onyomi' => ['ダイ', 'タイ'],
+            'meaning' => [
+                'en' => ['large; big'],
+            ],
+        ],
+        'meaning' => [
+            'kanji' => '太',
+            'kunyomi' => ['ふと'],
+            'onyomi' => ['タイ', 'タ'],
+            'meaning' => [
+                'en' => ['plump; thick; big around'],
+                'fr' => ['gras; dodu; gros'],
+            ],
+        ],
+        'same_onyomi_1' => [
+            'kanji' => '隊',
+            'onyomi' => ['タイ'],
+            'meaning' => [
+                'en' => ['party; company; squad'],
+            ],
+        ],
+        'same_onyomi_2' => [
+            'kanji' => '袋',
+            'kunyomi' => ['ふくろ'],
+            'onyomi' => ['タイ'],
+            'meaning' => [
+                'en' => ['sack; bag; pouch'],
+                'fr' => ['sac; sacoche; pochette']
+            ],
+        ],
+        'same_onyomi_3' => [
+            'kanji' => '帯',
+            'kunyomi' => ['お', 'おび'],
+            'onyomi' => ['タイ'],
+            'meaning' => [
+                'en' => ['sash', 'belt; obi', 'zone; region'],
+            ],
+        ],
+    ];
+
     private const GET_PAGINATION_FIXTURES = [
-        self::GET_SEARCH_FIXTURES['kunyomi'],
-        self::GET_SEARCH_FIXTURES['onyomi'],
-        self::GET_SEARCH_FIXTURES['meaning'],
-        self::GET_SEARCH_FIXTURES['same_onyomi_1'],
-        self::GET_SEARCH_FIXTURES['same_onyomi_2'],
-        self::GET_SEARCH_FIXTURES['same_onyomi_3'],
+        self::GET_EXPECTED_KANJI['kunyomi'],
+        self::GET_EXPECTED_KANJI['onyomi'],
+        self::GET_EXPECTED_KANJI['meaning'],
+        self::GET_EXPECTED_KANJI['same_onyomi_1'],
+        self::GET_EXPECTED_KANJI['same_onyomi_2'],
+        self::GET_EXPECTED_KANJI['same_onyomi_3'],
     ];
 
     public static function setUpBeforeClass(): void
@@ -109,42 +169,70 @@ class KanjiGetTest extends ApiTestCase
             'kanji' => [
                 'url' => '?kanji=天',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji'],
+                    self::GET_EXPECTED_KANJI['kanji'],
                 ],
             ],
-            'kunyomi' => [
+            'kunyomi_hiragana' => [
                 'url' => '?kunyomi=からだ',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kunyomi']
+                    self::GET_EXPECTED_KANJI['kunyomi']
                 ],
             ],
-            'onyomi' => [
+            'kunyomi_romaji' => [
+                'url' => '?kunyomi=karada',
+                'expected' => [
+                    self::GET_EXPECTED_KANJI['kunyomi']
+                ],
+            ],
+            'kunyomi_katakana' => [
+                'url' => '?kunyomi=カラダ',
+                'expected' => [],
+            ],
+            'kunyomi_kanji' => [
+                'url' => '?kunyomi=体',
+                'expected' => [],
+            ],
+            'onyomi_katakana' => [
                 'url' => '?onyomi=ダイ',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['onyomi']
+                    self::GET_EXPECTED_KANJI['onyomi']
                 ],
+            ],
+            'onyomi_romaji' => [
+                'url' => '?onyomi=ta',
+                'expected' => [
+                    self::GET_EXPECTED_KANJI['meaning']
+                ],
+            ],
+            'onyomi_hiragana' => [
+                'url' => '?onyomi=たい',
+                'expected' => [],
+            ],
+            'onyomi_kanji' => [
+                'url' => '?onyomi=大',
+                'expected' => [],
             ],
             'meaning' => [
                 'url' => '?meaning[lang]=en&meaning[search]=big around',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['meaning']
+                    self::GET_EXPECTED_KANJI['meaning']
                 ],
             ],
             'meaning_insensitive' => [
                 'url' => '?meaning[lang]=en&meaning[search]=realItY',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['meaning']
+                    self::GET_EXPECTED_KANJI['kunyomi']
                 ],
             ],
             'meaning_lang' => [
                 'url' => '?meaning[lang]=fr&meaning[search]=sacoche',
                 'expected' => [
-                    self::GET_PAGINATION_FIXTURES[4]
+                    self::GET_EXPECTED_KANJI['same_onyomi_2']
                 ],
             ],
             'meaning_lang_unknown' => [
                 'url' => '?meaning[lang]=dummy&meaning[search]=substance&onyomi=タイ',
-                'expected' => self::GET_PAGINATION_FIXTURES,
+                'expected' => [],
             ],
             'meaning_lang_missing' => [
                 'url' => '?meaning[search]=large&onyomi=タイ',
@@ -200,7 +288,7 @@ class KanjiGetTest extends ApiTestCase
         $content = json_decode($response->getContent(), true);
         $this->assertSame($content['hydra:totalItems'], 1);
         $this->assertArraySubset(
-            self::GET_SEARCH_FIXTURES['meaning'],
+            self::GET_EXPECTED_KANJI['meaning'],
             $content['hydra:member'][0]
         );
         $this->assertMatchesResourceCollectionJsonSchema(Kanji::class);
@@ -226,7 +314,7 @@ class KanjiGetTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hydra:totalItems', $content);
         $this->assertJsonContains(
-            self::GET_SEARCH_FIXTURES['meaning']
+            self::GET_EXPECTED_KANJI['meaning']
         );
 
         $this->assertMatchesResourceItemJsonSchema(Kanji::class);
@@ -273,11 +361,26 @@ class KanjiGetTest extends ApiTestCase
         ]);
     }
 
+    private function getIds(array $results): array
+    {
+        $ids = [];
+        foreach ($results as $result) {
+            $ids[] = $result['@id'];
+        }
+
+        return $ids;
+    }
+
     public function testKanjiGetPagination(): void
     {
         $totalItems = count(self::GET_PAGINATION_FIXTURES);
         $itemsPerPage = $this->getItemsPerPage();
         $lastPage = ceil($totalItems / $itemsPerPage);
+
+        $itemsOnSecondPage = $totalItems - $itemsPerPage;
+        if ($itemsOnSecondPage > $itemsPerPage) {
+            $itemsOnSecondPage = $itemsPerPage;
+        }
         
         $response = static::createClient()->request(
             'GET',
@@ -293,9 +396,9 @@ class KanjiGetTest extends ApiTestCase
             'hydra:totalItems' => $totalItems,
             'hydra:view' => [
                 '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/api/cards/kanji?onyomi=タイ&page=1',
-                'hydra:last' => '/api/cards/kanji?onyomi=タイ&page='.$lastPage,
-                'hydra:next' => '/api/cards/kanji?onyomi=タイ&page=2',
+                'hydra:first' => '/api/cards/kanji?onyomi='.urlencode('タイ').'&page=1',
+                'hydra:last' => '/api/cards/kanji?onyomi='.urlencode('タイ').'&page='.$lastPage,
+                'hydra:next' => '/api/cards/kanji?onyomi='.urlencode('タイ').'&page=2',
             ],
         ]);
         $firstPageContent = json_decode($response->getContent(), true);
@@ -307,19 +410,12 @@ class KanjiGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $secondPageContent = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsOnSecondPage, $secondPageContent['hydra:member']);
 
-        $this->assertTrue(
-            array_all(
-                $secondPageContent, fn($v) => !in_array($v, $firstPageContent)
-                )
-            );
-        /*
-        $this->assertArraySubset(
-            self::GET_SORT_FIXTURES['romaji_desc'][1],
-            $content['hydra:member'][2]
-        );
-        */
+        // first page results shouldn't be on second page
+        $firstPageIds = $this->getIds($firstPageContent['hydra:member']);
+        $secondPageIds = $this->getIds($secondPageContent['hydra:member']);
+        $this->assertSame($firstPageIds, array_diff($firstPageIds, $secondPageIds));
 
         // client-side pagination options should be disabled
         $response = static::createClient()->request(
