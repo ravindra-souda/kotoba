@@ -339,6 +339,6 @@ trait ScriptTrait
 
     private static function isRomaji(string $string): bool
     {
-        return 1 === preg_match('/^[a-z,āūēō]+$/um', $string);
+        return 1 === preg_match('/^[a-z,āūēō ]+$/um', $string);
     }
 }
