@@ -51,19 +51,15 @@ class Kanji extends Card
     use Trait\MeaningTrait;
     use Trait\Script\ScriptTrait;
 
-    public const KUNYOMI_MAXLENGTH = 100;
-
-    public const ONYOMI_MAXLENGTH = 100;
-
     public const VALIDATION_ERR_KANJI =
         'must be written using exactly one kanji';
 
     public const VALIDATION_ERR_ONYOMI =
-        'must be written using only lowercase roman characters, '.
+        'must be written using only lowercase roman or katakana characters, '.
         'will be converted to katakana by the API';
 
     public const VALIDATION_ERR_KUNYOMI =
-        'must be written using only lowercase roman characters, '.
+        'must be written using only lowercase roman or hiragana characters, '.
         'will be converted to hiragana by the API';
 
     public const VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI =
@@ -75,39 +71,27 @@ class Kanji extends Card
     #[MongoDB\Field(type: 'string')]
     protected string $kanji = '';
 
-    /** Must be written using only lowercase roman characters,
+    /** Must be written using only lowercase roman or hiragana characters,
      *  will be converted to hiragana by the API */
     #[Assert\All([
         new Assert\Regex(
-            pattern: '/^[a-zāūēō]+$/',
+            pattern: '/^\s*[a-zāūēō]+\s*$|^\s*\p{Hiragana}+\s*$/um',
             message: self::VALIDATION_ERR_KUNYOMI
         )
     ])]
-    /*
-    #[Assert\Length(
-        max: self::KUNYOMI_MAXLENGTH,
-        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
-    )]
-    */
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
     #[ApiFilter(YomiFilter::class)]
     protected ?array $kunyomi = null;
 
-    /** Must be written using only lowercase roman characters,
+    /** Must be written using only lowercase roman or katakana characters,
      *  will be converted to katakana by the API */
     #[Assert\All([
         new Assert\Regex(
-            pattern: '/^[a-zāūēō]+$/',
+            pattern: '/^\s*[a-zāūēō]+\s*$|^\s*\p{Katakana}+\s*$/um',
             message: self::VALIDATION_ERR_ONYOMI
         )
     ])]
-    /*
-    #[Assert\Length(
-        max: self::ONYOMI_MAXLENGTH,
-        maxMessage: self::VALIDATION_ERR_MAXLENGTH,
-    )]
-    */
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
     #[ApiFilter(YomiFilter::class)]

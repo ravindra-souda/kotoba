@@ -24,22 +24,38 @@ class KanjiPostTest extends ApiTestCase
                 'en' => ['    person; human '],
                 'fr' => ['  personne; humain    '],
             ],
-            'kunyomi' => '   hito, hitori, hitoto  ',
-            'onyomi' => '  jin, nin  ',
+            'kunyomi' => ['   hito', 'hitori', 'hitoto  '],
+            'onyomi' => ['  jin', 'nin  '],
+        ],
+        'kanji_kana' => [
+            'kanji' => '水',
+            'meaning' => [
+                'en' => [' water   '],
+            ],
+            'kunyomi' => ['  みず'],
+            'onyomi' => ['  スイ'],
+        ],
+        'kanji_mixed' => [
+            'kanji' => '日',
+            'meaning' => [
+                'en' => ['   day', ' sun', 'Japan  '],
+            ],
+            'kunyomi' => ['  hi', ' び  ', 'か   '],
+            'onyomi' => ['  ニチ  ', ' jitsu   '],
         ],
         'long_wovel' => [
             'kanji' => '週',
             'meaning' => [
                 'en' => ['    week '],
             ],
-            'onyomi' => '  shū  ',
+            'onyomi' => ['  shū  '],
         ],
         'kokuji_without_onyomi' => [
             'kanji' => '込',
             'meaning' => [
                 'en' => ['    crowded; mixture; in bulk; included '],
             ],
-            'kunyomi' => '  ko  ',
+            'kunyomi' => ['  ko  '],
         ],
     ];
 
@@ -51,9 +67,29 @@ class KanjiPostTest extends ApiTestCase
                     'en' => ['person; human'],
                     'fr' => ['personne; humain'],
                 ],
-                'kunyomi' => 'ひと、ひとり、ひとと',
-                'onyomi' => 'ジン、ニン',
+                'kunyomi' => ['ひと', 'ひとり', 'ひとと'],
+                'onyomi' => ['ジン', 'ニン'],
             ], 'person',
+        ],
+        'kanji_kana' => [
+            [
+                'kanji' => '水',
+                'meaning' => [
+                    'en' => ['water'],
+                ],
+                'kunyomi' => ['みず'],
+                'onyomi' => ['スイ'],
+            ], 'water',
+        ],
+        'kanji_mixed' => [
+            [
+                'kanji' => '日',
+                'meaning' => [
+                    'en' => ['day', 'sun', 'japan'],
+                ],
+                'kunyomi' => ['ひ', 'び', 'か'],
+                'onyomi' => ['ニチ', 'ジツ'],
+            ], 'day',
         ],
         'long_wovel' => [
             [
@@ -61,7 +97,7 @@ class KanjiPostTest extends ApiTestCase
                 'meaning' => [
                     'en' => ['week'],
                 ],
-                'onyomi' => 'シュウ',
+                'onyomi' => ['シュウ'],
             ], 'week',
         ],
         'kokuji_without_onyomi' => [
@@ -70,7 +106,7 @@ class KanjiPostTest extends ApiTestCase
                 'meaning' => [
                     'en' => ['crowded; mixture; in bulk; included'],
                 ],
-                'kunyomi' => 'こ',
+                'kunyomi' => ['こ'],
             ], 'crowded',
         ],
     ];
@@ -80,8 +116,8 @@ class KanjiPostTest extends ApiTestCase
         'meaning' => [
             'en' => ['dog'],
         ],
-        'kunyomi' => 'inu',
-        'onyomi' => 'ken',
+        'kunyomi' => ['inu'],
+        'onyomi' => ['ken'],
     ];
 
     private const POST_INVALID_KANJI = [
@@ -159,8 +195,8 @@ class KanjiPostTest extends ApiTestCase
         'kanji_kunyomi_onyomi_empty' => [
             'payload' => [
                 ...self::POST_MINIMAL_VALID_KANJI,
-                'kunyomi' => '',
-                'onyomi' => '',
+                'kunyomi' => [''],
+                'onyomi' => [],
             ],
             'message' => 'kunyomi: '.
                 Kanji::VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI.
@@ -168,39 +204,75 @@ class KanjiPostTest extends ApiTestCase
                 'onyomi: '.
                 Kanji::VALIDATION_ERR_NO_KUNYOMI_NOR_ONYOMI,
         ],
-        'kanji_kunyomi_not_in_romaji' => [
+        'kanji_kunyomi_in_katakana' => [
             'payload' => [
                 ...self::POST_COMPLETE_VALID_KANJI['kanji'],
-                'kunyomi' => 'ひと, ひとり, ひとと',
+                'kunyomi' => ['ひと', 'ひとり', 'ヒトト'],
             ],
-            'message' => 'kunyomi: '.Kanji::VALIDATION_ERR_KUNYOMI,
+            'message' => 'kunyomi[2]: '.Kanji::VALIDATION_ERR_KUNYOMI,
         ],
-        'kanji_kunyomi_maxlength' => [
-            'payload' => self::POST_COMPLETE_VALID_KANJI['kanji'],
-            'maxlength' => [
-                'kunyomi' => 'a',
-            ],
-            'message' => [
-                'text' => 'kunyomi: '.Kanji::VALIDATION_ERR_MAXLENGTH,
-                'values' => Kanji::KUNYOMI_MAXLENGTH,
-            ],
-        ],
-        'kanji_onyomi_not_in_romaji' => [
+        'kanji_kunyomi_in_kanji' => [
             'payload' => [
                 ...self::POST_COMPLETE_VALID_KANJI['kanji'],
-                'onyomi' => 'ジン, ニン',
+                'kunyomi' => ['ひと', '人', 'ひとり'],
             ],
-            'message' => 'onyomi: '.Kanji::VALIDATION_ERR_ONYOMI,
+            'message' => 'kunyomi[1]: '.Kanji::VALIDATION_ERR_KUNYOMI,
         ],
-        'kanji_onyomi_maxlength' => [
-            'payload' => self::POST_COMPLETE_VALID_KANJI['kanji'],
-            'maxlength' => [
-                'onyomi' => 'a',
+        'kanji_kunyomi_romaji_mixed' => [
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+                'kunyomi' => ['ひaと', 'ひとり'],
             ],
-            'message' => [
-                'text' => 'onyomi: '.Kanji::VALIDATION_ERR_MAXLENGTH,
-                'values' => Kanji::ONYOMI_MAXLENGTH,
+            'message' => 'kunyomi[0]: '.Kanji::VALIDATION_ERR_KUNYOMI,
+        ],
+        'kanji_kunyomi_katakana_mixed' => [
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+                'kunyomi' => ['ひと', 'ひとリ'],
             ],
+            'message' => 'kunyomi[1]: '.Kanji::VALIDATION_ERR_KUNYOMI,
+        ],
+        'kanji_kunyomi_kanji_mixed' => [
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+                'kunyomi' => ['ひと', '人とり'],
+            ],
+            'message' => 'kunyomi[1]: '.Kanji::VALIDATION_ERR_KUNYOMI,
+        ],
+        'kanji_onyomi_in_hiragana' => [
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+                'onyomi' => ['じん', 'ニン'],
+            ],
+            'message' => 'onyomi[0]: '.Kanji::VALIDATION_ERR_ONYOMI,
+        ],
+        'kanji_oyomi_in_kanji' => [
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+                'onyomi' => ['ジン', '人'],
+            ],
+            'message' => 'onyomi[1]: '.Kanji::VALIDATION_ERR_ONYOMI,
+        ],
+        'kanji_onyomi_romaji_mixed' => [
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+                'onyomi' => ['ジン', 'nン'],
+            ],
+            'message' => 'onyomi[1]: '.Kanji::VALIDATION_ERR_ONYOMI,
+        ],
+        'kanji_onyomi_hiragana_mixed' => [
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+                'onyomi' => ['ジン', 'にン'],
+            ],
+            'message' => 'onyomi[1]: '.Kanji::VALIDATION_ERR_ONYOMI,
+        ],
+        'kanji_onyomi_kanji_mixed' => [
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_KANJI['kanji'],
+                'onyomi' => ['ジン', 'ニ人'],
+            ],
+            'message' => 'onyomi[1]: '.Kanji::VALIDATION_ERR_ONYOMI,
         ],
     ];
 

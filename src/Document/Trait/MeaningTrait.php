@@ -127,7 +127,7 @@ trait MeaningTrait
         */
         array_walk_recursive($meaning, fn (&$v) => $v = explode(';', $v));
 
-        return $this->setLowerAndTrimmedOrNull('meaning', $meaning);
+        return $this->setLowerAndTrimmedOrNull('meaning', $meaning, false);
     }
 
     #[Assert\Callback]
