@@ -142,16 +142,18 @@ abstract class AbstractKotobaDocument
         }
 
         if (is_array($value)) {
-            $toString = '';
+            $isEmpty = true;
             array_walk_recursive(
                 $value,
-                function (&$v) use (&$toString) {
+                function (&$v) use (&$isEmpty) {
                     $v = trim(strtolower($v));
-                    $toString .= $v;
+                    if ($isEmpty && $v !== '') {
+                        $isEmpty = false;
+                    }
                 }
             );
             // null if there are only empty values
-            if ($nullable && $toString == '') {
+            if ($nullable && $isEmpty) {
                 $value = null;
             }
         }
