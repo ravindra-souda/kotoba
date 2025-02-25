@@ -16,8 +16,8 @@ class KanjiDeleteTest extends ApiTestCase
         'meaning' => [
             'en' => ['cat'],
         ],
-        'kunyomi' => 'neko',
-        'onyomi' => 'byou',
+        'kunyomi' => ['neko'],
+        'onyomi' => ['byou'],
     ];
 
     public function testKanjiDelete(): void
