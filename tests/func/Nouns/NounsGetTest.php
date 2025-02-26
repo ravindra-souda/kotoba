@@ -3,78 +3,88 @@
 declare(strict_types=1);
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Document\Adjective;
+use App\Document\Noun;
 
 /**
  * @internal
  *
  * @coversNothing
  */
-class AdjectivesGetTest extends ApiTestCase
+class NounsGetTest extends ApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'hiragana' => [
-            'hiragana' => 'たのしい',
-            'group' => 'i',
+            'hiragana' => 'とら',
             'meaning' => [
-                'en' => ['fun'],
+                'en' => ['tiger'],
             ],
         ],
         'hiragana_2' => [
-            'hiragana' => 'たいくつ',
-            'group' => 'na',
+            'hiragana' => 'うま',
             'meaning' => [
-                'en' => ['tedious; boring'],
+                'en' => ['horse'],
+            ],
+        ],
+        'hiragana_3' => [
+            'hiragana' => 'うし',
+            'meaning' => [
+                'en' => ['cow', 'beef'],
             ],
         ],
         'kanji' => [
-            'hiragana' => 'おとなしい',
-            'kanji' => '大人しい',
-            'group' => 'i',
+            'hiragana' => 'おおかみ',
+            'kanji' => '狼',
             'meaning' => [
-                'en' => ['gentle; quiet'],
+                'en' => ['wolf'],
+                'fr' => ['loup'],
             ],
         ],
         'kanji_2' => [
-            'hiragana' => 'じんこうてき',
-            'kanji' => '人工的',
-            'group' => 'na',
+            'hiragana' => 'がめ',
+            'kanji' => '亀',
             'meaning' => [
-                'en' => ['artificial; unnatural; search-me'],
+                'en' => ['turtle'],
+            ],
+        ],
+        'kanji_3' => [
+            'hiragana' => 'うみがめ',
+            'kanji' => '海亀',
+            'meaning' => [
+                'en' => ['sea turtle'],
             ],
         ],
         'katakana' => [
-            'katakana' => 'ユニーク',
-            'group' => 'na',
+            'katakana' => 'ライオン',
             'meaning' => [
-                'en' => ['unique'],
+                'en' => ['lion'],
             ],
         ],
         'katakana_2' => [
-            'katakana' => 'ユニバーサル',
-            'group' => 'na',
+            'katakana' => 'ウナギ',
             'meaning' => [
-                'en' => ['universal; search-me'],
+                'en' => ['eel'],
+            ],
+        ],
+        'katakana_3' => [
+            'katakana' => 'ウニ',
+            'meaning' => [
+                'en' => ['sea urchin'],
             ],
         ],
         'meaning' => [
-            'hiragana' => 'かんたん',
-            'group' => 'na',
+            'hiragana' => 'きつね',
+            'kanji' => '狐',
             'meaning' => [
-                'en' => [
-                    'simple; easy; uncomplicated; loin',
-                    'brief; quick; light',
-                ],
+                'en' => ['fox', 'light brown; golden brown'],
             ],
         ],
         'romaji' => [
-            'hiragana' => 'とおい',
-            'romaji' => 'paginationtōi',
-            'group' => 'i',
+            'hiragana' => 'ひょう',
+            'kanji' => '豹',
             'meaning' => [
-                'en' => ['far'],
-                'fr' => ['loin'],
+                'en' => ['leopard'],
             ],
+            'romaji' => 'hyou',
         ],
     ];
     private const GET_SORT_FIXTURES = [
@@ -161,12 +171,12 @@ class AdjectivesGetTest extends ApiTestCase
             ...array_values(self::GET_SORT_FIXTURES),
         );
         array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] = 'pagination'.Adjective::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
+            $fixture['romaji'] = 'pagination'.Noun::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
                 'POST',
-                '/api/cards/adjectives',
+                '/api/cards/nouns',
                 ['json' => $payload]
             );
 
@@ -183,133 +193,107 @@ class AdjectivesGetTest extends ApiTestCase
     /**
      * @return array<array<array<string>>>
      */
-    public function searchAdjectiveProvider(): array
+    public function searchNounsProvider(): array
     {
         return [
-            'group_i' => [
-                'url' => '?group=i&romaji=pagination&order[romaji]=asc',
-                'expected' => [
-                    self::GET_SORT_FIXTURES['search_and_sort'][0],
-                    self::GET_SORT_FIXTURES['search_and_sort'][1],
-                    self::GET_SEARCH_FIXTURES['kanji'],
-                    self::GET_SORT_FIXTURES['romaji_desc'][1],
-                    self::GET_SEARCH_FIXTURES['hiragana'],
-                    self::GET_SEARCH_FIXTURES['romaji'],
-                ],
-            ],
-            'group_na' => [
-                'url' => '?group=na&romaji=pagination&order[romaji]=asc',
-                'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji_2'],
-                    self::GET_SEARCH_FIXTURES['meaning'],
-                    self::GET_SORT_FIXTURES['search_and_sort'][2],
-                    self::GET_SORT_FIXTURES['romaji_asc'][1],
-                    self::GET_SORT_FIXTURES['romaji_asc'][2],
-                    self::GET_SORT_FIXTURES['romaji_asc'][0],
-                    self::GET_SORT_FIXTURES['romaji_desc'][0],
-                    self::GET_SORT_FIXTURES['romaji_desc'][2],
-                    self::GET_SEARCH_FIXTURES['hiragana_2'],
-                    self::GET_SEARCH_FIXTURES['katakana_2'],
-                    self::GET_SEARCH_FIXTURES['katakana'],
-                ],
-            ],
             'hiragana' => [
-                'url' => '?hiragana=たの&romaji=pagination',
+                'url' => '?hiragana=と&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana']
                 ],
             ],
             'hiragana_start' => [
-                'url' => '?hiragana=た&romaji=pagination',
+                'url' => '?hiragana=う&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana'],
                     self::GET_SEARCH_FIXTURES['hiragana_2'],
+                    self::GET_SEARCH_FIXTURES['hiragana_3'],
                 ],
             ],
             'kanji' => [
-                'url' => '?kanji=大人しい&romaji=pagination',
+                'url' => '?kanji=狼&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['kanji']
                 ],
             ],
             'kanji_partial' => [
-                'url' => '?kanji=人&romaji=pagination&order[romaji]=asc',
+                'url' => '?kanji=亀&romaji=pagination&order[romaji]=asc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['kanji_2'],
-                    self::GET_SEARCH_FIXTURES['kanji'],
+                    self::GET_SEARCH_FIXTURES['kanji_3'],
                 ],
             ],
             'katakana' => [
-                'url' => '?katakana=ユニ&romaji=pagination&order[romaji]=asc',
+                'url' => '?katakana=ライ&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['katakana_2'],
                     self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
             'katakana_start' => [
-                'url' => '?katakana=ニ&romaji=pagination',
-                'expected' => [],
+                'url' => '?katakana=ウ&romaji=pagination&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['katakana_3'],
+                ],
             ],
             'meaning' => [
-                'url' => '?meaning[lang]=en&meaning[search]=search-me&romaji=pagination&order[romaji]=asc',
+                'url' => '?meaning[lang]=en&meaning[search]=sea&romaji=pagination&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji_2'],
-                    self::GET_SORT_FIXTURES['search_and_sort'][1],
-                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['kanji_3'],
+                    self::GET_SEARCH_FIXTURES['katakana_3'],
                 ],
             ],
             'meaning_insensitive' => [
-                'url' => '?meaning[lang]=en&meaning[search]=quiCk&romaji=pagination',
+                'url' => '?meaning[lang]=en&meaning[search]=TurTLe&romaji=pagination&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['meaning']
+                    self::GET_SEARCH_FIXTURES['kanji_3'],
+                    self::GET_SEARCH_FIXTURES['kanji_2'],
                 ],
             ],
             'meaning_lang' => [
-                'url' => '?meaning[lang]=fr&meaning[search]=loin&romaji=pagination',
+                'url' => '?meaning[lang]=fr&meaning[search]=loup&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['romaji']
+                    self::GET_SEARCH_FIXTURES['kanji']
                 ],
             ],
             'meaning_lang_unknown' => [
-                'url' => '?meaning[lang]=dummy&meaning[search]=round&romaji=paginationma',
+                'url' => '?meaning[lang]=dummy&meaning[search]=tiger&romaji=pagination',
                 'expected' => [],
             ],
             'meaning_lang_missing' => [
-                'url' => '?meaning[search]=round&romaji=paginationma',
+                'url' => '?meaning[search]=tiger&romaji=paginationu',
                 'expected' => self::GET_SORT_FIXTURES['search_and_sort'],
             ],
             'meaning_search_missing' => [
-                'url' => '?meaning[lang]=en&romaji=paginationma',
+                'url' => '?meaning[lang]=en&romaji=paginationu',
                 'expected' => self::GET_SORT_FIXTURES['search_and_sort'],
             ],
             'romaji' => [
-                'url' => '?romaji=paginationTō',
+                'url' => '?romaji=paginationhY',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['romaji']
                 ],
             ],
             'romaji_start' => [
-                'url' => '?romaji=paginationTa&order[romaji]=asc',
+                'url' => '?romaji=paginationU&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana_2'],
-                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SORT_FIXTURES['search_and_sort'],
                 ],
             ],
         ];
     }
 
     /**
-     * @dataProvider searchAdjectiveProvider
+     * @dataProvider searchNounsProvider
      *
      * @param array<string> $expected
      */
-    public function testAdjectivesGetSearch(
+    public function testNounsGetSearch(
         string $url,
         array $expected,
     ): void {
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/adjectives'.$url,
+            '/api/cards/nouns'.$url,
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -323,7 +307,7 @@ class AdjectivesGetTest extends ApiTestCase
             array_slice($expected, 0, $this->getItemsPerPage()),
             $content['hydra:member']
         );
-        $this->assertMatchesResourceCollectionJsonSchema(Adjective::class);
+        $this->assertMatchesResourceCollectionJsonSchema(Noun::class);
     }
 
     /**
