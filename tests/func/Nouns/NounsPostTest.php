@@ -46,23 +46,19 @@ class NounsPostTest extends ApiTestCase
             ],
         ],
         'romaji_filled' => [
-            'romaji' => '    MoneY ',
-            'hiragana' => ' おかね',
-            'kanji' => 'お金',
-            'bikago' => 'お',
-            'jlpt' => 5,
+            'romaji' => '    MonkeY ',
+            'hiragana' => ' さる',
+            'kanji' => '猿',
+            'jlpt' => 3,
             'meaning' => [
-                'en' => [' money   '],
+                'en' => [' monkey   '],
             ],
         ],
         'romaji_long_wovel' => [
-            'romaji' => '    OnEesan ',
-            'hiragana' => ' おねえさん',
-            'kanji' => '   お姉さん  ',
-            'bikago' => 'お',
-            'jlpt' => 5,
+            'hiragana' => '  おおあめ ',
+            'kanji' => '   大雨  ',
             'meaning' => [
-                'en' => ['  big sister  '],
+                'en' => ['  heavy rain  '],
             ],
         ],
     ];
@@ -89,27 +85,28 @@ class NounsPostTest extends ApiTestCase
         ],
         'bikago' => [
             ...self::POST_COMPLETE_VALID_NOUNS['bikago'],
-            'romaji' => 'okane',
-            'hiragana' => 'おかね',
+            'romaji' => 'kane',
+            'hiragana' => 'かね',
+            'kanji' => '金',
             'meaning' => [
                 'en' => ['money'],
             ],
         ],
         'romaji_filled' => [
             ...self::POST_COMPLETE_VALID_NOUNS['romaji_filled'],
-            'romaji' => 'money',
-            'hiragana' => 'おかね',
+            'romaji' => 'monkey',
+            'hiragana' => 'さる',
             'meaning' => [
-                'en' => ['money'],
+                'en' => ['monkey'],
             ],
         ],
         'romaji_long_wovel' => [
             ...self::POST_COMPLETE_VALID_NOUNS['romaji_long_wovel'],
-            'romaji' => 'onēsan',
-            'hiragana' => 'おねえさん',
-            'kanji' => 'お姉さん',
+            'romaji' => 'ōame',
+            'hiragana' => 'おおあめ',
+            'kanji' => '大雨',
             'meaning' => [
-                'en' => ['big sister'],
+                'en' => ['heavy rain'],
             ],
         ],
     ];
