@@ -71,6 +71,22 @@ class NounsGetTest extends ApiTestCase
                 'en' => ['sea urchin'],
             ],
         ],
+        'bikago_o' => [
+            'hiragana' => 'かし',
+            'kanji' => '菓子',
+            'bikago' => 'お',
+            'meaning' => [
+                'en' => ['sweets; candy'],
+            ],
+        ],
+        'bikago_go' => [
+            'hiragana' => 'けっこん',
+            'kanji' => '結婚',
+            'bikago' => 'ご',
+            'meaning' => [
+                'en' => ['marriage'],
+            ],
+        ],
         'meaning' => [
             'hiragana' => 'きつね',
             'kanji' => '狐',
@@ -159,6 +175,30 @@ class NounsGetTest extends ApiTestCase
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['katakana_2'],
                     self::GET_SEARCH_FIXTURES['katakana_3'],
+                ],
+            ],
+            'bikago_o_hiragana' => [
+                'url' => '?hiragana=おかし&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['bikago_o'],
+                ],
+            ],
+            'bikago_o_kanji' => [
+                'url' => '?kanji=お菓子&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['bikago_o'],
+                ],
+            ],
+            'bikago_go_hiragana' => [
+                'url' => '?hiragana=ごけっこん&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['bikago_go'],
+                ],
+            ],
+            'bikago_go_kanji' => [
+                'url' => '?kanji=ご結婚&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['bikago_go'],
                 ],
             ],
             'meaning' => [
