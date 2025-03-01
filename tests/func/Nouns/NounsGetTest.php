@@ -110,9 +110,18 @@ class NounsGetTest extends ApiTestCase
         ],
     ];
 
+    private const GET_SORT_FIXTURES = [
+        self::GET_SEARCH_FIXTURES['hiragana_2'],
+        self::GET_SEARCH_FIXTURES['kanji_3'],
+        self::GET_SEARCH_FIXTURES['katakana_2'],
+        self::GET_SEARCH_FIXTURES['katakana_3'],
+        self::GET_SEARCH_FIXTURES['hiragana_3'],
+    ];
+
     public static function setUpBeforeClass(): void
     {
-        array_walk(self::GET_SEARCH_FIXTURES, fn(&$fixture) => 
+        $fixtures = self::GET_SEARCH_FIXTURES;
+        array_walk($fixtures, fn(&$fixture) => 
             $fixture['romaji'] = 'pagination'.Noun::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
         );
         foreach ($fixtures as $payload) {
@@ -123,7 +132,7 @@ class NounsGetTest extends ApiTestCase
             );
 
             static::assertResponseStatusCodeSame(201);
-            static::assertMatchesResourceItemJsonSchema(Adjective::class);
+            static::assertMatchesResourceItemJsonSchema(Noun::class);
         }
     }
 
@@ -145,9 +154,10 @@ class NounsGetTest extends ApiTestCase
                 ],
             ],
             'hiragana_start' => [
-                'url' => '?hiragana=う&romaji=pagination',
+                'url' => '?hiragana=う&romaji=pagination&order[romaji]=asc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana_2'],
+                    self::GET_SEARCH_FIXTURES['kanji_3'],
                     self::GET_SEARCH_FIXTURES['hiragana_3'],
                 ],
             ],
@@ -202,16 +212,14 @@ class NounsGetTest extends ApiTestCase
                 ],
             ],
             'meaning' => [
-                'url' => '?meaning[lang]=en&meaning[search]=sea&romaji=pagination&order[romaji]=asc',
+                'url' => '?meaning[lang]=en&meaning[search]=candy&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji_3'],
-                    self::GET_SEARCH_FIXTURES['katakana_3'],
+                    self::GET_SEARCH_FIXTURES['bikago_o'],
                 ],
             ],
             'meaning_insensitive' => [
-                'url' => '?meaning[lang]=en&meaning[search]=TurTLe&romaji=pagination&order[romaji]=asc',
+                'url' => '?meaning[lang]=en&meaning[search]=TurTLe&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji_3'],
                     self::GET_SEARCH_FIXTURES['kanji_2'],
                 ],
             ],
@@ -226,12 +234,12 @@ class NounsGetTest extends ApiTestCase
                 'expected' => [],
             ],
             'meaning_lang_missing' => [
-                'url' => '?meaning[search]=tiger&romaji=paginationu',
-                'expected' => self::GET_SORT_FIXTURES['search_and_sort'],
+                'url' => '?meaning[search]=tiger&romaji=paginationu&order[romaji]=asc',
+                'expected' => self::GET_SORT_FIXTURES,
             ],
             'meaning_search_missing' => [
-                'url' => '?meaning[lang]=en&romaji=paginationu',
-                'expected' => self::GET_SORT_FIXTURES['search_and_sort'],
+                'url' => '?meaning[lang]=en&romaji=paginationu&order[romaji]=asc',
+                'expected' => self::GET_SORT_FIXTURES,
             ],
             'romaji' => [
                 'url' => '?romaji=paginationhY',
@@ -242,7 +250,7 @@ class NounsGetTest extends ApiTestCase
             'romaji_start' => [
                 'url' => '?romaji=paginationU&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['search_and_sort'],
+                    self::GET_SORT_FIXTURES,
                 ],
             ],
         ];
@@ -285,14 +293,16 @@ class NounsGetTest extends ApiTestCase
             'romaji_asc' => [
                 'url' => '?romaji=paginationt&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['romaji_2'][1],
-                    self::GET_SEARCH_FIXTURES['hiragana'][2],
+                    self::GET_SEARCH_FIXTURES['romaji_2'],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
             'romaji_desc' => [
                 'url' => '?romaji=paginationk&order[romaji]=desc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['meaning'],
+                    self::GET_SEARCH_FIXTURES['bikago_go'],
+                    self::GET_SEARCH_FIXTURES['bikago_o'],
                     self::GET_SEARCH_FIXTURES['kanji_2'],
                 ],
             ],
@@ -343,7 +353,7 @@ class NounsGetTest extends ApiTestCase
         $response = static::createClient()->request(
             'GET',
             'api/cards/nouns?kanji='.
-            self::GET_SEARCH_FIXTURES['kanji_2']['kanji']
+            self::GET_SEARCH_FIXTURES['kanji_3']['kanji']
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -354,7 +364,7 @@ class NounsGetTest extends ApiTestCase
         $content = json_decode($response->getContent(), true);
         $this->assertSame($content['hydra:totalItems'], 1);
         $this->assertArraySubset(
-            self::GET_SEARCH_FIXTURES['kanji_2'],
+            self::GET_SEARCH_FIXTURES['kanji_3'],
             $content['hydra:member'][0]
         );
         $this->assertMatchesResourceCollectionJsonSchema(Noun::class);
@@ -380,7 +390,7 @@ class NounsGetTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hydra:totalItems', $content);
         $this->assertJsonContains(
-            self::GET_SEARCH_FIXTURES['kanji_2']
+            self::GET_SEARCH_FIXTURES['kanji_3']
         );
 
         $this->assertMatchesResourceItemJsonSchema(Noun::class);
@@ -447,9 +457,9 @@ class NounsGetTest extends ApiTestCase
             'hydra:totalItems' => $totalItems,
             'hydra:view' => [
                 '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/api/cards/adjectives?romaji=pagination&page=1',
-                'hydra:last' => '/api/cards/adjectives?romaji=pagination&page='.$lastPage,
-                'hydra:next' => '/api/cards/adjectives?romaji=pagination&page=2',
+                'hydra:first' => '/api/cards/nouns?romaji=pagination&page=1',
+                'hydra:last' => '/api/cards/nouns?romaji=pagination&page='.$lastPage,
+                'hydra:next' => '/api/cards/nouns?romaji=pagination&page=2',
             ],
         ]);
         $content = json_decode($response->getContent(), true);
