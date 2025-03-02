@@ -100,7 +100,7 @@ class NounsGetTest extends ApiTestCase
             'meaning' => [
                 'en' => ['leopard'],
             ],
-            'romaji' => 'hyou',
+            'romaji' => 'paginationhyou',
         ],
         'romaji_2' => [
             'katakana' => 'タコ',
@@ -249,9 +249,7 @@ class NounsGetTest extends ApiTestCase
             ],
             'romaji_start' => [
                 'url' => '?romaji=paginationU&order[romaji]=asc',
-                'expected' => [
-                    self::GET_SORT_FIXTURES,
-                ],
+                'expected' => self::GET_SORT_FIXTURES,
             ],
         ];
     }
@@ -474,7 +472,7 @@ class NounsGetTest extends ApiTestCase
         $this->assertCount($itemsPerPage, $content['hydra:member']);
         $this->assertArraySubset(
             self::GET_SEARCH_FIXTURES['romaji_2'],
-            $content['hydra:member'][1]
+            $content['hydra:member'][2]
         );
 
         // client-side pagination options should be disabled
