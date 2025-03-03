@@ -230,9 +230,10 @@ class NounsGetTest extends ApiTestCase
                 ],
             ],
             'starting_with_go' => [
-                'url' => '?hiragana=ご&romaji=pagination',
+                'url' => '?hiragana=ご&romaji=pagination&order[romaji]=asc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['starting_with_go'],
+                    self::GET_SEARCH_FIXTURES['bikago_go'],
                 ],
             ],
             'meaning' => [

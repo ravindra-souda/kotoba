@@ -41,11 +41,6 @@ final class WithBikagoFilter extends AbstractFilter
         $regexpWithoutBikago = $property === 'hiragana' ? 
             new Regex("^$valueWithoutBikago") : new Regex($valueWithoutBikago);
 
-        // prevents fetching nouns when search value is empty
-        if (strlen($valueWithoutBikago) === 0) {
-            $regexpWithoutBikago = null;
-        }
-
         $aggregationBuilder
             ->match()
                 // search = おんが where hiragana = おんがく and bikago = null
