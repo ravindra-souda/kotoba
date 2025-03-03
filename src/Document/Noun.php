@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchNounByCode;
+use App\Filter\WithBikagoFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -21,9 +22,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiFilter(
     SearchFilter::class,
+    // hiragana and kanji will be processed through WithBikagoFilter
     properties: [
-        'hiragana' => 'start',
-        'kanji' => 'partial',
         'katakana' => 'start',
         'romaji' => 'istart',
     ],
@@ -33,6 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     properties: ['romaji'],
     arguments: ['orderParameterName' => 'order'],
 )]
+#[ApiFilter(WithBikagoFilter::class)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [

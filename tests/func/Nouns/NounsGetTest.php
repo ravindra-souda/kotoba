@@ -87,6 +87,18 @@ class NounsGetTest extends ApiTestCase
                 'en' => ['marriage'],
             ],
         ],
+        'starting_with_o' => [
+            'hiragana' => 'おんがく',
+            'meaning' => [
+                'en' => ['music'],
+            ],
+        ],
+        'starting_with_go' => [
+            'hiragana' => 'ごぜん',
+            'meaning' => [
+                'en' => ['morning'],
+            ],
+        ],
         'meaning' => [
             'hiragana' => 'きつね',
             'kanji' => '狐',
@@ -209,6 +221,18 @@ class NounsGetTest extends ApiTestCase
                 'url' => '?kanji=ご結婚&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['bikago_go'],
+                ],
+            ],
+            'starting_with_o' => [
+                'url' => '?hiragana=おんが&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['starting_with_o'],
+                ],
+            ],
+            'starting_with_go' => [
+                'url' => '?hiragana=ご&romaji=pagination',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['starting_with_go'],
                 ],
             ],
             'meaning' => [
