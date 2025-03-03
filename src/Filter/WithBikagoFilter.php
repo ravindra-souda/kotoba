@@ -26,6 +26,7 @@ final class WithBikagoFilter extends AbstractFilter
         }
 
         $bikago = null;
+        $value = trim($value);
         foreach (Noun::ALLOWED_BIKAGO as $allowedBikago) {
             if (str_starts_with($value, $allowedBikago)) {
                 $bikago = $allowedBikago;
@@ -40,64 +41,45 @@ final class WithBikagoFilter extends AbstractFilter
         $regexpWithoutBikago = $property === 'hiragana' ? 
             new Regex("^$valueWithoutBikago") : new Regex($valueWithoutBikago);
 
+        // prevents fetching nouns when search value is empty
+        if (strlen($valueWithoutBikago) === 0) {
+            $regexpWithoutBikago = null;
+        }
+
         $aggregationBuilder
             ->match()
-                ->field($property)
-                ->equals($regexpWithoutBikago)
-                ->field('bikago')
-                ->equals($bikago);
-                /*
-                ->field($property)
-                ->equals($regexp)
+                // search = おんが where hiragana = おんがく and bikago = null
                 ->addOr(
                     $aggregationBuilder
-                    ->expr()
+                    ->matchExpr()
                     ->field($property)
-                    ->eq($property, $regexpWithoutBikago)
+                    ->equals($regexp)
+                    ->field('bikago')
+                    ->equals(null)
+                )
+                // search = おかし where hiragana = かし and bikago = お
+                ->addOr(
+                    $aggregationBuilder
+                    ->matchExpr()
+                    ->field($property)
+                    ->equals($regexpWithoutBikago)
+                    ->field('bikago')
+                    ->equals($bikago)
                 );
-                //->field($property)
-                //->equals($regexpWithoutBikago)
-                //->field('bikago')
-                //->equals($bikago);
-                /*
-                ->field($property)
-                ->equals($regexpWithoutBikago)
-                ->field('bikago')
-                ->equals($bikago);
-                */
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
     public function getDescription(string $resourceClass): array
     {
-        return [];
-        if (!$this->properties) {
-            return [];
-        }
-
-        $description["kunyomi"] = [
-            'property' => 'kunyomi',
+        $description["hiragana"] = [
+            'property' => 'hiragana',
             'type' => Type::BUILTIN_TYPE_STRING,
             'required' => false,
-            'description' => 'can be written in romaji or hiragana',
-            'openapi' => [
-                'example' => 'amatsu',
-                'allowReserved' => false,
-                'allowEmptyValue' => false,
-                'explode' => false, 
-            ],
         ];
-        $description["onyomi"] = [
-            'property' => 'onyomi',
+        $description["kanji"] = [
+            'property' => 'kanji',
             'type' => Type::BUILTIN_TYPE_STRING,
             'required' => false,
-            'description' => 'can be written in romaji or katakana',
-            'openapi' => [
-                'example' => 'テン',
-                'allowReserved' => false,
-                'allowEmptyValue' => false,
-                'explode' => false,
-            ],
         ];
 
         return $description;
