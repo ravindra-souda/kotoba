@@ -19,12 +19,18 @@ class VerbsGetTest extends ApiTestCase
             'meaning' => [
                 'en' => ['to open'],
             ],
+            'inflections' => [
+                'dictionary' => 'あける',
+            ],
         ],
         'katakana' => [
             'katakana' => 'モテる',
             'group' => 'ichidan',
             'meaning' => [
                 'en' => ['to be popular'],
+            ],
+            'inflections' => [
+                'dictionary' => 'モテる',
             ],
         ],
         'kanji' => [
@@ -34,6 +40,9 @@ class VerbsGetTest extends ApiTestCase
             'meaning' => [
                 'en' => ['to be shut', 'to be closed'],
             ],
+            'inflections' => [
+                'dictionary' => 'しまる',
+            ],
         ],
         'meaning' => [
             'hiragana' => 'ふさぐ',
@@ -42,12 +51,18 @@ class VerbsGetTest extends ApiTestCase
             'meaning' => [
                 'en' => ['to stop up; to close up'],
             ],
+            'inflections' => [
+                'dictionary' => 'ふさぐ',
+            ],
         ],
         'romaji' => [
             'romaji' => 'asobu',
             'group' => 'godan',
             'meaning' => [
                 'en' => ['to play; to enjoy'],
+            ],
+            'inflections' => [
+                'dictionary' => 'あそぶ',
             ],
         ],
     ];
