@@ -9,7 +9,7 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class MeaningFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         // Otherwise filter is applied to order and page as well
         if (
