@@ -33,12 +33,23 @@ class VerbsGetTest extends ApiTestCase
                 'dictionary' => 'モテる',
             ],
         ],
+        'katakana_2' => [
+            'katakana' => 'モフる',
+            'group' => 'godan',
+            'meaning' => [
+                'en' => ['to stroke (something fluffy); to rub; to pat'],
+            ],
+            'inflections' => [
+                'dictionary' => 'モフる',
+            ],
+        ],
         'kanji' => [
             'hiragana' => 'しまる',
             'kanji' => '閉まる',
             'group' => 'godan',
             'meaning' => [
                 'en' => ['to be shut', 'to be closed'],
+                'fr' => ['être fermé'],
             ],
             'inflections' => [
                 'dictionary' => 'しまる',
@@ -56,6 +67,7 @@ class VerbsGetTest extends ApiTestCase
             ],
         ],
         'romaji' => [
+            'hiragana' => 'あそぶ',
             'romaji' => 'asobu',
             'group' => 'godan',
             'meaning' => [
@@ -79,17 +91,17 @@ class VerbsGetTest extends ApiTestCase
     {
         $fixtures = self::GET_SEARCH_FIXTURES;
         array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] = 'pagination'.Noun::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
+            $fixture['romaji'] = 'pagination'.Verb::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
                 'POST',
-                '/api/cards/nouns',
+                '/api/cards/verbs',
                 ['json' => $payload]
             );
 
             static::assertResponseStatusCodeSame(201);
-            static::assertMatchesResourceItemJsonSchema(Noun::class);
+            static::assertMatchesResourceItemJsonSchema(Verb::class);
         }
     }
 
@@ -105,106 +117,67 @@ class VerbsGetTest extends ApiTestCase
     {
         return [
             'hiragana' => [
-                'url' => '?hiragana=と&romaji=pagination',
+                'url' => '?hiragana=あけ&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana']
                 ],
             ],
             'hiragana_start' => [
-                'url' => '?hiragana=う&romaji=pagination&order[romaji]=asc',
+                'url' => '?hiragana=あ&romaji=pagination&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana_2'],
-                    self::GET_SEARCH_FIXTURES['kanji_3'],
-                    self::GET_SEARCH_FIXTURES['hiragana_3'],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
             'kanji' => [
-                'url' => '?kanji=狼&romaji=pagination',
+                'url' => '?kanji=閉まる&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['kanji']
                 ],
             ],
             'kanji_partial' => [
-                'url' => '?kanji=亀&romaji=pagination&order[romaji]=asc',
+                'url' => '?kanji=塞&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji_2'],
-                    self::GET_SEARCH_FIXTURES['kanji_3'],
+                    self::GET_SEARCH_FIXTURES['meaning'],
                 ],
             ],
             'katakana' => [
-                'url' => '?katakana=ライ&romaji=pagination',
+                'url' => '?katakana=モテ&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
             'katakana_start' => [
-                'url' => '?katakana=ウ&romaji=pagination&order[romaji]=asc',
+                'url' => '?katakana=モ&romaji=pagination&order[romaji]=asc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['katakana_2'],
-                    self::GET_SEARCH_FIXTURES['katakana_3'],
-                ],
-            ],
-            'bikago_o_hiragana' => [
-                'url' => '?hiragana=おかし&romaji=pagination',
-                'expected' => [
-                    self::GET_SEARCH_FIXTURES['bikago_o'],
-                ],
-            ],
-            'bikago_o_kanji' => [
-                'url' => '?kanji=お菓子&romaji=pagination',
-                'expected' => [
-                    self::GET_SEARCH_FIXTURES['bikago_o'],
-                ],
-            ],
-            'bikago_go_hiragana' => [
-                'url' => '?hiragana=ごけっこん&romaji=pagination',
-                'expected' => [
-                    self::GET_SEARCH_FIXTURES['bikago_go'],
-                ],
-            ],
-            'bikago_go_kanji' => [
-                'url' => '?kanji=ご結婚&romaji=pagination',
-                'expected' => [
-                    self::GET_SEARCH_FIXTURES['bikago_go'],
-                ],
-            ],
-            'starting_with_o' => [
-                'url' => '?hiragana=おんが&romaji=pagination',
-                'expected' => [
-                    self::GET_SEARCH_FIXTURES['starting_with_o'],
-                ],
-            ],
-            'starting_with_go' => [
-                'url' => '?hiragana=ご&romaji=pagination&order[romaji]=asc',
-                'expected' => [
-                    self::GET_SEARCH_FIXTURES['starting_with_go'],
-                    self::GET_SEARCH_FIXTURES['bikago_go'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
             'meaning' => [
-                'url' => '?meaning[lang]=en&meaning[search]=candy&romaji=pagination',
+                'url' => '?meaning[lang]=en&meaning[search]=to close up&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['bikago_o'],
+                    self::GET_SEARCH_FIXTURES['meaning'],
                 ],
             ],
             'meaning_insensitive' => [
-                'url' => '?meaning[lang]=en&meaning[search]=TurTLe&romaji=pagination',
+                'url' => '?meaning[lang]=en&meaning[search]=TO Be sHuT&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji_2'],
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ],
             ],
             'meaning_lang' => [
-                'url' => '?meaning[lang]=fr&meaning[search]=loup&romaji=pagination',
+                'url' => '?meaning[lang]=fr&meaning[search]=être fermé&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['kanji']
                 ],
             ],
             'meaning_lang_unknown' => [
-                'url' => '?meaning[lang]=dummy&meaning[search]=tiger&romaji=pagination',
+                'url' => '?meaning[lang]=dummy&meaning[search]=to open&romaji=pagination',
                 'expected' => [],
             ],
             'meaning_lang_missing' => [
-                'url' => '?meaning[search]=tiger&romaji=paginationu&order[romaji]=asc',
+                'url' => '?meaning[search]=to open&romaji=paginationu&order[romaji]=asc',
                 'expected' => self::GET_SORT_FIXTURES,
             ],
             'meaning_search_missing' => [
@@ -212,14 +185,17 @@ class VerbsGetTest extends ApiTestCase
                 'expected' => self::GET_SORT_FIXTURES,
             ],
             'romaji' => [
-                'url' => '?romaji=paginationhY',
+                'url' => '?romaji=paginationAso',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['romaji']
                 ],
             ],
             'romaji_start' => [
-                'url' => '?romaji=paginationU&order[romaji]=asc',
-                'expected' => self::GET_SORT_FIXTURES,
+                'url' => '?romaji=paginationMO&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['katakana_2'],
+                    self::GET_SORT_FIXTURES['katakana'],
+                ]
             ],
         ];
     }
