@@ -113,7 +113,7 @@ class VerbsGetTest extends ApiTestCase
     /**
      * @return array<array<array<string>>>
      */
-    public function searchNounsProvider(): array
+    public function searchVerbsProvider(): array
     {
         return [
             'hiragana' => [
@@ -201,17 +201,17 @@ class VerbsGetTest extends ApiTestCase
     }
 
     /**
-     * @dataProvider searchNounsProvider
+     * @dataProvider searchVerbsProvider
      *
      * @param array<string> $expected
      */
-    public function testNounsGetSearch(
+    public function testVerbsGetSearch(
         string $url,
         array $expected,
     ): void {
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/nouns'.$url,
+            '/api/cards/verbs'.$url,
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -225,37 +225,34 @@ class VerbsGetTest extends ApiTestCase
             array_slice($expected, 0, $this->getItemsPerPage()),
             $content['hydra:member']
         );
-        $this->assertMatchesResourceCollectionJsonSchema(Noun::class);
+        $this->assertMatchesResourceCollectionJsonSchema(Verb::class);
     }
 
     /**
      * @return array<array<string, array<array<string, string>>|string>>
      */
-    public function sortNounsProvider(): array
+    public function sortVerbsProvider(): array
     {
         return [
             'romaji_asc' => [
-                'url' => '?romaji=paginationt&order[romaji]=asc',
+                'url' => '?romaji=paginationm&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['romaji_2'],
-                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
             'romaji_desc' => [
-                'url' => '?romaji=paginationk&order[romaji]=desc',
+                'url' => '?romaji=paginationa&order[romaji]=desc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['meaning'],
-                    self::GET_SEARCH_FIXTURES['bikago_go'],
-                    self::GET_SEARCH_FIXTURES['bikago_o'],
-                    self::GET_SEARCH_FIXTURES['kanji_2'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
             'search_and_order' => [
-                'url' => '?hiragana=う&order[romaji]=desc',
+                'url' => '?hiragana=あ&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana_3'],
-                    self::GET_SEARCH_FIXTURES['kanji_3'],
-                    self::GET_SEARCH_FIXTURES['hiragana_2'],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
         ];
