@@ -197,6 +197,24 @@ class VerbsGetTest extends ApiTestCase
                     self::GET_SORT_FIXTURES['katakana'],
                 ]
             ],
+            'inflections_hiragana' => [
+                'url' => '?romaji=pagination&hiragana=あそんだ',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['romaji'],
+                ]
+            ], 
+            'inflections_katakana' => [
+                'url' => '?romaji=pagination&katakana=モテろ',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['katakana'],
+                ]
+            ],
+            'inflections_kanji' => [
+                'url' => '?romaji=pagination&kanji=閉まらせられない',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['kanji'],
+                ]
+            ],
         ];
     }
 
@@ -259,17 +277,17 @@ class VerbsGetTest extends ApiTestCase
     }
 
     /**
-     * @dataProvider sortNounsProvider
+     * @dataProvider sortVerbsProvider
      *
      * @param array<array<string>> $expected
      */
-    public function testNounsGetSort(
+    public function testVerbsGetSort(
         string $url,
         array $expected,
     ): void {
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/nouns'.$url,
+            '/api/cards/verbs'.$url,
         );
 
         $this->assertResponseStatusCodeSame(200);
@@ -286,15 +304,15 @@ class VerbsGetTest extends ApiTestCase
                 $content['hydra:member'][$i]
             );
         }
-        $this->assertMatchesResourceCollectionJsonSchema(Noun::class);
+        $this->assertMatchesResourceCollectionJsonSchema(Verb::class);
     }
 
-    public function testNounsGetOneNoun(): string
+    public function testVerbsGetOneVerb(): string
     {
         $response = static::createClient()->request(
             'GET',
-            'api/cards/nouns?kanji='.
-            self::GET_SEARCH_FIXTURES['kanji_3']['kanji']
+            'api/cards/verbs?katakana='.
+            self::GET_SEARCH_FIXTURES['katakana_2']['katakana']
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -305,18 +323,18 @@ class VerbsGetTest extends ApiTestCase
         $content = json_decode($response->getContent(), true);
         $this->assertSame($content['hydra:totalItems'], 1);
         $this->assertArraySubset(
-            self::GET_SEARCH_FIXTURES['kanji_3'],
+            self::GET_SEARCH_FIXTURES['katakana_2'],
             $content['hydra:member'][0]
         );
-        $this->assertMatchesResourceCollectionJsonSchema(Noun::class);
+        $this->assertMatchesResourceCollectionJsonSchema(Verb::class);
 
         return $content['hydra:member'][0]['@id'];
     }
 
     /**
-     * @depends testNounsGetOneNoun
+     * @depends testVerbsGetOneVerb
      */
-    public function testNounsGetOneNounByCode(string $code): void
+    public function testVerbsGetOneVerbByCode(string $code): void
     {
         $response = static::createClient()->request(
             'GET',
@@ -331,17 +349,17 @@ class VerbsGetTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hydra:totalItems', $content);
         $this->assertJsonContains(
-            self::GET_SEARCH_FIXTURES['kanji_3']
+            self::GET_SEARCH_FIXTURES['katakana_2']
         );
 
-        $this->assertMatchesResourceItemJsonSchema(Noun::class);
+        $this->assertMatchesResourceItemJsonSchema(Verb::class);
     }
 
-    public function testNounsGetUnknown(): void
+    public function testVerbsGetUnknown(): void
     {
         static::createClient()->request(
             'GET',
-            '/api/cards/nouns/dummy',
+            '/api/cards/verbs/dummy',
         );
 
         $this->assertResponseStatusCodeSame(404);
@@ -360,11 +378,11 @@ class VerbsGetTest extends ApiTestCase
     /**
      * @dataProvider emptyCollectionProvider
      */
-    public function testNounsGetEmptyCollection(string $url): void
+    public function testVerbsGetEmptyCollection(string $url): void
     {
         static::createClient()->request(
             'GET',
-            '/api/cards/nouns'.$url,
+            '/api/cards/verbs'.$url,
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -378,7 +396,7 @@ class VerbsGetTest extends ApiTestCase
         ]);
     }
 
-    public function testNounsGetPagination(): void
+    public function testVerbsGetPagination(): void
     {
         $totalItems = count(self::GET_SEARCH_FIXTURES);
         $itemsPerPage = $this->getItemsPerPage();
@@ -386,7 +404,7 @@ class VerbsGetTest extends ApiTestCase
         
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/nouns?romaji=pagination',
+            '/api/cards/verbs?romaji=pagination',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
@@ -398,9 +416,9 @@ class VerbsGetTest extends ApiTestCase
             'hydra:totalItems' => $totalItems,
             'hydra:view' => [
                 '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/api/cards/nouns?romaji=pagination&page=1',
-                'hydra:last' => '/api/cards/nouns?romaji=pagination&page='.$lastPage,
-                'hydra:next' => '/api/cards/nouns?romaji=pagination&page=2',
+                'hydra:first' => '/api/cards/verbs?romaji=pagination&page=1',
+                'hydra:last' => '/api/cards/verbs?romaji=pagination&page='.$lastPage,
+                'hydra:next' => '/api/cards/verbs?romaji=pagination&page=2',
             ],
         ]);
         $content = json_decode($response->getContent(), true);
@@ -408,20 +426,20 @@ class VerbsGetTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/nouns?romaji=pagination&order[romaji]=desc&page=2',
+            '/api/cards/verbs?romaji=pagination&order[romaji]=desc&page=2',
         );
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($response->getContent(), true);
         $this->assertCount($itemsPerPage, $content['hydra:member']);
         $this->assertArraySubset(
-            self::GET_SEARCH_FIXTURES['romaji_2'],
-            $content['hydra:member'][2]
+            self::GET_SEARCH_FIXTURES['hiragana'],
+            $content['hydra:member'][0]
         );
 
         // client-side pagination options should be disabled
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/nouns?romaji=pagination&pagination=false',
+            '/api/cards/verbs?romaji=pagination&pagination=false',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -433,7 +451,7 @@ class VerbsGetTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'GET',
-            '/api/cards/nouns?romaji=pagination&itemsPerPage=1',
+            '/api/cards/verbs?romaji=pagination&itemsPerPage=1',
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
