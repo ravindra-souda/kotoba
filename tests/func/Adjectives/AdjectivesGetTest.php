@@ -295,6 +295,18 @@ class AdjectivesGetTest extends ApiTestCase
                     self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
+            'inflections_hiragana' => [
+                'url' => '?hiragana=たのしかった',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                ],
+            ],
+            'inflections_katakana' => [
+                'url' => '?katakana=ユニークじゃない',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                ],
+            ],
         ];
     }
 
