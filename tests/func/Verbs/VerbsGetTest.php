@@ -80,11 +80,11 @@ class VerbsGetTest extends ApiTestCase
     ];
 
     private const GET_SORT_FIXTURES = [
-        self::GET_SEARCH_FIXTURES['hiragana_2'],
-        self::GET_SEARCH_FIXTURES['kanji_3'],
+        self::GET_SEARCH_FIXTURES['hiragana'],
+        self::GET_SEARCH_FIXTURES['romaji'],
+        self::GET_SEARCH_FIXTURES['meaning'],
         self::GET_SEARCH_FIXTURES['katakana_2'],
-        self::GET_SEARCH_FIXTURES['katakana_3'],
-        self::GET_SEARCH_FIXTURES['hiragana_3'],
+        self::GET_SEARCH_FIXTURES['katakana'],
     ];
 
     public static function setUpBeforeClass(): void
@@ -177,11 +177,11 @@ class VerbsGetTest extends ApiTestCase
                 'expected' => [],
             ],
             'meaning_lang_missing' => [
-                'url' => '?meaning[search]=to open&romaji=paginationu&order[romaji]=asc',
+                'url' => '?meaning[search]=to open&order[romaji]=asc',
                 'expected' => self::GET_SORT_FIXTURES,
             ],
             'meaning_search_missing' => [
-                'url' => '?meaning[lang]=en&romaji=paginationu&order[romaji]=asc',
+                'url' => '?meaning[lang]=en&order[romaji]=asc',
                 'expected' => self::GET_SORT_FIXTURES,
             ],
             'romaji' => [
@@ -193,26 +193,26 @@ class VerbsGetTest extends ApiTestCase
             'romaji_start' => [
                 'url' => '?romaji=paginationMO&order[romaji]=asc',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['katakana_2'],
-                    self::GET_SORT_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
                 ]
             ],
             'inflections_hiragana' => [
                 'url' => '?romaji=pagination&hiragana=あそんだ',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['romaji'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
                 ]
             ], 
             'inflections_katakana' => [
                 'url' => '?romaji=pagination&katakana=モテろ',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
                 ]
             ],
             'inflections_kanji' => [
                 'url' => '?romaji=pagination&kanji=閉まらせられない',
                 'expected' => [
-                    self::GET_SORT_FIXTURES['kanji'],
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ]
             ],
         ];
