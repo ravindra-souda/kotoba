@@ -161,6 +161,26 @@ class Verb extends Card
         return $this->fillRomaji()->conjugate();
     }
 
+    private function fillRomaji(): self
+    {
+        $katakanaString = str_replace('る', 'ル', $this->katakana ?? '');
+        $this->romaji ??= $this->toRomaji($this->hiragana ?? $katakanaString);
+
+        return $this;
+    }
+
+    public static function isValidKatakana(?string $string): bool
+    {
+        if (null === $string || '' === $string) {
+            return true;
+        }
+        
+        // must start with katakana and can end with る
+        return 1 === preg_match('/^\p{Katakana}+る?$/um', $string)
+            // half-width katakana are not allowed
+            && 1 !== preg_match('/[\x{FF65}-\x{FF9F}]/um', $string);
+    }
+
     /**
      * @return array<string,array<mixed>|string>
      */
