@@ -91,6 +91,19 @@ class VerbsPutTest extends ApiTestCase
                 'katakana' => ' タベル  ',
             ],
         ],
+        'katakana_2' => [
+            'fixture' => 'godan',
+            'payload' => [
+                'hiragana' => '   ',
+                'katakana' => 'デモる  ',
+                'meaning' => [
+                    'en' => ['  to DEMOnstrate (e.g. in the streets)  '],
+                ],
+                'inflections' => [
+                    'dictionary' => ' デモる   ',
+                ],
+            ],
+        ],
         'kanji' => [
             'fixture' => 'godan',
             'payload' => [
@@ -316,6 +329,52 @@ class VerbsPutTest extends ApiTestCase
             'imperative' => [
                 'affirmative' => 'こい',
                 'negative' => 'くるな',
+            ],
+        ],
+        'katakana_2' => [
+            'non-past' => [
+                'informal' => [
+                    'affirmative' => 'デモる',
+                    'negative' => 'デモらない',
+                ],
+                'polite' => [
+                    'affirmative' => 'デモります',
+                    'negative' => 'デモりません',
+                ],
+            ],
+            'past' => [
+                'informal' => [
+                    'affirmative' => 'デモった',
+                    'negative' => 'デモらなかった',
+                ],
+                'polite' => [
+                    'affirmative' => 'デモりました',
+                    'negative' => 'デモりませんでした',
+                ],
+            ],
+            'te' => [
+                'affirmative' => 'デモって',
+                'negative' => 'デモらなくて',
+            ],
+            'potential' => [
+                'affirmative' => 'デモれる',
+                'negative' => 'デモれない',
+            ],
+            'passive' => [
+                'affirmative' => 'デモられる',
+                'negative' => 'デモられない',
+            ],
+            'causative' => [
+                'affirmative' => 'デモらせる',
+                'negative' => 'デモらせない',
+                'passive' => [
+                    'affirmative' => 'デモらせられる',
+                    'negative' => 'デモらせられない',
+                ],
+            ],
+            'imperative' => [
+                'affirmative' => 'デモれ',
+                'negative' => 'デモるな',
             ],
         ],
         'group_ichidan' => [
@@ -569,6 +628,19 @@ class VerbsPutTest extends ApiTestCase
                 'inflections' => self::EXPECTED_INFLECTIONS['ichidan'],
             ],
             'code' => 'taberu',
+        ],
+        'katakana_2' => [
+            'doc' => [
+                ...self::PUT_FIXTURE_VERBS['godan'],
+                'katakana' => 'デモる',
+                'hiragana' => null,
+                'romaji' => 'demoru',
+                'meaning' => [
+                    'en' => ['to demonstrate (e.g. in the streets)'],
+                ],
+                'inflections' => self::EXPECTED_INFLECTIONS['katakana_2'],
+            ],
+            'code' => 'demoru',
         ],
         'kanji' => [
             'doc' => [
