@@ -25,6 +25,7 @@ class VerbsGetTest extends ApiTestCase
         ],
         'katakana' => [
             'katakana' => 'モテる',
+            'romaji' => 'paginationmoteru',
             'group' => 'ichidan',
             'meaning' => [
                 'en' => ['to be popular'],
@@ -35,6 +36,7 @@ class VerbsGetTest extends ApiTestCase
         ],
         'katakana_2' => [
             'katakana' => 'モフる',
+            'romaji' => 'paginationmofuru',
             'group' => 'godan',
             'meaning' => [
                 'en' => ['to stroke (something fluffy); to rub; to pat'],
@@ -68,7 +70,7 @@ class VerbsGetTest extends ApiTestCase
         ],
         'romaji' => [
             'hiragana' => 'あそぶ',
-            'romaji' => 'asobu',
+            'romaji' => 'paginationasobu',
             'group' => 'godan',
             'meaning' => [
                 'en' => ['to play; to enjoy'],
@@ -85,13 +87,14 @@ class VerbsGetTest extends ApiTestCase
         self::GET_SEARCH_FIXTURES['meaning'],
         self::GET_SEARCH_FIXTURES['katakana_2'],
         self::GET_SEARCH_FIXTURES['katakana'],
+        self::GET_SEARCH_FIXTURES['kanji'],
     ];
 
     public static function setUpBeforeClass(): void
     {
         $fixtures = self::GET_SEARCH_FIXTURES;
         array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] = 'pagination'.Verb::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
+            $fixture['romaji'] ??= 'pagination'.Verb::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
@@ -430,7 +433,9 @@ class VerbsGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $itemsOnPage2 = $totalItems - $itemsPerPage;
+        if ($itemsOnPage2 > $itemsPerPage) $itemsOnPage2 = $itemsPerPage;
+        $this->assertCount($itemsOnPage2, $content['hydra:member']);
         $this->assertArraySubset(
             self::GET_SEARCH_FIXTURES['hiragana'],
             $content['hydra:member'][0]
