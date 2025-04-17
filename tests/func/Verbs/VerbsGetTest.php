@@ -54,7 +54,7 @@ class VerbsGetTest extends ApiTestCase
                 'fr' => ['être fermé'],
             ],
             'inflections' => [
-                'dictionary' => 'しまる',
+                'dictionary' => '閉まる',
             ],
         ],
         'meaning' => [

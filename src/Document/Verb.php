@@ -56,17 +56,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     processor: SaveProcessor::class,
 )]
 #[MongoDB\Document(repositoryClass: 'App\Repository\VerbRepository')]
-/** @MongoDB\Index(keys={"inflections"="asc"}) */
-#[MongoDB\Index(
-    keys: [
-      'inflections.dictionary' => 'asc',
-      'inflections.non-past.informal.affirmative' => 'asc',
-      'inflections.non-past.informal.negative' => 'asc',
-      'inflections.past.informal.affirmative' => 'asc',
-      'inflections.imperative.affirmative' => 'asc',
-      'romaji' => 'asc',
-    ],
-)]
 class Verb extends Card
 {
     use Trait\GroupTrait;
@@ -191,6 +180,10 @@ class Verb extends Card
         ],
     ];
 
+    #[Groups(['read'])]
+    #[MongoDB\Field(type: 'collection')]
+    protected array $searchInflections = [];
+
     /** Reviewed by users after automatic conjugation */
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'bool')]
@@ -305,12 +298,24 @@ class Verb extends Card
      */
     public function setInflections(array $inflections): Verb
     {
-        return $this->setLowerAndTrimmedOrNull('inflections', $inflections, false);
+        $this->setLowerAndTrimmedOrNull('inflections', $inflections, false);
+
+        return $this->updateSearchInflections();
     }
 
     public function setReviewed(bool $reviewed): Verb
     {
         $this->reviewed = $reviewed;
+
+        return $this;
+    }
+
+    private function updateSearchInflections(): Verb
+    {
+        $this->searchInflections = [];
+        array_walk_recursive($this->inflections, function($value) {
+            array_push($this->searchInflections, $value);
+        });
 
         return $this;
     }

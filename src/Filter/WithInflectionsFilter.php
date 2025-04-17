@@ -25,33 +25,23 @@ final class WithInflectionsFilter extends AbstractFilter
             return;
         }
         
+        $value = trim($value);
         $regexp = $property === 'kanji' ? 
             new Regex($value) : new Regex("^$value");
 
-        // $elemMatch is needed to search in nested arrays
-        //$obj = (object) ['$elemMatch' => ['$in' => [trim(strtolower($value))]]];
-
         $aggregationBuilder
             ->match()
-                // search = おんが where hiragana = おんがく and bikago = null
                 ->addOr(
                     $aggregationBuilder
                     ->matchExpr()
                     ->field($property)
                     ->equals($regexp)
                 )
-                // search = おかし where hiragana = かし and bikago = お
                 ->addOr(
                     $aggregationBuilder
                     ->matchExpr()
-                    ->field('inflections.past.informal.affirmative')
-                    ->equals($value)
-                )
-                ->addOr(
-                    $aggregationBuilder
-                    ->matchExpr()
-                    ->field('inflections.imperative.affirmative')
-                    ->equals($value)
+                    ->field('searchInflections')
+                    ->in([$value])
                 );
     }
 
