@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchVerbByCode;
+use App\Filter\WithInflectionsFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,11 +24,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiFilter(
     SearchFilter::class,
-    // hiragana and kanji will be processed through WithBikagoFilter
+    // hiragana, katakana and kanji 
+    // will be processed through WithInflectionsFilter
     properties: [
-        'hiragana' => 'start',
-        'kanji' => 'partial',
-        'katakana' => 'start',
         'romaji' => 'istart',
     ],
 )]
@@ -36,6 +35,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     properties: ['romaji'],
     arguments: ['orderParameterName' => 'order'],
 )]
+#[ApiFilter(WithInflectionsFilter::class)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -56,6 +56,17 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     processor: SaveProcessor::class,
 )]
 #[MongoDB\Document(repositoryClass: 'App\Repository\VerbRepository')]
+/** @MongoDB\Index(keys={"inflections"="asc"}) */
+#[MongoDB\Index(
+    keys: [
+      'inflections.dictionary' => 'asc',
+      'inflections.non-past.informal.affirmative' => 'asc',
+      'inflections.non-past.informal.negative' => 'asc',
+      'inflections.past.informal.affirmative' => 'asc',
+      'inflections.imperative.affirmative' => 'asc',
+      'romaji' => 'asc',
+    ],
+)]
 class Verb extends Card
 {
     use Trait\GroupTrait;

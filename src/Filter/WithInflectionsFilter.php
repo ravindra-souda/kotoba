@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Filter;
+
+use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
+use ApiPlatform\Metadata\Operation;
+use App\Document\Noun;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use MongoDB\BSON\Regex;
+use Symfony\Component\PropertyInfo\Type;
+
+final class WithInflectionsFilter extends AbstractFilter
+{
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    {
+        // Otherwise filter is applied to order and page as well
+        if (
+            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyMapped($property, $resourceClass)
+        ) {
+            return;
+        }
+        
+        if (!in_array($property, ['hiragana', 'katakana', 'kanji'])) {
+            return;
+        }
+        
+        $regexp = $property === 'kanji' ? 
+            new Regex($value) : new Regex("^$value");
+
+        // $elemMatch is needed to search in nested arrays
+        //$obj = (object) ['$elemMatch' => ['$in' => [trim(strtolower($value))]]];
+
+        $aggregationBuilder
+            ->match()
+                // search = おんが where hiragana = おんがく and bikago = null
+                ->addOr(
+                    $aggregationBuilder
+                    ->matchExpr()
+                    ->field($property)
+                    ->equals($regexp)
+                )
+                // search = おかし where hiragana = かし and bikago = お
+                ->addOr(
+                    $aggregationBuilder
+                    ->matchExpr()
+                    ->field('inflections.past.informal.affirmative')
+                    ->equals($value)
+                )
+                ->addOr(
+                    $aggregationBuilder
+                    ->matchExpr()
+                    ->field('inflections.imperative.affirmative')
+                    ->equals($value)
+                );
+    }
+
+    // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
+    public function getDescription(string $resourceClass): array
+    {
+        $description["hiragana"] = [
+            'property' => 'hiragana',
+            'type' => Type::BUILTIN_TYPE_STRING,
+            'required' => false,
+        ];
+        $description["kanji"] = [
+            'property' => 'kanji',
+            'type' => Type::BUILTIN_TYPE_STRING,
+            'required' => false,
+        ];
+
+        return $description;
+    }
+}
