@@ -298,9 +298,9 @@ class Verb extends Card
      */
     public function setInflections(array $inflections): Verb
     {
-        $this->setLowerAndTrimmedOrNull('inflections', $inflections, false);
-
-        return $this->updateSearchInflections();
+        return $this
+            ->setLowerAndTrimmedOrNull('inflections', $inflections, false)
+            ->updateSearchInflections();
     }
 
     public function setReviewed(bool $reviewed): Verb

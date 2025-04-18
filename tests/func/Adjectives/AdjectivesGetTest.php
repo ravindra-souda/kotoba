@@ -295,16 +295,34 @@ class AdjectivesGetTest extends ApiTestCase
                     self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
-            'inflections_hiragana' => [
-                'url' => '?hiragana=たのしかった',
+            'inflections_hiragana_i' => [
+                'url' => '?hiragana=おとなしかった',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ],
             ],
-            'inflections_katakana' => [
+            'inflections_kanji_i' => [
+                'url' => '?kanji=大人しくなかった',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji'],
+                ],
+            ],
+            'inflections_hiragana_na' => [
+                'url' => '?hiragana=じんこうてきじゃなかった',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji_2'],
+                ],
+            ],
+            'inflections_katakana_na' => [
                 'url' => '?katakana=ユニークじゃない',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['katakana'],
+                ],
+            ],
+            'inflections_kanji_na' => [
+                'url' => '?kanji=人工的じゃない',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji_2'],
                 ],
             ],
         ];

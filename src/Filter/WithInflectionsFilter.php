@@ -58,6 +58,11 @@ final class WithInflectionsFilter extends AbstractFilter
             'type' => Type::BUILTIN_TYPE_STRING,
             'required' => false,
         ];
+        $description["katakana"] = [
+            'property' => 'katakana',
+            'type' => Type::BUILTIN_TYPE_STRING,
+            'required' => false,
+        ];
 
         return $description;
     }
