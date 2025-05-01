@@ -53,6 +53,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(uriTemplate: '/wildcards')
+    ]
+)]
 #[MongoDB\Document(repositoryClass: 'App\Repository\NounRepository')]
 class Noun extends Card
 {

@@ -28,3 +28,7 @@ services:
         bind:
             $persistProcessor: '@api_platform.doctrine_mongodb.odm.state.persist_processor'
             $removeProcessor: '@api_platform.doctrine_mongodb.odm.state.remove_processor'
+    
+    App\State\CardProvider:
+        bind:
+            $collectionProvider: '@api_platform.doctrine_mongodb.odm.state.collection_provider'

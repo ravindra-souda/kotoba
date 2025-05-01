@@ -56,6 +56,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
+#[ApiResource(
+    operations: [
+        new GetCollection(uriTemplate: '/wildcards')
+    ]
+)]
 #[MongoDB\Document(repositoryClass: 'App\Repository\AdjectiveRepository')]
 class Adjective extends Card
 {
