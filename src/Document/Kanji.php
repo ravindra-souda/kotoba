@@ -72,7 +72,10 @@ class Kanji extends Card
     protected string $kanji = '';
 
     /** Must be written using only lowercase roman or hiragana characters,
-     *  will be converted to hiragana by the API */
+     *  will be converted to hiragana by the API 
+     * 
+     * @var array<string>
+    */
     #[Assert\All([
         new Assert\Regex(
             pattern: '/^\s*[a-zāūēō]+\s*$|^\s*\p{Hiragana}+\s*$/um',
@@ -85,7 +88,10 @@ class Kanji extends Card
     protected ?array $kunyomi = null;
 
     /** Must be written using only lowercase roman or katakana characters,
-     *  will be converted to katakana by the API */
+     *  will be converted to katakana by the API 
+     * 
+     * @var array<string>
+    */
     #[Assert\All([
         new Assert\Regex(
             pattern: '/^\s*[a-zāūēō]+\s*$|^\s*\p{Katakana}+\s*$/um',
@@ -102,11 +108,17 @@ class Kanji extends Card
         return $this->kanji;
     }
 
+    /**
+     * @return ?array<string>
+     */
     public function getKunyomi(): ?array
     {
         return $this->kunyomi;
     }
 
+    /**
+     * @return ?array<string>
+     */
     public function getOnyomi(): ?array
     {
         return $this->onyomi;
@@ -123,11 +135,17 @@ class Kanji extends Card
         return $this->setLowerAndTrimmedOrNull('kanji', $kanji);
     }
 
+    /**
+     * @param ?array<string> $kunyomi
+     */
     public function setKunyomi(?array $kunyomi): Kanji
     {
         return $this->setLowerAndTrimmedOrNull('kunyomi', $kunyomi);
     }
 
+    /**
+     * @param ?array<string> $onyomi
+     */
     public function setOnyomi(?array $onyomi): Kanji
     {
         return $this->setLowerAndTrimmedOrNull('onyomi', $onyomi);

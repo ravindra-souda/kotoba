@@ -119,6 +119,9 @@ class Adjective extends Card
         ],
     ];
 
+    /**
+     * @var array<string>
+     */
     #[Groups(['read'])]
     #[MongoDB\Field(type: 'collection')]
     protected array $searchInflections = [];
@@ -133,6 +136,7 @@ class Adjective extends Card
 
     /**
      * @param array<string,array<string,string>> $inflections
+     * @param ?array<string> $replacements
      */
     public function setInflections(
         array $inflections, ?array $replacements = null): Adjective
@@ -236,6 +240,9 @@ class Adjective extends Card
         return 0;
     }
 
+    /**
+     * @param ?array<string> $replacements
+     */
     private function updateSearchInflections(
         ?array $replacements = null): Adjective
     {

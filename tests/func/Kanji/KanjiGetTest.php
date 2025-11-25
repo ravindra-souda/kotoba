@@ -361,6 +361,10 @@ class KanjiGetTest extends ApiTestCase
         ]);
     }
 
+    /**
+     * @param array<mixed> $results
+     * @return array<string>
+     */
     private function getIds(array $results): array
     {
         $ids = [];

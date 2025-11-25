@@ -180,6 +180,9 @@ class Verb extends Card
         ],
     ];
 
+    /**
+     * @var array<string>
+     */
     #[Groups(['read'])]
     #[MongoDB\Field(type: 'collection')]
     protected array $searchInflections = [];
