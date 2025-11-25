@@ -302,8 +302,7 @@ class AdjectivesPostTest extends ApiTestCase
         $provider = [];
 
         foreach (self::POST_COMPLETE_VALID_ADJECTIVES as $key => $value) {
-            $expected = self::POST_COMPLETE_EXPECTED_ADJECTIVES[$key] ?? $value;
-            $provider[$key] = [$value, $expected];
+            $provider[$key] = [$value, self::POST_COMPLETE_EXPECTED_ADJECTIVES[$key]];
         }
 
         return $provider;

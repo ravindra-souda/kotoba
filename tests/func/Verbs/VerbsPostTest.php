@@ -676,8 +676,7 @@ class VerbsPostTest extends ApiTestCase
         $provider = [];
 
         foreach (self::POST_COMPLETE_VALID_VERBS as $key => $value) {
-            $expected = self::POST_COMPLETE_EXPECTED_VERBS[$key] ?? $value;
-            $provider[$key] = [$value, $expected];
+            $provider[$key] = [$value, self::POST_COMPLETE_EXPECTED_VERBS[$key]];
         }
 
         return $provider;

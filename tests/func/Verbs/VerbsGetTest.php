@@ -94,7 +94,7 @@ class VerbsGetTest extends ApiTestCase
     {
         $fixtures = self::GET_SEARCH_FIXTURES;
         array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] ??= 'pagination'.Verb::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
+            $fixture['romaji'] ??= 'pagination'.Verb::toRomaji($fixture['hiragana'])
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(

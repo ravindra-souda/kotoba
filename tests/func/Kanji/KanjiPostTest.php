@@ -284,8 +284,7 @@ class KanjiPostTest extends ApiTestCase
         $provider = [];
 
         foreach (self::POST_COMPLETE_VALID_KANJI as $key => $value) {
-            $expected = self::POST_COMPLETE_EXPECTED_KANJI[$key] ?? $value;
-            $provider[$key] = [$value, ...$expected];
+            $provider[$key] = [$value, ...self::POST_COMPLETE_EXPECTED_KANJI[$key]];
         }
 
         return $provider;
