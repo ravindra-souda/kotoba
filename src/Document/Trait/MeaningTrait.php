@@ -80,6 +80,7 @@ trait MeaningTrait
         $displayedMeaning = [];
         foreach ($this->meaning as $userLang => $userMeanings) {
             foreach ($userMeanings as $userMeaning) {
+                /** @var array<string> $userMeaning */
                 $displayedMeaning[$userLang][] = implode('; ', $userMeaning);
             }
         }
@@ -107,7 +108,9 @@ trait MeaningTrait
                 return 3;
             }
             foreach ($userMeanings as $userMeaning) {
-                if (!is_array($userMeaning) || '' === trim($userMeaning[0] ?? '')) {
+                /** @var array<string> $userMeaning */
+                if (!is_array($userMeaning) 
+                    || '' === trim($userMeaning[0] ?? '')) {
                     return 3;
                 }
             }

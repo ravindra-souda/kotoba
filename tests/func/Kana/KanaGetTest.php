@@ -61,7 +61,10 @@ class KanaGetTest extends ApiTestCase
             ...array_values(self::GET_SORT_FIXTURES),
         );
         array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] = substr('x'.Kana::toRomaji($fixture['hiragana'] ?? $fixture['katakana']), 0, 4)
+            $fixture['romaji'] = substr(
+                'x'.
+                Kana::toRomaji($fixture['hiragana'] ?? $fixture['katakana']),
+                0, 4)
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
@@ -81,7 +84,7 @@ class KanaGetTest extends ApiTestCase
     }
 
     /**
-     * @return array<array<array<string>>>
+     * @return array<array<string|array<array<string>>>>
      */
     public function searchKanaProvider(): array
     {
