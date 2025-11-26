@@ -9,7 +9,14 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class MeaningFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    /**
+     * @param array<mixed> $context
+     */
+    protected function filterProperty(
+        string $property, mixed $value, Builder $aggregationBuilder, 
+        string $resourceClass, ?Operation $operation = null, 
+        array &$context = []
+    ): void
     {
         // Otherwise filter is applied to order and page as well
         if (
@@ -23,22 +30,33 @@ final class MeaningFilter extends AbstractFilter
             return;
         }
 
-        if (!array_key_exists('lang', $value) || !array_key_exists('search', $value)) {
+        if (!array_key_exists('lang', $value) || 
+            !array_key_exists('search', $value)
+        ) {
             return;
         }
 
         ['lang' => $lang, 'search' => $search] = $value;
 
         // $elemMatch is needed to search in nested arrays
-        $obj = (object) ['$elemMatch' => ['$in' => [trim(strtolower($search))]]];
-
         $aggregationBuilder
             ->match()
                 ->field('meaning.'.$lang)
-                ->elemMatch($obj);
+                ->elemMatch(
+                    ['$elemMatch' 
+                        => ['$in' 
+                            => [trim(strtolower($search))]
+                        ]
+                    ]
+                );
     }
 
-    // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
+    /**
+     * This function is only used to hook in documentation generators 
+     * (supported by Swagger and Hydra)
+     * 
+     * @return array<mixed>
+    */
     public function getDescription(string $resourceClass): array
     {
         if (!$this->properties) {

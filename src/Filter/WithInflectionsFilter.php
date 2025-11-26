@@ -11,7 +11,14 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class WithInflectionsFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    /**
+     * @param array<mixed> $context
+     */
+    protected function filterProperty(
+        string $property, mixed $value, Builder $aggregationBuilder, 
+        string $resourceClass, ?Operation $operation = null, 
+        array &$context = []
+    ): void
     {
         // Otherwise filter is applied to order and page as well
         if (
@@ -45,7 +52,12 @@ final class WithInflectionsFilter extends AbstractFilter
                 );
     }
 
-    // This function is only used to hook in documentation generators (supported by Swagger and Hydra)
+    /**
+     * This function is only used to hook in documentation generators 
+     * (supported by Swagger and Hydra)
+     * 
+     * @return array<mixed>
+    */
     public function getDescription(string $resourceClass): array
     {
         $description["hiragana"] = [
