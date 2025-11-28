@@ -15,16 +15,15 @@ use App\Document\Noun;
 use App\Document\Verb;
 
 /**
- * @template T1
- * @template T2
+ * @template T
  *
- * @template-implements ProcessorInterface<T1,T2>
+ * @template-implements ProcessorInterface<T>
  */
 final class SaveProcessor implements ProcessorInterface
 {
     /**
-     * @param ProcessorInterface<T1,T2> $persistProcessor
-     * @param ProcessorInterface<T1,T2> $removeProcessor
+     * @param ProcessorInterface<T> $persistProcessor
+     * @param ProcessorInterface<T> $removeProcessor
      */
     public function __construct(
         private ProcessorInterface $persistProcessor,
