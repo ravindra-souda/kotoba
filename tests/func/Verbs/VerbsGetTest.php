@@ -93,8 +93,9 @@ class VerbsGetTest extends ApiTestCase
     public static function setUpBeforeClass(): void
     {
         $fixtures = self::GET_SEARCH_FIXTURES;
-        array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] ??= 'pagination'.Verb::toRomaji($fixture['hiragana'])
+        array_walk(
+            $fixtures,
+            fn (&$fixture) => $fixture['romaji'] ??= 'pagination'.Verb::toRomaji($fixture['hiragana'])
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
@@ -108,11 +109,6 @@ class VerbsGetTest extends ApiTestCase
         }
     }
 
-    private function getItemsPerPage(): int 
-    {
-        return (int) $_ENV["ITEMS_PER_PAGE"];
-    }
-
     /**
      * @return array<array<array<string>>>
      */
@@ -122,7 +118,7 @@ class VerbsGetTest extends ApiTestCase
             'hiragana' => [
                 'url' => '?hiragana=あけ&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana']
+                    self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
             'hiragana_start' => [
@@ -135,7 +131,7 @@ class VerbsGetTest extends ApiTestCase
             'kanji' => [
                 'url' => '?kanji=閉まる&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji']
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ],
             ],
             'kanji_partial' => [
@@ -172,7 +168,7 @@ class VerbsGetTest extends ApiTestCase
             'meaning_lang' => [
                 'url' => '?meaning[lang]=fr&meaning[search]=être fermé&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji']
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ],
             ],
             'meaning_lang_unknown' => [
@@ -190,7 +186,7 @@ class VerbsGetTest extends ApiTestCase
             'romaji' => [
                 'url' => '?romaji=paginationAso',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['romaji']
+                    self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
             'romaji_start' => [
@@ -198,25 +194,25 @@ class VerbsGetTest extends ApiTestCase
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['katakana_2'],
                     self::GET_SEARCH_FIXTURES['katakana'],
-                ]
+                ],
             ],
             'inflections_hiragana' => [
                 'url' => '?romaji=pagination&hiragana=あそんだ',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['romaji'],
-                ]
-            ], 
+                ],
+            ],
             'inflections_katakana' => [
                 'url' => '?romaji=pagination&katakana=モテろ',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['katakana'],
-                ]
+                ],
             ],
             'inflections_kanji' => [
                 'url' => '?romaji=pagination&kanji=閉まらせられない',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['kanji'],
-                ]
+                ],
             ],
         ];
     }
@@ -404,7 +400,7 @@ class VerbsGetTest extends ApiTestCase
         $totalItems = count(self::GET_SEARCH_FIXTURES);
         $itemsPerPage = $this->getItemsPerPage();
         $lastPage = ceil($totalItems / $itemsPerPage);
-        
+
         $response = static::createClient()->request(
             'GET',
             '/api/cards/verbs?romaji=pagination',
@@ -434,7 +430,9 @@ class VerbsGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($response->getContent(), true);
         $itemsOnPage2 = $totalItems - $itemsPerPage;
-        if ($itemsOnPage2 > $itemsPerPage) $itemsOnPage2 = $itemsPerPage;
+        if ($itemsOnPage2 > $itemsPerPage) {
+            $itemsOnPage2 = $itemsPerPage;
+        }
         $this->assertCount($itemsOnPage2, $content['hydra:member']);
         $this->assertArraySubset(
             self::GET_SEARCH_FIXTURES['hiragana'],
@@ -465,5 +463,10 @@ class VerbsGetTest extends ApiTestCase
         ]);
         $content = json_decode($response->getContent(), true);
         $this->assertCount($itemsPerPage, $content['hydra:member']);
+    }
+
+    private function getItemsPerPage(): int
+    {
+        return (int) $_ENV['ITEMS_PER_PAGE'];
     }
 }

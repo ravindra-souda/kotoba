@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiFilter(
     SearchFilter::class,
-    // hiragana, katakana and kanji 
+    // hiragana, katakana and kanji
     // will be processed through WithInflectionsFilter
     properties: [
         'romaji' => 'istart',
@@ -126,7 +126,7 @@ class Verb extends Card
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'hash')]
     #[ApiProperty(
-        /* needed for unit-testing 
+        /* needed for unit-testing
         https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification */
         jsonSchemaContext: [
             'type' => 'object',
@@ -198,20 +198,12 @@ class Verb extends Card
         return $this->fillRomaji()->conjugate();
     }
 
-    private function fillRomaji(): self
-    {
-        $katakanaString = str_replace('る', 'ル', $this->katakana ?? '');
-        $this->romaji ??= $this->toRomaji($this->hiragana ?? $katakanaString);
-
-        return $this;
-    }
-
     public static function isValidKatakana(?string $string): bool
     {
         if (null === $string || '' === $string) {
             return true;
         }
-        
+
         // must start with katakana and can end with る
         return 1 === preg_match('/^\p{Katakana}+る?$/um', $string)
             // half-width katakana are not allowed
@@ -303,22 +295,13 @@ class Verb extends Card
     {
         return $this
             ->setLowerAndTrimmedOrNull('inflections', $inflections, false)
-            ->updateSearchInflections();
+            ->updateSearchInflections()
+        ;
     }
 
     public function setReviewed(bool $reviewed): Verb
     {
         $this->reviewed = $reviewed;
-
-        return $this;
-    }
-
-    private function updateSearchInflections(): Verb
-    {
-        $this->searchInflections = [];
-        array_walk_recursive($this->inflections, function($value) {
-            array_push($this->searchInflections, $value);
-        });
 
         return $this;
     }
@@ -408,6 +391,24 @@ class Verb extends Card
     public function getSlugReference(): string
     {
         return $this->romaji;
+    }
+
+    private function fillRomaji(): self
+    {
+        $katakanaString = str_replace('る', 'ル', $this->katakana ?? '');
+        $this->romaji ??= $this->toRomaji($this->hiragana ?? $katakanaString);
+
+        return $this;
+    }
+
+    private function updateSearchInflections(): Verb
+    {
+        $this->searchInflections = [];
+        array_walk_recursive($this->inflections, function ($value) {
+            array_push($this->searchInflections, $value);
+        });
+
+        return $this;
     }
 
     private function conjugateIchidan(): Verb

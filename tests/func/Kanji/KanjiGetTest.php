@@ -59,7 +59,7 @@ class KanjiGetTest extends ApiTestCase
             'onyomi' => ['tai'],
             'meaning' => [
                 'en' => ['sack; bag; pouch'],
-                'fr' => ['sac; sacoche; pochette']
+                'fr' => ['sac; sacoche; pochette'],
             ],
         ],
         'same_onyomi_3' => [
@@ -119,7 +119,7 @@ class KanjiGetTest extends ApiTestCase
             'onyomi' => ['タイ'],
             'meaning' => [
                 'en' => ['sack; bag; pouch'],
-                'fr' => ['sac; sacoche; pochette']
+                'fr' => ['sac; sacoche; pochette'],
             ],
         ],
         'same_onyomi_3' => [
@@ -155,11 +155,6 @@ class KanjiGetTest extends ApiTestCase
         }
     }
 
-    private function getItemsPerPage(): int 
-    {
-        return (int) $_ENV["ITEMS_PER_PAGE"];
-    }
-
     /**
      * @return array<array<array<string>>>
      */
@@ -175,13 +170,13 @@ class KanjiGetTest extends ApiTestCase
             'kunyomi_hiragana' => [
                 'url' => '?kunyomi=からだ',
                 'expected' => [
-                    self::GET_EXPECTED_KANJI['kunyomi']
+                    self::GET_EXPECTED_KANJI['kunyomi'],
                 ],
             ],
             'kunyomi_romaji' => [
                 'url' => '?kunyomi=karada',
                 'expected' => [
-                    self::GET_EXPECTED_KANJI['kunyomi']
+                    self::GET_EXPECTED_KANJI['kunyomi'],
                 ],
             ],
             'kunyomi_katakana' => [
@@ -195,13 +190,13 @@ class KanjiGetTest extends ApiTestCase
             'onyomi_katakana' => [
                 'url' => '?onyomi=ダイ',
                 'expected' => [
-                    self::GET_EXPECTED_KANJI['onyomi']
+                    self::GET_EXPECTED_KANJI['onyomi'],
                 ],
             ],
             'onyomi_romaji' => [
                 'url' => '?onyomi=ta',
                 'expected' => [
-                    self::GET_EXPECTED_KANJI['meaning']
+                    self::GET_EXPECTED_KANJI['meaning'],
                 ],
             ],
             'onyomi_hiragana' => [
@@ -215,19 +210,19 @@ class KanjiGetTest extends ApiTestCase
             'meaning' => [
                 'url' => '?meaning[lang]=en&meaning[search]=big around',
                 'expected' => [
-                    self::GET_EXPECTED_KANJI['meaning']
+                    self::GET_EXPECTED_KANJI['meaning'],
                 ],
             ],
             'meaning_insensitive' => [
                 'url' => '?meaning[lang]=en&meaning[search]=realItY',
                 'expected' => [
-                    self::GET_EXPECTED_KANJI['kunyomi']
+                    self::GET_EXPECTED_KANJI['kunyomi'],
                 ],
             ],
             'meaning_lang' => [
                 'url' => '?meaning[lang]=fr&meaning[search]=sacoche',
                 'expected' => [
-                    self::GET_EXPECTED_KANJI['same_onyomi_2']
+                    self::GET_EXPECTED_KANJI['same_onyomi_2'],
                 ],
             ],
             'meaning_lang_unknown' => [
@@ -361,20 +356,6 @@ class KanjiGetTest extends ApiTestCase
         ]);
     }
 
-    /**
-     * @param array<mixed> $results
-     * @return array<string>
-     */
-    private function getIds(array $results): array
-    {
-        $ids = [];
-        foreach ($results as $result) {
-            $ids[] = $result['@id'];
-        }
-
-        return $ids;
-    }
-
     public function testKanjiGetPagination(): void
     {
         $totalItems = count(self::GET_PAGINATION_FIXTURES);
@@ -385,7 +366,7 @@ class KanjiGetTest extends ApiTestCase
         if ($itemsOnSecondPage > $itemsPerPage) {
             $itemsOnSecondPage = $itemsPerPage;
         }
-        
+
         $response = static::createClient()->request(
             'GET',
             '/api/cards/kanji?onyomi=タイ',
@@ -445,5 +426,25 @@ class KanjiGetTest extends ApiTestCase
         ]);
         $content = json_decode($response->getContent(), true);
         $this->assertCount($itemsPerPage, $content['hydra:member']);
+    }
+
+    private function getItemsPerPage(): int
+    {
+        return (int) $_ENV['ITEMS_PER_PAGE'];
+    }
+
+    /**
+     * @param array<mixed> $results
+     *
+     * @return array<string>
+     */
+    private function getIds(array $results): array
+    {
+        $ids = [];
+        foreach ($results as $result) {
+            $ids[] = $result['@id'];
+        }
+
+        return $ids;
     }
 }

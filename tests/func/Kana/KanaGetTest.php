@@ -60,11 +60,14 @@ class KanaGetTest extends ApiTestCase
             array_values(self::GET_SEARCH_FIXTURES),
             ...array_values(self::GET_SORT_FIXTURES),
         );
-        array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] = substr(
+        array_walk(
+            $fixtures,
+            fn (&$fixture) => $fixture['romaji'] = substr(
                 'x'.
-                Kana::toRomaji($fixture['hiragana'] ?? $fixture['katakana']),
-                0, 4)
+                    Kana::toRomaji($fixture['hiragana'] ?? $fixture['katakana']),
+                0,
+                4
+            )
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
@@ -78,13 +81,8 @@ class KanaGetTest extends ApiTestCase
         }
     }
 
-    private function getItemsPerPage(): int 
-    {
-        return (int) $_ENV["ITEMS_PER_PAGE"];
-    }
-
     /**
-     * @return array<array<string|array<array<string>>>>
+     * @return array<array<array<array<string>>|string>>
      */
     public function searchKanaProvider(): array
     {
@@ -92,38 +90,38 @@ class KanaGetTest extends ApiTestCase
             'hiragana' => [
                 'url' => '?hiragana=き&romaji=x',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana']
+                    self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
             'hiragana_glide' => [
                 'url' => '?hiragana=きゃ&romaji=x',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana_glide']
+                    self::GET_SEARCH_FIXTURES['hiragana_glide'],
                 ],
             ],
             'katakana' => [
                 'url' => '?katakana=キ&romaji=x',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['katakana']
+                    self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
             'katakana_glide' => [
                 'url' => '?katakana=キャ&romaji=x',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['katakana_glide']
+                    self::GET_SEARCH_FIXTURES['katakana_glide'],
                 ],
             ],
             'romaji' => [
                 'url' => '?romaji=xku',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['romaji']
+                    self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
             'romaji_hiragana_and_katakana' => [
                 'url' => '?romaji=xki',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana'],
-                    self::GET_SEARCH_FIXTURES['katakana']
+                    self::GET_SEARCH_FIXTURES['katakana'],
                 ],
             ],
             'romaji_start' => [
@@ -133,7 +131,7 @@ class KanaGetTest extends ApiTestCase
                     self::GET_SEARCH_FIXTURES['katakana'],
                     self::GET_SEARCH_FIXTURES['romaji'],
                     self::GET_SEARCH_FIXTURES['hiragana_glide'],
-                    self::GET_SEARCH_FIXTURES['katakana_glide'],  
+                    self::GET_SEARCH_FIXTURES['katakana_glide'],
                 ],
             ],
         ];
@@ -314,14 +312,15 @@ class KanaGetTest extends ApiTestCase
 
     public function testKanaGetPagination(): void
     {
-        $totalItems = count(array_merge_recursive(
+        $totalItems = count(
+            array_merge_recursive(
                 array_values(self::GET_SEARCH_FIXTURES),
                 ...array_values(self::GET_SORT_FIXTURES),
             )
         );
         $itemsPerPage = $this->getItemsPerPage();
         $lastPage = ceil($totalItems / $itemsPerPage);
-        
+
         $response = static::createClient()->request(
             'GET',
             '/api/cards/kana?romaji=x',
@@ -380,5 +379,10 @@ class KanaGetTest extends ApiTestCase
         ]);
         $content = json_decode($response->getContent(), true);
         $this->assertCount($itemsPerPage, $content['hydra:member']);
+    }
+
+    private function getItemsPerPage(): int
+    {
+        return (int) $_ENV['ITEMS_PER_PAGE'];
     }
 }

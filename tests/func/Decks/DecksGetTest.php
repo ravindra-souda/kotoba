@@ -118,11 +118,6 @@ class DecksGetTest extends ApiTestCase
         }
     }
 
-    private function getItemsPerPage(): int 
-    {
-        return (int) $_ENV["ITEMS_PER_PAGE"];
-    }
-
     /**
      * @return array<array<array<string>>>
      */
@@ -408,5 +403,10 @@ class DecksGetTest extends ApiTestCase
         ]);
         $content = json_decode($response->getContent(), true);
         $this->assertCount($itemsPerPage, $content['hydra:member']);
+    }
+
+    private function getItemsPerPage(): int
+    {
+        return (int) $_ENV['ITEMS_PER_PAGE'];
     }
 }

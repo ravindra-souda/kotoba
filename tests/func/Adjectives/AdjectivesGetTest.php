@@ -83,21 +83,21 @@ class AdjectivesGetTest extends ApiTestCase
                 'hiragana' => 'らく',
                 'group' => 'na',
                 'meaning' => [
-                    'en' => ['comfort; ease; relief']
+                    'en' => ['comfort; ease; relief'],
                 ],
             ],
             [
                 'hiragana' => 'らっかんてき',
                 'group' => 'na',
                 'meaning' => [
-                    'en' => ['optimistic; hopeful']
+                    'en' => ['optimistic; hopeful'],
                 ],
             ],
             [
                 'katakana' => 'ラッキー',
                 'group' => 'na',
                 'meaning' => [
-                    'en' => ['lucky']
+                    'en' => ['lucky'],
                 ],
             ],
         ],
@@ -106,21 +106,21 @@ class AdjectivesGetTest extends ApiTestCase
                 'hiragana' => 'しずか',
                 'group' => 'na',
                 'meaning' => [
-                    'en' => ['quiet; silent']
+                    'en' => ['quiet; silent'],
                 ],
             ],
             [
                 'hiragana' => 'しろい',
                 'group' => 'i',
                 'meaning' => [
-                    'en' => ['white']
+                    'en' => ['white'],
                 ],
             ],
             [
                 'hiragana' => 'しょうじき',
                 'group' => 'na',
                 'meaning' => [
-                    'en' => ['honest; frank; candid; straightforward']
+                    'en' => ['honest; frank; candid; straightforward'],
                 ],
             ],
         ],
@@ -130,7 +130,7 @@ class AdjectivesGetTest extends ApiTestCase
                 'kanji' => '丸い',
                 'group' => 'i',
                 'meaning' => [
-                    'en' => ['round; circular; spherical']
+                    'en' => ['round; circular; spherical'],
                 ],
             ],
             [
@@ -139,7 +139,7 @@ class AdjectivesGetTest extends ApiTestCase
                 'meaning' => [
                     'en' => [
                         'bad(-tasting); awful; terrible',
-                        'poor; unskillful; search-me'
+                        'poor; unskillful; search-me',
                     ],
                 ],
             ],
@@ -148,7 +148,7 @@ class AdjectivesGetTest extends ApiTestCase
                 'kanji' => '満足',
                 'group' => 'na',
                 'meaning' => [
-                    'en' => ['sufficient; satisfactory; enough; adequate']
+                    'en' => ['sufficient; satisfactory; enough; adequate'],
                 ],
             ],
         ],
@@ -160,8 +160,9 @@ class AdjectivesGetTest extends ApiTestCase
             array_values(self::GET_SEARCH_FIXTURES),
             ...array_values(self::GET_SORT_FIXTURES),
         );
-        array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] = 'pagination'.Adjective::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
+        array_walk(
+            $fixtures,
+            fn (&$fixture) => $fixture['romaji'] = 'pagination'.Adjective::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
@@ -173,11 +174,6 @@ class AdjectivesGetTest extends ApiTestCase
             static::assertResponseStatusCodeSame(201);
             static::assertMatchesResourceItemJsonSchema(Adjective::class);
         }
-    }
-
-    private function getItemsPerPage(): int 
-    {
-        return (int) $_ENV["ITEMS_PER_PAGE"];
     }
 
     /**
@@ -216,7 +212,7 @@ class AdjectivesGetTest extends ApiTestCase
             'hiragana' => [
                 'url' => '?hiragana=たの&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana']
+                    self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
             'hiragana_start' => [
@@ -229,7 +225,7 @@ class AdjectivesGetTest extends ApiTestCase
             'kanji' => [
                 'url' => '?kanji=大人しい&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji']
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ],
             ],
             'kanji_partial' => [
@@ -261,13 +257,13 @@ class AdjectivesGetTest extends ApiTestCase
             'meaning_insensitive' => [
                 'url' => '?meaning[lang]=en&meaning[search]=quiCk&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['meaning']
+                    self::GET_SEARCH_FIXTURES['meaning'],
                 ],
             ],
             'meaning_lang' => [
                 'url' => '?meaning[lang]=fr&meaning[search]=loin&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['romaji']
+                    self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
             'meaning_lang_unknown' => [
@@ -285,7 +281,7 @@ class AdjectivesGetTest extends ApiTestCase
             'romaji' => [
                 'url' => '?romaji=paginationTō',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['romaji']
+                    self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
             'romaji_start' => [
@@ -511,14 +507,15 @@ class AdjectivesGetTest extends ApiTestCase
 
     public function testAdjectivesGetPagination(): void
     {
-        $totalItems = count(array_merge_recursive(
+        $totalItems = count(
+            array_merge_recursive(
                 array_values(self::GET_SEARCH_FIXTURES),
                 ...array_values(self::GET_SORT_FIXTURES),
             )
         );
         $itemsPerPage = $this->getItemsPerPage();
         $lastPage = ceil($totalItems / $itemsPerPage);
-        
+
         $response = static::createClient()->request(
             'GET',
             '/api/cards/adjectives?romaji=pagination',
@@ -577,5 +574,10 @@ class AdjectivesGetTest extends ApiTestCase
         ]);
         $content = json_decode($response->getContent(), true);
         $this->assertCount($itemsPerPage, $content['hydra:member']);
+    }
+
+    private function getItemsPerPage(): int
+    {
+        return (int) $_ENV['ITEMS_PER_PAGE'];
     }
 }

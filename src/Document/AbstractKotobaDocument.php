@@ -147,7 +147,7 @@ abstract class AbstractKotobaDocument
                 $value,
                 function (&$v) use (&$isEmpty) {
                     $v = trim(strtolower($v));
-                    if ($isEmpty && $v !== '') {
+                    if ($isEmpty && '' !== $v) {
                         $isEmpty = false;
                     }
                 }

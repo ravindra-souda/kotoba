@@ -216,6 +216,23 @@ trait ScriptTrait
         return self::isRomaji($romaji) ? $romaji : false;
     }
 
+    public static function detect(string $string): ?string
+    {
+        if (self::isHiragana($string)) {
+            return self::HIRAGANA;
+        }
+
+        if (self::isKatakana($string)) {
+            return self::KATAKANA;
+        }
+
+        if (self::isRomaji($string)) {
+            return self::ROMAJI;
+        }
+
+        return null;
+    }
+
     private static function convert(
         string $string,
         string $to,
@@ -223,7 +240,7 @@ trait ScriptTrait
     ): string {
         $from = self::detect($string);
 
-        if ($from === $to || $from === null) {
+        if ($from === $to || null === $from) {
             return $string;
         }
 
@@ -308,23 +325,6 @@ trait ScriptTrait
         }
 
         return str_replace(self::GLIDES_TO_FIX, self::GLIDES_FIXED, $string);
-    }
-
-    public static function detect(string $string): ?string
-    {
-        if (self::isHiragana($string)) {
-            return self::HIRAGANA;
-        }
-
-        if (self::isKatakana($string)) {
-            return self::KATAKANA;
-        }
-
-        if (self::isRomaji($string)) {
-            return self::ROMAJI;
-        }
-
-        return null;
     }
 
     private static function isHiragana(string $string): bool

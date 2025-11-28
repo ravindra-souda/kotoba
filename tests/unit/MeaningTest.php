@@ -24,16 +24,16 @@ class MeaningTest extends TestCase
         /*
         'meaning' => [
             'en' => [
-                ['high', 'tall'], 
+                ['high', 'tall'],
                 ['expensive', 'high-priced']
             ]
             'fr' => [
-                ['haut', 'grand'], 
+                ['haut', 'grand'],
                 ['onéreux', 'à prix fort']
             ]
         ]
         */
-        
+
         return [
             '0_mandatoryLang' => [
                 [
@@ -51,7 +51,7 @@ class MeaningTest extends TestCase
                         ['expensive', 'high-priced'],
                     ],
                     $secondaryLang => [
-                        ['haut', 'grand'], 
+                        ['haut', 'grand'],
                         ['onéreux', 'à prix fort'],
                     ],
                 ],
@@ -89,7 +89,7 @@ class MeaningTest extends TestCase
                         ['expensive', 'high-priced'],
                     ],
                     'dummy' => [
-                        ['???']
+                        ['???'],
                     ],
                 ],
                 2,
@@ -103,7 +103,7 @@ class MeaningTest extends TestCase
             '3_mandatoryLang_empty_level2' => [
                 [
                     $mandatoryLang => [
-                        ['   ']
+                        ['   '],
                     ],
                 ],
                 3,
@@ -117,7 +117,7 @@ class MeaningTest extends TestCase
             '3_mandatoryLang_null_level2' => [
                 [
                     $mandatoryLang => [
-                        [null]
+                        [null],
                     ],
                 ],
                 3,
@@ -131,7 +131,7 @@ class MeaningTest extends TestCase
             '3_mandatoryLang_not_an_array_level2' => [
                 [
                     $mandatoryLang => [
-                        'high'
+                        'high',
                     ],
                 ],
                 3,

@@ -72,15 +72,15 @@ class Kanji extends Card
     protected string $kanji = '';
 
     /** Must be written using only lowercase roman or hiragana characters,
-     *  will be converted to hiragana by the API 
-     * 
+     *  will be converted to hiragana by the API.
+     *
      * @var array<string>
-    */
+     */
     #[Assert\All([
         new Assert\Regex(
             pattern: '/^\s*[a-zāūēō]+\s*$|^\s*\p{Hiragana}+\s*$/um',
             message: self::VALIDATION_ERR_KUNYOMI
-        )
+        ),
     ])]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
@@ -88,15 +88,15 @@ class Kanji extends Card
     protected ?array $kunyomi = null;
 
     /** Must be written using only lowercase roman or katakana characters,
-     *  will be converted to katakana by the API 
-     * 
+     *  will be converted to katakana by the API.
+     *
      * @var array<string>
-    */
+     */
     #[Assert\All([
         new Assert\Regex(
             pattern: '/^\s*[a-zāūēō]+\s*$|^\s*\p{Katakana}+\s*$/um',
             message: self::VALIDATION_ERR_ONYOMI
-        )
+        ),
     ])]
     #[Groups(['read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
@@ -228,7 +228,8 @@ class Kanji extends Card
     private function fillOnyomi(): Kanji
     {
         $this->onyomi = array_map(
-            fn($v) => $this->toKatakana($v, false), $this->onyomi ?? []
+            fn ($v) => $this->toKatakana($v, false),
+            $this->onyomi ?? []
         );
 
         return $this;

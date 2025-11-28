@@ -66,7 +66,7 @@ class KanjiPutTest extends ApiTestCase
             'onyomi' => [' getsu', 'gatsu    '],
         ],
         'onyomi_kana' => [
-            'onyomi' => [' ゲ', '  ガ ',  'ツ '],
+            'onyomi' => [' ゲ', '  ガ ', 'ツ '],
         ],
         'onyomi_mixed' => [
             'onyomi' => ['mu', ' ヌ'],
@@ -131,7 +131,7 @@ class KanjiPutTest extends ApiTestCase
         ],
         'onyomi_kana' => [
             'doc' => [
-                'onyomi' => ['ゲ', 'ガ',  'ツ'],
+                'onyomi' => ['ゲ', 'ガ', 'ツ'],
                 'kunyomi' => ['ひ', 'び', 'か'],
             ],
             'code' => 'day',

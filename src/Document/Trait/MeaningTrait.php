@@ -42,8 +42,8 @@ trait MeaningTrait
                 'fr' => ['haut; grand', 'coûteux; cher'],
             ],
         ],
-        /* needed for unit-testing 
-        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification 
+        /* needed for unit-testing
+        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification
         */
         jsonSchemaContext: [
             'type' => 'object',
@@ -75,7 +75,7 @@ trait MeaningTrait
     public function getMeaning(): array
     {
         /*  displayed as 'en' => ['high; tall', 'expensive; high-priced'],
-            persisted as 'en' => [['high', 'tall'], ['expensive', 'high-priced']] 
+            persisted as 'en' => [['high', 'tall'], ['expensive', 'high-priced']]
         */
         $displayedMeaning = [];
         foreach ($this->meaning as $userLang => $userMeanings) {
@@ -84,6 +84,7 @@ trait MeaningTrait
                 $displayedMeaning[$userLang][] = implode('; ', $userMeaning);
             }
         }
+
         return $displayedMeaning;
     }
 
@@ -109,7 +110,7 @@ trait MeaningTrait
             }
             foreach ($userMeanings as $userMeaning) {
                 /** @var array<string> $userMeaning */
-                if (!is_array($userMeaning) 
+                if (!is_array($userMeaning)
                     || '' === trim($userMeaning[0] ?? '')) {
                     return 3;
                 }

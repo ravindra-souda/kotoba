@@ -133,8 +133,9 @@ class NounsGetTest extends ApiTestCase
     public static function setUpBeforeClass(): void
     {
         $fixtures = self::GET_SEARCH_FIXTURES;
-        array_walk($fixtures, fn(&$fixture) => 
-            $fixture['romaji'] = 'pagination'.Noun::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
+        array_walk(
+            $fixtures,
+            fn (&$fixture) => $fixture['romaji'] = 'pagination'.Noun::toRomaji($fixture['hiragana'] ?? $fixture['katakana'])
         );
         foreach ($fixtures as $payload) {
             static::createClient()->request(
@@ -148,11 +149,6 @@ class NounsGetTest extends ApiTestCase
         }
     }
 
-    private function getItemsPerPage(): int 
-    {
-        return (int) $_ENV["ITEMS_PER_PAGE"];
-    }
-
     /**
      * @return array<array<array<string>>>
      */
@@ -162,7 +158,7 @@ class NounsGetTest extends ApiTestCase
             'hiragana' => [
                 'url' => '?hiragana=と&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['hiragana']
+                    self::GET_SEARCH_FIXTURES['hiragana'],
                 ],
             ],
             'hiragana_start' => [
@@ -176,7 +172,7 @@ class NounsGetTest extends ApiTestCase
             'kanji' => [
                 'url' => '?kanji=狼&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji']
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ],
             ],
             'kanji_partial' => [
@@ -251,7 +247,7 @@ class NounsGetTest extends ApiTestCase
             'meaning_lang' => [
                 'url' => '?meaning[lang]=fr&meaning[search]=loup&romaji=pagination',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['kanji']
+                    self::GET_SEARCH_FIXTURES['kanji'],
                 ],
             ],
             'meaning_lang_unknown' => [
@@ -269,7 +265,7 @@ class NounsGetTest extends ApiTestCase
             'romaji' => [
                 'url' => '?romaji=paginationhY',
                 'expected' => [
-                    self::GET_SEARCH_FIXTURES['romaji']
+                    self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
             'romaji_start' => [
@@ -465,7 +461,7 @@ class NounsGetTest extends ApiTestCase
         $totalItems = count(self::GET_SEARCH_FIXTURES);
         $itemsPerPage = $this->getItemsPerPage();
         $lastPage = ceil($totalItems / $itemsPerPage);
-        
+
         $response = static::createClient()->request(
             'GET',
             '/api/cards/nouns?romaji=pagination',
@@ -524,5 +520,10 @@ class NounsGetTest extends ApiTestCase
         ]);
         $content = json_decode($response->getContent(), true);
         $this->assertCount($itemsPerPage, $content['hydra:member']);
+    }
+
+    private function getItemsPerPage(): int
+    {
+        return (int) $_ENV['ITEMS_PER_PAGE'];
     }
 }

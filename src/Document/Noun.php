@@ -94,27 +94,6 @@ class Noun extends Card
         return $this;
     }
 
-    private function dedupBikago(): self
-    {
-        if ($this->bikago === null) {
-            return $this;
-        }
-
-        if (str_starts_with($this->hiragana ?? '', $this->bikago)) {
-            $this->setHiragana(
-                substr($this->hiragana, strlen($this->bikago))
-            );
-        }
-
-        if (str_starts_with($this->kanji ?? '', $this->bikago)) {
-            $this->setKanji(
-                substr($this->kanji, strlen($this->bikago))
-            );
-        }
-
-        return $this;
-    }
-
     // called right before persist, see App\State\SaveProcessor
     public function finalizeTasks(): self
     {
@@ -140,5 +119,26 @@ class Noun extends Card
     public function getSlugReference(): string
     {
         return $this->romaji;
+    }
+
+    private function dedupBikago(): self
+    {
+        if (null === $this->bikago) {
+            return $this;
+        }
+
+        if (str_starts_with($this->hiragana ?? '', $this->bikago)) {
+            $this->setHiragana(
+                substr($this->hiragana, strlen($this->bikago))
+            );
+        }
+
+        if (str_starts_with($this->kanji ?? '', $this->bikago)) {
+            $this->setKanji(
+                substr($this->kanji, strlen($this->bikago))
+            );
+        }
+
+        return $this;
     }
 }

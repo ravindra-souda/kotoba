@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiFilter(
     SearchFilter::class,
-    // hiragana, katakana and kanji 
+    // hiragana, katakana and kanji
     // will be processed through WithInflectionsFilter
     properties: [
         'group' => 'iexact',
@@ -102,7 +102,7 @@ class Adjective extends Card
     #[Groups(['read'])]
     #[MongoDB\Field(type: 'hash')]
     #[ApiProperty(
-        /* needed for unit-testing 
+        /* needed for unit-testing
         https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification */
         jsonSchemaContext: [
             'type' => 'object',
@@ -136,14 +136,16 @@ class Adjective extends Card
 
     /**
      * @param array<string,array<string,string>> $inflections
-     * @param ?array<string> $replacements
+     * @param ?array<string>                     $replacements
      */
     public function setInflections(
-        array $inflections, ?array $replacements = null): Adjective
-    {
+        array $inflections,
+        ?array $replacements = null
+    ): Adjective {
         return $this
             ->setLowerAndTrimmedOrNull('inflections', $inflections)
-            ->updateSearchInflections($replacements);
+            ->updateSearchInflections($replacements)
+        ;
     }
 
     public function conjugate(): Adjective
@@ -240,35 +242,6 @@ class Adjective extends Card
         return 0;
     }
 
-    /**
-     * @param ?array<string> $replacements
-     */
-    private function updateSearchInflections(
-        ?array $replacements = null): Adjective
-    {
-        $this->searchInflections = [];
-        array_walk_recursive($this->inflections, function($value) {
-            array_push($this->searchInflections, $value);
-        });
-
-        if ($replacements === null) {
-            return $this;
-        }
-
-        [$base, $altBase] = $replacements;
-        $bases = [$base, mb_substr($base, 0, -1)];
-        $altBases = [$altBase, mb_substr($altBase, 0, -1)];
-
-        $altInflections = str_replace(
-            $bases, $altBases, $this->searchInflections
-        );
-        $this->searchInflections = array_merge(
-            $altInflections, $this->searchInflections
-        );
-
-        return $this;
-    }
-
     #[Assert\Callback]
     public function validateGroup(
         ExecutionContextInterface $context,
@@ -284,5 +257,37 @@ class Adjective extends Card
             ->atPath('group')
             ->addViolation()
         ;
+    }
+
+    /**
+     * @param ?array<string> $replacements
+     */
+    private function updateSearchInflections(
+        ?array $replacements = null
+    ): Adjective {
+        $this->searchInflections = [];
+        array_walk_recursive($this->inflections, function ($value) {
+            array_push($this->searchInflections, $value);
+        });
+
+        if (null === $replacements) {
+            return $this;
+        }
+
+        [$base, $altBase] = $replacements;
+        $bases = [$base, mb_substr($base, 0, -1)];
+        $altBases = [$altBase, mb_substr($altBase, 0, -1)];
+
+        $altInflections = str_replace(
+            $bases,
+            $altBases,
+            $this->searchInflections
+        );
+        $this->searchInflections = array_merge(
+            $altInflections,
+            $this->searchInflections
+        );
+
+        return $this;
     }
 }
