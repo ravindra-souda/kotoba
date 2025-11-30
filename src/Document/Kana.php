@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchKanaByCode;
@@ -14,6 +19,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'hiragana' => 'exact',
+        'katakana' => 'exact',
+        'romaji' => 'istart',
+    ],
+)]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: ['romaji'],
+    arguments: ['orderParameterName' => 'order'],
+)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -26,6 +44,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                controller */
             read: false
         ),
+        new Get(),
+        new GetCollection(),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
