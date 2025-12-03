@@ -4,17 +4,39 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchAdjectiveByCode;
+use App\Filter\WithInflectionsFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+#[ApiFilter(
+    SearchFilter::class,
+    // hiragana, katakana and kanji
+    // will be processed through WithInflectionsFilter
+    properties: [
+        'group' => 'iexact',
+        'romaji' => 'istart',
+    ],
+)]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: ['romaji'],
+    arguments: ['orderParameterName' => 'order'],
+)]
+#[ApiFilter(WithInflectionsFilter::class)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -27,6 +49,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                controller */
             read: false
         ),
+        new Get(),
+        new GetCollection(),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
@@ -77,6 +101,13 @@ class Adjective extends Card
     )]
     #[Groups(['read'])]
     #[MongoDB\Field(type: 'hash')]
+    #[ApiProperty(
+        /* needed for unit-testing
+        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification */
+        jsonSchemaContext: [
+            'type' => 'object',
+        ]
+    )]
     protected array $inflections = [
         'non-past' => [
             'affirmative' => '',
@@ -89,6 +120,13 @@ class Adjective extends Card
     ];
 
     /**
+     * @var array<string>
+     */
+    #[Groups(['read'])]
+    #[MongoDB\Field(type: 'collection')]
+    protected array $searchInflections = [];
+
+    /**
      * @return array<string,array<string,string>>
      */
     public function getInflections(): array
@@ -98,10 +136,16 @@ class Adjective extends Card
 
     /**
      * @param array<string,array<string,string>> $inflections
+     * @param ?array<string>                     $replacements
      */
-    public function setInflections(array $inflections): Adjective
-    {
-        return $this->setLowerAndTrimmedOrNull('inflections', $inflections);
+    public function setInflections(
+        array $inflections,
+        ?array $replacements = null
+    ): Adjective {
+        return $this
+            ->setLowerAndTrimmedOrNull('inflections', $inflections)
+            ->updateSearchInflections($replacements)
+        ;
     }
 
     public function conjugate(): Adjective
@@ -111,6 +155,7 @@ class Adjective extends Card
         }
 
         $base = $this->kanji ?? $this->hiragana ?? $this->katakana;
+        $altBase = $this->hiragana ?? $this->katakana;
 
         if (null === $base) {
             throw new \Exception(self::ERR_NO_BASE);
@@ -150,7 +195,8 @@ class Adjective extends Card
             ];
         }
 
-        $this->setInflections($inflections);
+        $replacements = ($altBase !== $base) ? [$base, $altBase] : null;
+        $this->setInflections($inflections, $replacements);
 
         return $this;
     }
@@ -211,5 +257,37 @@ class Adjective extends Card
             ->atPath('group')
             ->addViolation()
         ;
+    }
+
+    /**
+     * @param ?array<string> $replacements
+     */
+    private function updateSearchInflections(
+        ?array $replacements = null
+    ): Adjective {
+        $this->searchInflections = [];
+        array_walk_recursive($this->inflections, function ($value) {
+            array_push($this->searchInflections, $value);
+        });
+
+        if (null === $replacements) {
+            return $this;
+        }
+
+        [$base, $altBase] = $replacements;
+        $bases = [$base, mb_substr($base, 0, -1)];
+        $altBases = [$altBase, mb_substr($altBase, 0, -1)];
+
+        $altInflections = str_replace(
+            $bases,
+            $altBases,
+            $this->searchInflections
+        );
+        $this->searchInflections = array_merge(
+            $altInflections,
+            $this->searchInflections
+        );
+
+        return $this;
     }
 }

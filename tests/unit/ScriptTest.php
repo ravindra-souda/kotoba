@@ -193,6 +193,52 @@ class ScriptTest extends TestCase
     }
 
     /**
+     * @return array<array<null|false|string>>
+     */
+    public function detectProvider(): array
+    {
+        /** @var App\Document\Noun $mock */
+        $mock = $this->getMockForTrait(ScriptTrait::class);
+        $tests = [
+            ['あ', $mock::HIRAGANA],
+            ['しゃ', $mock::HIRAGANA],
+            ['ひ、び、か', $mock::HIRAGANA],
+            ['ゐ', $mock::HIRAGANA],
+            ['ア', $mock::KATAKANA],
+            ['シュ', $mock::KATAKANA],
+            ['ヒ、ビ、カ', $mock::KATAKANA],
+            ['ヰ', $mock::KATAKANA],
+            ['a', $mock::ROMAJI],
+            ['ā', $mock::ROMAJI],
+            'empty' => ['', null],
+            'integer' => ['1', null],
+            ['字', null],
+            ['食べる', null],
+            ['ちュ', null],
+            ['チょ', null],
+            ['あa', null],
+            ['アa', null],
+            ['あア', null],
+        ];
+
+        return $this->setProviderKeys($tests);
+    }
+
+    /**
+     * @dataProvider detectProvider
+     *
+     * @param ?string $string
+     */
+    public function testDetect(
+        ?string $string,
+        string|null $expected,
+    ): void {
+        /** @var App\Document\Noun $mock */
+        $mock = $this->getMockForTrait(ScriptTrait::class);
+        $this->assertEquals($mock->detect($string), $expected);
+    }
+
+    /**
      * @param array<int|string,array<null|bool|string>> $tests
      *
      * @return array<string,array<null|bool|string>>

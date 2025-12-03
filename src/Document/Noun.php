@@ -4,16 +4,36 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchNounByCode;
+use App\Filter\WithBikagoFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiFilter(
+    SearchFilter::class,
+    // hiragana and kanji will be processed through WithBikagoFilter
+    properties: [
+        'katakana' => 'start',
+        'romaji' => 'istart',
+    ],
+)]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: ['romaji'],
+    arguments: ['orderParameterName' => 'order'],
+)]
+#[ApiFilter(WithBikagoFilter::class)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -26,6 +46,8 @@ use Symfony\Component\Validator\Constraints as Assert;
                controller */
             read: false
         ),
+        new Get(),
+        new GetCollection(),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
