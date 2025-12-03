@@ -4,17 +4,28 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchKanjiByCode;
+use App\Filter\YomiFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'kanji' => 'exact',
+    ],
+)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -27,6 +38,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                controller */
             read: false
         ),
+        new Get(),
+        new GetCollection(),
     ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
@@ -70,7 +83,8 @@ class Kanji extends Card
         ),
     ])]
     #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'hash')]
+    #[MongoDB\Field(type: 'collection')]
+    #[ApiFilter(YomiFilter::class)]
     protected ?array $kunyomi = null;
 
     /** Must be written using only lowercase roman or katakana characters,
@@ -85,7 +99,8 @@ class Kanji extends Card
         ),
     ])]
     #[Groups(['read', 'write'])]
-    #[MongoDB\Field(type: 'hash')]
+    #[MongoDB\Field(type: 'collection')]
+    #[ApiFilter(YomiFilter::class)]
     protected ?array $onyomi = null;
 
     public function getKanji(): string
@@ -157,7 +172,7 @@ class Kanji extends Card
 
     public function getSlugReference(): string
     {
-        return explode(';', $this->meaning['en'][0], 2)[0];
+        return $this->meaning['en'][0][0];
     }
 
     public function hasKunyomiOrOnyomi(): bool

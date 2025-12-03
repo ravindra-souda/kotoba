@@ -6,11 +6,11 @@ namespace App\Document\Trait\Script;
 
 trait ScriptTrait
 {
-    private const HIRAGANA = 'hiragana';
+    public const HIRAGANA = 'hiragana';
 
-    private const KATAKANA = 'katakana';
+    public const KATAKANA = 'katakana';
 
-    private const ROMAJI = 'romaji';
+    public const ROMAJI = 'romaji';
 
     private const SHORT = [
         'hiragana' => [
@@ -216,6 +216,23 @@ trait ScriptTrait
         return self::isRomaji($romaji) ? $romaji : false;
     }
 
+    public static function detect(string $string): ?string
+    {
+        if (self::isHiragana($string)) {
+            return self::HIRAGANA;
+        }
+
+        if (self::isKatakana($string)) {
+            return self::KATAKANA;
+        }
+
+        if (self::isRomaji($string)) {
+            return self::ROMAJI;
+        }
+
+        return null;
+    }
+
     private static function convert(
         string $string,
         string $to,
@@ -223,7 +240,7 @@ trait ScriptTrait
     ): string {
         $from = self::detect($string);
 
-        if ($from === $to) {
+        if ($from === $to || null === $from) {
             return $string;
         }
 
@@ -308,19 +325,6 @@ trait ScriptTrait
         }
 
         return str_replace(self::GLIDES_TO_FIX, self::GLIDES_FIXED, $string);
-    }
-
-    private static function detect(string $string): string
-    {
-        if (self::isHiragana($string)) {
-            return self::HIRAGANA;
-        }
-
-        if (self::isKatakana($string)) {
-            return self::KATAKANA;
-        }
-
-        return self::ROMAJI;
     }
 
     private static function isHiragana(string $string): bool

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Document\Trait;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use App\Document\Card;
+use App\Filter\MeaningFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -39,9 +41,16 @@ trait MeaningTrait
                 'en' => ['high; tall', 'expensive; high-priced'],
                 'fr' => ['haut; grand', 'coûteux; cher'],
             ],
+        ],
+        /* needed for unit-testing
+        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification
+        */
+        jsonSchemaContext: [
+            'type' => 'object',
         ]
     )]
     #[MongoDB\Field(type: 'hash')]
+    #[ApiFilter(MeaningFilter::class)]
     protected array $meaning = [
         'en' => [''],
         'fr' => [''],
@@ -65,7 +74,18 @@ trait MeaningTrait
      */
     public function getMeaning(): array
     {
-        return $this->meaning;
+        /*  displayed as 'en' => ['high; tall', 'expensive; high-priced'],
+            persisted as 'en' => [['high', 'tall'], ['expensive', 'high-priced']]
+        */
+        $displayedMeaning = [];
+        foreach ($this->meaning as $userLang => $userMeanings) {
+            foreach ($userMeanings as $userMeaning) {
+                /** @var array<string> $userMeaning */
+                $displayedMeaning[$userLang][] = implode('; ', $userMeaning);
+            }
+        }
+
+        return $displayedMeaning;
     }
 
     /**
@@ -81,12 +101,19 @@ trait MeaningTrait
             return 1;
         }
 
-        foreach ($meaning as $userLang => $userMeaning) {
+        foreach ($meaning as $userLang => $userMeanings) {
             if (!in_array($userLang, self::ALLOWED_LANGS)) {
                 return 2;
             }
-            if (!is_array($userMeaning) || '' === trim($userMeaning[0] ?? '')) {
+            if (!is_array($userMeanings) || empty($userMeanings[0])) {
                 return 3;
+            }
+            foreach ($userMeanings as $userMeaning) {
+                /** @var array<string> $userMeaning */
+                if (!is_array($userMeaning)
+                    || '' === trim($userMeaning[0] ?? '')) {
+                    return 3;
+                }
             }
         }
 
@@ -98,6 +125,12 @@ trait MeaningTrait
      */
     public function setMeaning(array $meaning): static
     {
+        /*  words will be persisted in arrays for easy search
+            displayed as 'en' => ['high; tall', 'expensive; high-priced'],
+            persisted as 'en' => [['high', 'tall'], ['expensive', 'high-priced']]
+        */
+        array_walk_recursive($meaning, fn (&$v) => $v = explode(';', $v));
+
         return $this->setLowerAndTrimmedOrNull('meaning', $meaning, false);
     }
 

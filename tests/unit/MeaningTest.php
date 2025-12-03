@@ -21,24 +21,50 @@ class MeaningTest extends TestCase
         $mandatoryLang = Noun::getMandatoryLang();
         $secondaryLang = Noun::getAllowedLangs()[1];
 
+        /*
+        'meaning' => [
+            'en' => [
+                ['high', 'tall'],
+                ['expensive', 'high-priced']
+            ]
+            'fr' => [
+                ['haut', 'grand'],
+                ['onéreux', 'à prix fort']
+            ]
+        ]
+        */
+
         return [
             '0_mandatoryLang' => [
                 [
-                    $mandatoryLang => ['to eat'],
+                    $mandatoryLang => [
+                        ['high', 'tall'],
+                        ['expensive', 'high-priced'],
+                    ],
                 ],
                 0,
             ],
             '0_mandatoryLang_and_secondaryLang' => [
                 [
-                    $mandatoryLang => ['to eat'],
-                    $secondaryLang => ['manger'],
+                    $mandatoryLang => [
+                        ['high', 'tall'],
+                        ['expensive', 'high-priced'],
+                    ],
+                    $secondaryLang => [
+                        ['haut', 'grand'],
+                        ['onéreux', 'à prix fort'],
+                    ],
                 ],
                 0,
             ],
             '0_secondaryLang_and_mandatoryLang' => [
                 [
-                    $secondaryLang => ['manger'],
-                    $mandatoryLang => ['to eat'],
+                    $secondaryLang => [
+                        ['onéreux', 'à prix fort'],
+                    ],
+                    $mandatoryLang => [
+                        ['expensive', 'high-priced'],
+                    ],
                 ],
                 0,
             ],
@@ -48,15 +74,23 @@ class MeaningTest extends TestCase
             '1_null_array' => [[null], 1],
             '1_missing_mandatoryLang' => [
                 [
-                    $secondaryLang => ['manger'],
+                    $secondaryLang => [
+                        ['haut', 'grand'],
+                    ],
                 ],
                 1,
             ],
             '2_unknown_lang' => [
                 [
-                    $secondaryLang => ['manger'],
-                    $mandatoryLang => ['to eat'],
-                    'dummy' => ['???'],
+                    $secondaryLang => [
+                        ['onéreux', 'à prix fort'],
+                    ],
+                    $mandatoryLang => [
+                        ['expensive', 'high-priced'],
+                    ],
+                    'dummy' => [
+                        ['???'],
+                    ],
                 ],
                 2,
             ],
@@ -66,15 +100,39 @@ class MeaningTest extends TestCase
                 ],
                 3,
             ],
+            '3_mandatoryLang_empty_level2' => [
+                [
+                    $mandatoryLang => [
+                        ['   '],
+                    ],
+                ],
+                3,
+            ],
             '3_mandatoryLang_null' => [
                 [
                     $mandatoryLang => [null],
                 ],
                 3,
             ],
+            '3_mandatoryLang_null_level2' => [
+                [
+                    $mandatoryLang => [
+                        [null],
+                    ],
+                ],
+                3,
+            ],
             '3_mandatoryLang_not_an_array' => [
                 [
-                    $mandatoryLang => 'to eat',
+                    $mandatoryLang => 'high',
+                ],
+                3,
+            ],
+            '3_mandatoryLang_not_an_array_level2' => [
+                [
+                    $mandatoryLang => [
+                        'high',
+                    ],
                 ],
                 3,
             ],
