@@ -20,22 +20,25 @@ abstract class AbstractKotobaDocument
         'must be one of these: {{ choices }}';
 
     /** set by MongoDB */
-    #[Groups('read')]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'date_immutable')]
     protected ?\DateTimeImmutable $createdAt = null;
 
     /** set by MongoDB */
-    #[Groups('read')]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'date_immutable')]
     protected ?\DateTimeImmutable $updatedAt = null;
 
     #[ApiProperty(identifier: false)]
-    #[Groups('read')]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Id(strategy: 'AUTO', type: 'object_id')]
     protected string $id;
 
     #[MongoDB\Field(type: 'int')]
     protected int $increment;
+
+    #[MongoDB\Field(type: 'string')]
+    protected string $slug;
 
     abstract public function finalizeTasks(): self;
 
@@ -45,6 +48,8 @@ abstract class AbstractKotobaDocument
     abstract public static function getFields(): array;
 
     abstract public function getSlugReference(): string;
+
+    public function onDelete(): void {}
 
     final public function trimFields(): static
     {
@@ -94,14 +99,14 @@ abstract class AbstractKotobaDocument
     }
 
     // see App\EventListener\PrePersistListener
-    public function setCreatedAt(\DateTimeImmutable $date): self
+    public function setCreatedAt(\DateTimeImmutable $date): static
     {
         $this->createdAt = $date;
 
         return $this;
     }
 
-    public function setId(string $id): self
+    public function setId(string $id): static
     {
         $this->id = $id;
 
@@ -109,15 +114,23 @@ abstract class AbstractKotobaDocument
     }
 
     // see App\EventListener\PrePersistListener
-    public function setIncrement(int $increment): self
+    public function setIncrement(int $increment): static
     {
         $this->increment = $increment;
 
         return $this;
     }
 
+    // see App\EventListener\Trait\SlugifyCodeTrait
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
     // see App\EventListener\PreUpdateListener
-    public function setUpdatedAt(\DateTimeImmutable $date): self
+    public function setUpdatedAt(\DateTimeImmutable $date): static
     {
         $this->updatedAt = $date;
 
@@ -161,5 +174,14 @@ abstract class AbstractKotobaDocument
         $this->{$prop} = $value;
 
         return $this;
+    }
+
+    public final static function sortByIri(array $iris): array
+    {
+        usort($iris, fn(string $i1, string $i2) =>
+            preg_replace('/\d+-/', '', $i1) <=> preg_replace('/\d+-/', '', $i2)
+        );
+
+        return $iris;
     }
 }

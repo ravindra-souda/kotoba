@@ -41,7 +41,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -67,7 +67,7 @@ class Kanji extends Card
 
     /** Must be written using only kanji */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected string $kanji = '';
 
@@ -82,7 +82,7 @@ class Kanji extends Card
             message: self::VALIDATION_ERR_KUNYOMI
         ),
     ])]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
     #[ApiFilter(YomiFilter::class)]
     protected ?array $kunyomi = null;
@@ -98,7 +98,7 @@ class Kanji extends Card
             message: self::VALIDATION_ERR_ONYOMI
         ),
     ])]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
     #[ApiFilter(YomiFilter::class)]
     protected ?array $onyomi = null;
@@ -130,7 +130,7 @@ class Kanji extends Card
         return 1 === preg_match('/^\p{Han}$/um', $string);
     }
 
-    public function setKanji(string $kanji): Kanji
+    public function setKanji(string $kanji): static
     {
         return $this->setLowerAndTrimmedOrNull('kanji', $kanji);
     }
@@ -138,7 +138,7 @@ class Kanji extends Card
     /**
      * @param ?array<string> $kunyomi
      */
-    public function setKunyomi(?array $kunyomi): Kanji
+    public function setKunyomi(?array $kunyomi): static
     {
         return $this->setLowerAndTrimmedOrNull('kunyomi', $kunyomi);
     }
@@ -146,13 +146,13 @@ class Kanji extends Card
     /**
      * @param ?array<string> $onyomi
      */
-    public function setOnyomi(?array $onyomi): Kanji
+    public function setOnyomi(?array $onyomi): static
     {
         return $this->setLowerAndTrimmedOrNull('onyomi', $onyomi);
     }
 
     // called right before persist, see App\State\SaveProcessor
-    public function finalizeTasks(): self
+    public function finalizeTasks(): static
     {
         return $this->fillKunyomi()->fillOnyomi();
     }
@@ -218,14 +218,14 @@ class Kanji extends Card
         ;
     }
 
-    private function fillKunyomi(): Kanji
+    private function fillKunyomi(): static
     {
         $this->kunyomi = array_map([$this, 'toHiragana'], $this->kunyomi ?? []);
 
         return $this;
     }
 
-    private function fillOnyomi(): Kanji
+    private function fillOnyomi(): static
     {
         $this->onyomi = array_map(
             fn ($v) => $this->toKatakana($v, false),

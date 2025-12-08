@@ -21,7 +21,7 @@ trait KatakanaTrait
         max: self::KATAKANA_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected ?string $katakana = null;
 

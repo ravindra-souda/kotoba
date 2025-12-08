@@ -12,12 +12,8 @@ trait SlugifyCodeTrait
 
     private function slugifyCode(mixed $doc): void
     {
-        $doc
-            ->setCode(
-                $this->slugify->slugify(
-                    $doc->getIncrement().'-'.$doc->getSlugReference()
-                )
-            )
-        ;
+        $slug = $this->slugify->slugify($doc->getSlugReference());
+        $doc->setCode($doc->getIncrement().'-'.$slug)
+            ->setSlug($slug);
     }
 }

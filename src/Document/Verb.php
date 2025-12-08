@@ -51,7 +51,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -123,7 +123,7 @@ class Verb extends Card
         type: 'array',
         message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'hash')]
     #[ApiProperty(
         /* needed for unit-testing
@@ -183,17 +183,17 @@ class Verb extends Card
     /**
      * @var array<string>
      */
-    #[Groups(['read'])]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'collection')]
     protected array $searchInflections = [];
 
     /** Reviewed by users after automatic conjugation */
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'bool')]
     protected bool $reviewed = false;
 
     // called right before persist, see App\State\SaveProcessor
-    public function finalizeTasks(): self
+    public function finalizeTasks(): static
     {
         return $this->fillRomaji()->conjugate();
     }
@@ -291,7 +291,7 @@ class Verb extends Card
     /**
      * @param array<string,array<mixed>|string> $inflections
      */
-    public function setInflections(array $inflections): Verb
+    public function setInflections(array $inflections): static
     {
         return $this
             ->setLowerAndTrimmedOrNull('inflections', $inflections, false)
@@ -299,7 +299,7 @@ class Verb extends Card
         ;
     }
 
-    public function setReviewed(bool $reviewed): Verb
+    public function setReviewed(bool $reviewed): static
     {
         $this->reviewed = $reviewed;
 
@@ -356,7 +356,7 @@ class Verb extends Card
         ;
     }
 
-    public function conjugate(): Verb
+    public function conjugate(): static
     {
         if (0 !== $this->hasValidGroup($this->inflections)) {
             throw new \Exception(
@@ -393,7 +393,7 @@ class Verb extends Card
         return $this->romaji;
     }
 
-    private function updateSearchInflections(): Verb
+    private function updateSearchInflections(): static
     {
         $this->searchInflections = [];
         array_walk_recursive($this->inflections, function ($value) {
@@ -403,7 +403,7 @@ class Verb extends Card
         return $this;
     }
 
-    private function fillRomaji(): self
+    private function fillRomaji(): static
     {
         $katakanaString = str_replace('る', 'ル', $this->katakana ?? '');
         $this->romaji ??= $this->toRomaji($this->hiragana ?? $katakanaString);
@@ -411,7 +411,7 @@ class Verb extends Card
         return $this;
     }
 
-    private function conjugateIchidan(): Verb
+    private function conjugateIchidan(): static
     {
         $inflections = $this->getInflections();
         $root = mb_substr($inflections['dictionary'], 0, -1);
@@ -425,7 +425,7 @@ class Verb extends Card
         return $this->fillEmptyInflections($autoConjugations);
     }
 
-    private function conjugateIrregular(): Verb
+    private function conjugateIrregular(): static
     {
         $dict = $this->getInflections()['dictionary'];
 
@@ -439,7 +439,7 @@ class Verb extends Card
         ;
     }
 
-    private function conjugateGodan(): Verb
+    private function conjugateGodan(): static
     {
         $inflections = $this->getInflections();
         $root = mb_substr($inflections['dictionary'], 0, -1);
@@ -460,7 +460,7 @@ class Verb extends Card
     /**
      * @param array<string,array<mixed>|string> $autoConjugations
      */
-    private function fillEmptyInflections(array $autoConjugations): Verb
+    private function fillEmptyInflections(array $autoConjugations): static
     {
         $inflections = $this->getInflections();
 
@@ -477,7 +477,7 @@ class Verb extends Card
     /**
      * @param array<string,array<mixed>|string> $inflections
      */
-    private function fixIrregularities(array $inflections): Verb
+    private function fixIrregularities(array $inflections): static
     {
         switch (trim($inflections['dictionary'])) {
             case 'いく':

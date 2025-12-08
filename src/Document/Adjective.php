@@ -52,7 +52,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -99,7 +99,7 @@ class Adjective extends Card
         type: 'array',
         message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
     )]
-    #[Groups(['read'])]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'hash')]
     #[ApiProperty(
         /* needed for unit-testing
@@ -122,7 +122,7 @@ class Adjective extends Card
     /**
      * @var array<string>
      */
-    #[Groups(['read'])]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'collection')]
     protected array $searchInflections = [];
 
@@ -141,14 +141,14 @@ class Adjective extends Card
     public function setInflections(
         array $inflections,
         ?array $replacements = null
-    ): Adjective {
+    ): static {
         return $this
             ->setLowerAndTrimmedOrNull('inflections', $inflections)
             ->updateSearchInflections($replacements)
         ;
     }
 
-    public function conjugate(): Adjective
+    public function conjugate(): static
     {
         if (0 !== $this->isValidGroup()) {
             throw new \Exception(self::ERR_INCORRECT_GROUP);
@@ -202,7 +202,7 @@ class Adjective extends Card
     }
 
     // called right before persist, see App\State\SaveProcessor
-    public function finalizeTasks(): self
+    public function finalizeTasks(): static
     {
         return $this->fillRomaji()->conjugate();
     }
@@ -264,7 +264,7 @@ class Adjective extends Card
      */
     private function updateSearchInflections(
         ?array $replacements = null
-    ): Adjective {
+    ): static {
         $this->searchInflections = [];
         array_walk_recursive($this->inflections, function ($value) {
             array_push($this->searchInflections, $value);

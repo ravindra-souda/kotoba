@@ -34,7 +34,7 @@ trait MeaningTrait
      * @var array<string,array<string>>
      */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[ApiProperty(
         openapiContext: [
             'example' => [

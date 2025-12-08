@@ -47,7 +47,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -71,7 +71,7 @@ class Kana extends Card
         'must be exactly one mora long and written using only katakana';
 
     // called right before persist, see App\State\SaveProcessor
-    public function finalizeTasks(): self
+    public function finalizeTasks(): static
     {
         return $this->fillRomaji();
     }

@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -78,7 +78,7 @@ class Noun extends Card
         choices: self::ALLOWED_BIKAGO,
         message: self::VALIDATION_ERR_ENUM,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field]
     protected ?string $bikago = null;
 
@@ -87,7 +87,7 @@ class Noun extends Card
         return $this->bikago;
     }
 
-    public function setBikago(?string $bikago): Noun
+    public function setBikago(?string $bikago): static
     {
         $this->bikago = $bikago;
 
@@ -95,7 +95,7 @@ class Noun extends Card
     }
 
     // called right before persist, see App\State\SaveProcessor
-    public function finalizeTasks(): self
+    public function finalizeTasks(): static
     {
         return $this->dedupBikago()->fillRomaji();
     }
@@ -121,7 +121,7 @@ class Noun extends Card
         return $this->romaji;
     }
 
-    private function dedupBikago(): self
+    private function dedupBikago(): static
     {
         if (null === $this->bikago) {
             return $this;
