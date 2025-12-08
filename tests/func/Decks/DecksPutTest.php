@@ -132,6 +132,117 @@ class DecksPutTest extends ApiTestCase
         ],
     ];
 
+    private const PUT_DECKS_WITH_CARDS = [
+        'any' => [
+            'title' => 'Welcome to the urban jungle',
+            'description' => 'Surviving guide to this new city',
+            'type' => 'any',
+            'color' => '#2f2492e0',
+        ],
+        'nouns' => [
+            'title' => 'Pets',
+            'description' => 'Your friendly small companions',
+            'type' => 'noun',
+            'color' => '#7c280eb0',
+        ],
+    ];
+
+    private const PUT_CARDS_ATTACHED_TO_DECKS = [
+        'any' => [
+            'nouns' => [
+                [
+                    'hiragana' => 'まち',
+                    'kanji' => '町',
+                    'jlpt' => 5,
+                    'meaning' => [
+                        'en' => ['town, block, neighbourhood'],
+                        'fr' => ['ville, quartier, voisinnage'],
+                    ],
+                ], [
+                    'katakana' => 'コンビニ',
+                    'jlpt' => 5,
+                    'meaning' => [
+                        'en' => ['convenience store'],
+                        'fr' => ['commerce de proximité, supérette'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                [
+                    'hiragana' => 'はたらく',
+                    'kanji' => '働く',
+                    'jlpt' => 5,
+                    'group' => 'godan',
+                    'meaning' => [
+                        'en' => ['to work'],
+                    ],
+                    'inflections' => [
+                        'dictionary' => '働く',
+                    ],
+                ], [
+                    'hiragana' => 'あるく',
+                    'kanji' => '歩く',
+                    'jlpt' => 5,
+                    'group' => 'godan',
+                    'meaning' => [
+                        'en' => ['to walk'],
+                    ],
+                    'inflections' => [
+                        'dictionary' => '歩く',
+                    ],
+                ],
+            ],
+            'adjectives' => [
+                [
+                    'hiragana' => 'にぎやか',
+                    'kanji' => '賑やか',
+                    'jlpt' => 5,
+                    'group' => 'na',
+                    'meaning' => [
+                        'en' => ['bustling, busy, crowded, lively, prosperous'],
+                    ],
+                ],
+            ],
+        ],
+        'nouns' => [
+            'nouns' => [
+                [
+                    'hiragana' => 'うさぎ',
+                    'kanji' => '兎',
+                    'jlpt' => 5,
+                    'meaning' => [
+                        'en' => ['rabbit'],
+                    ],
+                ], [
+                    'katakana' => 'ハムスター',
+                    'jlpt' => 5,
+                    'meaning' => [
+                        'en' => ['hamster'],
+                    ],
+                ],
+            ],
+        ],
+        'both' => [
+            'nouns' => [
+                [
+                    'hiragana' => 'ねこ',
+                    'kanji' => '猫',
+                    'jlpt' => 5,
+                    'meaning' => [
+                        'en' => ['cat'],
+                    ],
+                ], [
+                    'hiragana' => 'こいぬ',
+                    'kanji' => '子犬',
+                    'jlpt' => 5,
+                    'meaning' => [
+                        'en' => ['puppy'],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
     /**
      * @return array<array<array<string>>>
      */
