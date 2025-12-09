@@ -182,11 +182,11 @@ class VerbsGetTest extends ApiTestCase
                 'expected' => [],
             ],
             'meaning_lang_missing' => [
-                'url' => '?meaning[search]=to open&order[romaji]=asc',
+                'url' => '?romaji=pagination&meaning[search]=to open&order[romaji]=asc',
                 'expected' => self::GET_SORT_FIXTURES,
             ],
             'meaning_search_missing' => [
-                'url' => '?meaning[lang]=en&order[romaji]=asc',
+                'url' => '?romaji=pagination&meaning[lang]=en&order[romaji]=asc',
                 'expected' => self::GET_SORT_FIXTURES,
             ],
             'romaji' => [
@@ -272,7 +272,7 @@ class VerbsGetTest extends ApiTestCase
                 ],
             ],
             'search_and_order' => [
-                'url' => '?hiragana=あ&order[romaji]=asc',
+                'url' => '?romaji=paginationa&hiragana=あ&order[romaji]=asc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana'],
                     self::GET_SEARCH_FIXTURES['romaji'],

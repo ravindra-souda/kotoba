@@ -334,7 +334,7 @@ class NounsGetTest extends ApiTestCase
                 ],
             ],
             'search_and_order' => [
-                'url' => '?hiragana=う&order[romaji]=desc',
+                'url' => '?romaji=paginationu&hiragana=う&order[romaji]=desc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana_3'],
                     self::GET_SEARCH_FIXTURES['kanji_3'],
