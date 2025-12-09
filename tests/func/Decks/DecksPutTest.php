@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Document\Deck;
+use App\Document\{Deck, Adjective, Noun, Verb};
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -142,106 +142,145 @@ class DecksPutTest extends ApiTestCase
         'nouns' => [
             'title' => 'Pets',
             'description' => 'Your friendly small companions',
-            'type' => 'noun',
+            'type' => 'nouns',
             'color' => '#7c280eb0',
         ],
     ];
 
     private const PUT_CARDS_ATTACHED_TO_DECKS = [
-        'any' => [
-            'nouns' => [
-                [
-                    'hiragana' => 'まち',
-                    'kanji' => '町',
-                    'jlpt' => 5,
-                    'meaning' => [
-                        'en' => ['town, block, neighbourhood'],
-                        'fr' => ['ville, quartier, voisinnage'],
-                    ],
-                ], [
-                    'katakana' => 'コンビニ',
-                    'jlpt' => 5,
-                    'meaning' => [
-                        'en' => ['convenience store'],
-                        'fr' => ['commerce de proximité, supérette'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                [
-                    'hiragana' => 'はたらく',
-                    'kanji' => '働く',
-                    'jlpt' => 5,
-                    'group' => 'godan',
-                    'meaning' => [
-                        'en' => ['to work'],
-                    ],
-                    'inflections' => [
-                        'dictionary' => '働く',
-                    ],
-                ], [
-                    'hiragana' => 'あるく',
-                    'kanji' => '歩く',
-                    'jlpt' => 5,
-                    'group' => 'godan',
-                    'meaning' => [
-                        'en' => ['to walk'],
-                    ],
-                    'inflections' => [
-                        'dictionary' => '歩く',
-                    ],
-                ],
-            ],
-            'adjectives' => [
-                [
-                    'hiragana' => 'にぎやか',
-                    'kanji' => '賑やか',
-                    'jlpt' => 5,
-                    'group' => 'na',
-                    'meaning' => [
-                        'en' => ['bustling, busy, crowded, lively, prosperous'],
-                    ],
-                ],
+        'nouns_city_1' => [
+            'hiragana' => 'まち',
+            'kanji' => '町',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['town, block, neighbourhood'],
+                'fr' => ['ville, quartier, voisinnage'],
             ],
         ],
-        'nouns' => [
-            'nouns' => [
-                [
-                    'hiragana' => 'うさぎ',
-                    'kanji' => '兎',
-                    'jlpt' => 5,
-                    'meaning' => [
-                        'en' => ['rabbit'],
-                    ],
-                ], [
-                    'katakana' => 'ハムスター',
-                    'jlpt' => 5,
-                    'meaning' => [
-                        'en' => ['hamster'],
-                    ],
-                ],
+        'nouns_city_2' => [
+            'katakana' => 'コンビニ',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['convenience store'],
+                'fr' => ['commerce de proximité, supérette'],
             ],
         ],
-        'both' => [
-            'nouns' => [
-                [
-                    'hiragana' => 'ねこ',
-                    'kanji' => '猫',
-                    'jlpt' => 5,
-                    'meaning' => [
-                        'en' => ['cat'],
-                    ],
-                ], [
-                    'hiragana' => 'こいぬ',
-                    'kanji' => '子犬',
-                    'jlpt' => 5,
-                    'meaning' => [
-                        'en' => ['puppy'],
-                    ],
-                ],
+        'nouns_pets_1' => [
+            'hiragana' => 'うさぎ',
+            'kanji' => '兎',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['rabbit'],
+            ],
+        ],
+        'nouns_pets_2' => [
+            'katakana' => 'ハムスター',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['hamster'],
+            ],
+        ],
+        'nouns_both_1' => [
+            'hiragana' => 'ねこ',
+            'kanji' => '猫',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['cat'],
+            ],
+        ],
+        'nouns_both_2' => [
+            'hiragana' => 'こいぬ',
+            'kanji' => '子犬',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['puppy'],
+            ],
+        ],
+        'verbs_city_1' => [
+            'hiragana' => 'はたらく',
+            'kanji' => '働く',
+            'jlpt' => 5,
+            'group' => 'godan',
+            'meaning' => [
+                'en' => ['to work'],
+            ],
+            'inflections' => [
+                'dictionary' => '働く',
+            ],
+        ],
+        'verbs_city_2' => [
+            'hiragana' => 'あるく',
+            'kanji' => '歩く',
+            'jlpt' => 5,
+            'group' => 'godan',
+            'meaning' => [
+                'en' => ['to walk'],
+            ],
+            'inflections' => [
+                'dictionary' => '歩く',
+            ],
+        ],
+        'adjectives_city_1' => [
+            'hiragana' => 'にぎやか',
+            'kanji' => '賑やか',
+            'jlpt' => 5,
+            'group' => 'na',
+            'meaning' => [
+                'en' => ['bustling, busy, crowded, lively, prosperous'],
             ],
         ],
     ];
+
+    private const PUT_DECKS_CARDS_ASSOCIATIONS = [
+        'any' => [
+            'nouns_city_1', 'nouns_city_2', 'nouns_both_1', 'nouns_both_2',
+            'verbs_city_1', 'verbs_city_2', 'adjectives_city_1',
+        ],
+        'nouns' => [
+            'nouns_pets_1', 'nouns_pets_2', 'nouns_both_1', 'nouns_both_2',
+        ],
+    ];
+
+    private const CARDS_CLASSES = [
+        'adjectives' => Adjective::class,
+        'nouns' => Noun::class,
+        'verbs' => Verb::class,
+    ];
+
+    private static array $objectIds;
+
+    public static function setUpBeforeClass(): void
+    {
+        foreach (self::PUT_DECKS_WITH_CARDS as $payload) {
+            static::createClient()->request(
+                'POST',
+                '/api/decks',
+                ['json' => $payload]
+            );
+
+            static::assertResponseStatusCodeSame(201);
+            static::assertMatchesResourceItemJsonSchema(Deck::class);
+        }
+
+        foreach (self::PUT_CARDS_ATTACHED_TO_DECKS as $key => $payload) {
+            $path = explode('_', $key, 2)[0];
+            $response = static::createClient()->request(
+                'POST',
+                '/api/cards/'.$path,
+                ['json' => $payload]
+            );
+
+            static::assertResponseStatusCodeSame(201);
+            static::assertMatchesResourceItemJsonSchema(
+                self::CARDS_CLASSES[$path]
+            );
+
+            $content = json_decode($response->getContent(), true);
+            static::assertArrayHasKey('id', $content);
+            
+            static::$objectIds[$key] = $content['id'];
+        }
+    }
 
     /**
      * @return array<array<array<string>>>
