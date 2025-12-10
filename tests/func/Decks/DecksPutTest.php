@@ -247,7 +247,14 @@ class DecksPutTest extends ApiTestCase
         'verbs' => Verb::class,
     ];
 
-    private static array $objectIds;
+    private static array $associations = [
+        'any' => [
+            'cards' => [],
+        ],
+        'nouns' => [
+            'cards' => [],
+        ],
+    ];
 
     public static function setUpBeforeClass(): void
     {
@@ -261,6 +268,8 @@ class DecksPutTest extends ApiTestCase
             static::assertResponseStatusCodeSame(201);
             static::assertMatchesResourceItemJsonSchema(Deck::class);
         }
+
+        $objectIds = [];
 
         foreach (self::PUT_CARDS_ATTACHED_TO_DECKS as $key => $payload) {
             $path = explode('_', $key, 2)[0];
@@ -278,7 +287,13 @@ class DecksPutTest extends ApiTestCase
             $content = json_decode($response->getContent(), true);
             static::assertArrayHasKey('id', $content);
             
-            static::$objectIds[$key] = $content['id'];
+            $objectIds[$key] = $content['id'];
+        }
+
+        foreach (self::$associations as $deck => $cards) {
+            $names = array_flip(self::PUT_DECKS_CARDS_ASSOCIATIONS[$deck]);
+            $ids = array_intersect_key($objectIds, $names);
+            self::$associations[$deck]['cards'] = array_values($ids);
         }
     }
 
