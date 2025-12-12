@@ -68,6 +68,18 @@ class DecksPutTest extends ApiTestCase
             'title' => 'Basic vocab 3',
             'type' => Deck::ALLOWED_TYPES[0],
         ],
+        'association_any' => [
+            'title' => 'Associations: Welcome to the urban jungle',
+            'description' => 'Surviving guide to this new city',
+            'type' => 'any',
+            'color' => '#2f2492e0',
+        ],
+        'association_specific' => [
+            'title' => 'Associations: Pets',
+            'description' => 'Your friendly small companions',
+            'type' => 'nouns',
+            'color' => '#7c280eb0',
+        ],
         'color' => [
             ...self::PUT_COMPLETE_VALID_DECK,
             'title' => 'Basic vocab 4',
@@ -129,21 +141,6 @@ class DecksPutTest extends ApiTestCase
                 'color' => '#G1F2F3F4',
             ],
             'message' => 'color: '.Deck::VALIDATION_ERR_COLOR,
-        ],
-    ];
-
-    private const PUT_DECKS_WITH_CARDS = [
-        'any' => [
-            'title' => 'Welcome to the urban jungle',
-            'description' => 'Surviving guide to this new city',
-            'type' => 'any',
-            'color' => '#2f2492e0',
-        ],
-        'nouns' => [
-            'title' => 'Pets',
-            'description' => 'Your friendly small companions',
-            'type' => 'nouns',
-            'color' => '#7c280eb0',
         ],
     ];
 
@@ -236,7 +233,7 @@ class DecksPutTest extends ApiTestCase
             'nouns_city_1', 'nouns_city_2', 'nouns_both_1', 'nouns_both_2',
             'verbs_city_1', 'verbs_city_2', 'adjectives_city_1',
         ],
-        'nouns' => [
+        'specific' => [
             'nouns_pets_1', 'nouns_pets_2', 'nouns_both_1', 'nouns_both_2',
         ],
     ];
@@ -247,28 +244,21 @@ class DecksPutTest extends ApiTestCase
         'verbs' => Verb::class,
     ];
 
-    private static array $associations = [
+    private static array $decksWithAssociations = [
         'any' => [
+            ...self::PUT_VALID_DECKS['association_any'],
             'cards' => [],
         ],
-        'nouns' => [
+        'specific' => [
+            ...self::PUT_VALID_DECKS['association_specific'],
             'cards' => [],
         ],
     ];
 
+    private static array $cardToBeRemoved;
+
     public static function setUpBeforeClass(): void
     {
-        foreach (self::PUT_DECKS_WITH_CARDS as $payload) {
-            static::createClient()->request(
-                'POST',
-                '/api/decks',
-                ['json' => $payload]
-            );
-
-            static::assertResponseStatusCodeSame(201);
-            static::assertMatchesResourceItemJsonSchema(Deck::class);
-        }
-
         $objectIds = [];
 
         foreach (self::PUT_CARDS_ATTACHED_TO_DECKS as $key => $payload) {
@@ -288,12 +278,17 @@ class DecksPutTest extends ApiTestCase
             static::assertArrayHasKey('id', $content);
             
             $objectIds[$key] = $content['id'];
+
+            if ($key === 'nouns_both_1') {
+                self::$cardToBeRemoved['path'] = $content['@id'];
+                self::$cardToBeRemoved['id'] = $content['id'];
+            }
         }
 
-        foreach (self::$associations as $deck => $cards) {
+        foreach (self::$decksWithAssociations as $deck => $cards) {
             $names = array_flip(self::PUT_DECKS_CARDS_ASSOCIATIONS[$deck]);
             $ids = array_intersect_key($objectIds, $names);
-            self::$associations[$deck]['cards'] = array_values($ids);
+            self::$decksWithAssociations[$deck]['cards'] = array_values($ids);
         }
     }
 
@@ -335,6 +330,18 @@ class DecksPutTest extends ApiTestCase
                 self::PUT_VALID_DECKS['type'],
                 self::PUT_VALID_DECKS['type'],
                 'basic-vocab-3',
+            ],
+            'association_any' => [
+                self::PUT_VALID_DECKS['association_any'],
+                self::$decksWithAssociations['any'],
+                self::$decksWithAssociations['any'],
+                'welcome-to-the-urban-jungle',
+            ],
+            'association_specific' => [
+                self::PUT_VALID_DECKS['association_specific'],
+                self::$decksWithAssociations['specific'],
+                self::$decksWithAssociations['specific'],
+                'pets',
             ],
             'color' => [
                 [
@@ -400,6 +407,39 @@ class DecksPutTest extends ApiTestCase
         $this->assertArrayHasKey('updatedAt', $content);
         $this->assertStringStartsWith(date('Y-m-d'), $content['updatedAt']);
         $this->assertSame($expectedIncrement.'-'.$code, $content['code']);
+    }
+
+    /**
+     * @depends testDecksPutValid
+     */
+    public function testDecksAssociationsOrphanRemoval(): void
+    {
+        static::createClient()->request(
+            'DELETE',
+            self::$cardToBeRemoved['path'],
+        );
+        $this->assertResponseStatusCodeSame(204);
+
+        $response = static::createClient()->request(
+            'GET',
+            '/api/decks?title=associations',
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame(
+            'content-type',
+            'application/ld+json; charset=utf-8'
+        );
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertSame($content['hydra:totalItems'], 2);
+        $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
+
+        foreach ($content['hydra:member'] as $deck) {
+            $this->assertNotContains(
+                self::$cardToBeRemoved['id'], $deck['cards']
+            );
+        }
     }
 
     /**
