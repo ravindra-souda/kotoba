@@ -236,6 +236,13 @@ class DecksPutTest extends ApiTestCase
         'specific' => [
             'nouns_pets_1', 'nouns_pets_2', 'nouns_both_1', 'nouns_both_2',
         ],
+        'dedup' => [
+            'nouns_city_1', 'nouns_city_2', 'nouns_both_1', 'nouns_both_2',
+            'nouns_pets_1', 'nouns_pets_2', 'nouns_both_1', 'nouns_both_2',
+            'verbs_city_1', 'adjectives_city_1',
+            'nouns_pets_2', 'nouns_both_1', 'adjectives_city_1', 'verbs_city_1',
+            'verbs_city_2',
+        ],
     ];
 
     private const CARDS_CLASSES = [
@@ -251,6 +258,11 @@ class DecksPutTest extends ApiTestCase
         ],
         'specific' => [
             ...self::PUT_VALID_DECKS['association_specific'],
+            'cards' => [],
+        ],
+        'dedup' => [
+            ...self::PUT_VALID_DECKS['association_any'],
+            'title' => 'association dedup',
             'cards' => [],
         ],
     ];
@@ -342,6 +354,18 @@ class DecksPutTest extends ApiTestCase
                 self::$decksWithAssociations['specific'],
                 self::$decksWithAssociations['specific'],
                 'pets',
+            ],
+            'association_dedup' => [
+                [
+                    ...self::PUT_VALID_DECKS['association_any'],
+                    'title' => 'association dedup',
+                ],
+                self::$decksWithAssociations['dedup'],
+                [
+                    ...self::$decksWithAssociations['any'],
+                    'title' => 'association dedup',
+                ],
+                'association-dedup',
             ],
             'color' => [
                 [
@@ -440,6 +464,54 @@ class DecksPutTest extends ApiTestCase
                 self::$cardToBeRemoved['id'], $deck['cards']
             );
         }
+    }
+
+    /**
+     * @depends testDecksAssociationsOrphanRemoval
+     */
+    public function testDecksAssociationsUnknownCard(): void
+    {
+        $response = static::createClient()->request(
+            'GET',
+            '/api/decks?title=associations-welcome-to-the-urban-jungle',
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame(
+            'content-type',
+            'application/ld+json; charset=utf-8'
+        );
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertSame($content['hydra:totalItems'], 1);
+        $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
+
+        $expected = $content['hydra:member'][0];
+        $_id = $content['hydra:member'][0]['@id'];
+        $cards = $content['hydra:member'][0]['cards'];
+
+        $cardsWithUnknownCard = $cards[] = self::$cardToBeRemoved['id'];
+        $cardsWithUnknownCard = shuffle($cardsWithUnknownCard);
+        $payload = $expected;
+        $payload['cards'] = $cardsWithUnknownCard;
+
+        $response = static::createClient()->request(
+            'PUT',
+            $_id,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/ld+json',
+                ],
+                'json' => $payload,
+            ],
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame(
+            'content-type',
+            'application/ld+json; charset=utf-8'
+        );
+        $this->assertJsonContains($expected);
     }
 
     /**
