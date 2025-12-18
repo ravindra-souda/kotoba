@@ -45,6 +45,10 @@ class DecksPutTest extends ApiTestCase
             ...self::PUT_COMPLETE_VALID_DECK,
             'title' => 'put unknown type',
         ],
+        'association_specific' => [
+            ...self::PUT_VALID_DECKS['association_specific'],
+            'title' => 'put association specific',
+        ],
         'color' => [
             ...self::PUT_COMPLETE_VALID_DECK,
             'title' => 'put invalid color',
@@ -133,6 +137,16 @@ class DecksPutTest extends ApiTestCase
             'message' => [
                 'text' => 'type: '.Deck::VALIDATION_ERR_ENUM,
                 'values' => Deck::ALLOWED_TYPES,
+            ],
+        ],
+        'association_specific' => [
+            'fixture' => 'association_specific',
+            'payload' => [
+                'cards' => '*',
+            ],
+            'message' => [
+                'text' => 'cards: '.Deck::VALIDATION_ERR_CARDS_ASSOCIATION,
+                'values' => '*',
             ],
         ],
         'color' => [
@@ -251,7 +265,7 @@ class DecksPutTest extends ApiTestCase
         'verbs' => Verb::class,
     ];
 
-    private static array $decksWithAssociations = [
+    private array $decksWithAssociations = [
         'any' => [
             ...self::PUT_VALID_DECKS['association_any'],
             'cards' => [],
@@ -267,10 +281,16 @@ class DecksPutTest extends ApiTestCase
         ],
     ];
 
-    private static array $cardToBeRemoved;
+    private array $cardToBeRemoved;
 
-    public static function setUpBeforeClass(): void
+    private bool $cardsInitializationDone = false;
+
+    private function initializeCardsBeforeAllTests(): void
     {
+        if ($this->cardsInitializationDone) {
+            return;
+        }
+
         $objectIds = [];
 
         foreach (self::PUT_CARDS_ATTACHED_TO_DECKS as $key => $payload) {
@@ -281,27 +301,29 @@ class DecksPutTest extends ApiTestCase
                 ['json' => $payload]
             );
 
-            static::assertResponseStatusCodeSame(201);
-            static::assertMatchesResourceItemJsonSchema(
+            $this->assertResponseStatusCodeSame(201);
+            $this->assertMatchesResourceItemJsonSchema(
                 self::CARDS_CLASSES[$path]
             );
 
             $content = json_decode($response->getContent(), true);
-            static::assertArrayHasKey('id', $content);
+            $this->assertArrayHasKey('id', $content);
             
             $objectIds[$key] = $content['id'];
 
             if ($key === 'nouns_both_1') {
-                self::$cardToBeRemoved['path'] = $content['@id'];
-                self::$cardToBeRemoved['id'] = $content['id'];
+                $this->cardToBeRemoved['path'] = $content['@id'];
+                $this->cardToBeRemoved['id'] = $content['id'];
             }
         }
 
-        foreach (self::$decksWithAssociations as $deck => $cards) {
+        foreach ($this->decksWithAssociations as $deck => $cards) {
             $names = array_flip(self::PUT_DECKS_CARDS_ASSOCIATIONS[$deck]);
             $ids = array_intersect_key($objectIds, $names);
-            self::$decksWithAssociations[$deck]['cards'] = array_values($ids);
+            $this->decksWithAssociations[$deck]['cards'] = array_values($ids);
         }
+
+        $this->cardsInitializationDone = true;
     }
 
     /**
@@ -309,6 +331,7 @@ class DecksPutTest extends ApiTestCase
      */
     public function validDeckProvider(): array
     {
+        self::initializeCardsBeforeAllTests();
         return [
             'title' => [
                 [
@@ -345,14 +368,14 @@ class DecksPutTest extends ApiTestCase
             ],
             'association_any' => [
                 self::PUT_VALID_DECKS['association_any'],
-                self::$decksWithAssociations['any'],
-                self::$decksWithAssociations['any'],
+                $this->decksWithAssociations['any'],
+                $this->decksWithAssociations['any'],
                 'welcome-to-the-urban-jungle',
             ],
             'association_specific' => [
                 self::PUT_VALID_DECKS['association_specific'],
-                self::$decksWithAssociations['specific'],
-                self::$decksWithAssociations['specific'],
+                $this->decksWithAssociations['specific'],
+                $this->decksWithAssociations['specific'],
                 'pets',
             ],
             'association_dedup' => [
@@ -360,9 +383,9 @@ class DecksPutTest extends ApiTestCase
                     ...self::PUT_VALID_DECKS['association_any'],
                     'title' => 'association dedup',
                 ],
-                self::$decksWithAssociations['dedup'],
+                $this->decksWithAssociations['dedup'],
                 [
-                    ...self::$decksWithAssociations['any'],
+                    ...$this->decksWithAssociations['any'],
                     'title' => 'association dedup',
                 ],
                 'association-dedup',
@@ -438,9 +461,10 @@ class DecksPutTest extends ApiTestCase
      */
     public function testDecksAssociationsOrphanRemoval(): void
     {
+        $this->initializeCardsBeforeAllTests();
         static::createClient()->request(
             'DELETE',
-            self::$cardToBeRemoved['path'],
+            $this->cardToBeRemoved['path'],
         );
         $this->assertResponseStatusCodeSame(204);
 
@@ -461,7 +485,7 @@ class DecksPutTest extends ApiTestCase
 
         foreach ($content['hydra:member'] as $deck) {
             $this->assertNotContains(
-                self::$cardToBeRemoved['id'], $deck['cards']
+                $this->cardToBeRemoved['id'], $deck['cards']
             );
         }
     }
@@ -490,7 +514,7 @@ class DecksPutTest extends ApiTestCase
         $_id = $content['hydra:member'][0]['@id'];
         $cards = $content['hydra:member'][0]['cards'];
 
-        $cardsWithUnknownCard = $cards[] = self::$cardToBeRemoved['id'];
+        $cardsWithUnknownCard = $cards[] = $this->cardToBeRemoved['id'];
         $cardsWithUnknownCard = shuffle($cardsWithUnknownCard);
         $payload = $expected;
         $payload['cards'] = $cardsWithUnknownCard;
@@ -519,10 +543,17 @@ class DecksPutTest extends ApiTestCase
      */
     public function invalidDeckProvider(): array
     {
-        return $this->buildPutProvider(
+        $this->initializeCardsBeforeAllTests();
+        $provider = $this->buildPutProvider(
             self::PUT_INVALID_DECKS,
             self::PUT_FIXTURE_DECKS
         );
+
+        $provider['association_specific']['payload']['cards'] = 
+            $this->decksWithAssociations['dedup']['cards'];
+
+        /** TODO: message with details on invalid card association */
+        return $provider;
     }
 
     /**
