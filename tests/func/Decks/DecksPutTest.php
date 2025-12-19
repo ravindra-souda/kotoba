@@ -281,6 +281,8 @@ class DecksPutTest extends ApiTestCase
         ],
     ];
 
+    private array $objectIds;
+
     private array $cardToBeRemoved;
 
     private bool $cardsInitializationDone = false;
@@ -290,8 +292,6 @@ class DecksPutTest extends ApiTestCase
         if ($this->cardsInitializationDone) {
             return;
         }
-
-        $objectIds = [];
 
         foreach (self::PUT_CARDS_ATTACHED_TO_DECKS as $key => $payload) {
             $path = explode('_', $key, 2)[0];
@@ -309,7 +309,7 @@ class DecksPutTest extends ApiTestCase
             $content = json_decode($response->getContent(), true);
             $this->assertArrayHasKey('id', $content);
             
-            $objectIds[$key] = $content['id'];
+            $this->objectIds[$key] = $content['id'];
 
             if ($key === 'nouns_both_1') {
                 $this->cardToBeRemoved['path'] = $content['@id'];
@@ -318,11 +318,11 @@ class DecksPutTest extends ApiTestCase
         }
 
         foreach ($this->decksWithAssociations as $deck => $cards) {
-            $names = array_flip(self::PUT_DECKS_CARDS_ASSOCIATIONS[$deck]);
-            $ids = array_intersect_key($objectIds, $names);
-            $this->decksWithAssociations[$deck]['cards'] = array_values($ids);
+            $cards = self::PUT_DECKS_CARDS_ASSOCIATIONS[$deck];
+            array_walk($cards, fn (&$card) => $card = $this->objectIds[$card]);
+            $this->decksWithAssociations[$deck]['cards'] = $cards;
         }
-
+        
         $this->cardsInitializationDone = true;
     }
 
@@ -544,16 +544,30 @@ class DecksPutTest extends ApiTestCase
     public function invalidDeckProvider(): array
     {
         $this->initializeCardsBeforeAllTests();
-        $provider = $this->buildPutProvider(
-            self::PUT_INVALID_DECKS,
-            self::PUT_FIXTURE_DECKS
-        );
 
-        $provider['association_specific']['payload']['cards'] = 
+        $invalidDecks = self::PUT_INVALID_DECKS;
+        $invalidDecks['association_specific']['payload']['cards'] = 
             $this->decksWithAssociations['dedup']['cards'];
 
-        /** TODO: message with details on invalid card association */
-        return $provider;
+        $invalidCards = array_filter(
+            $this->objectIds,
+            fn ($key) => !str_contains($key, 'nouns_'),
+            ARRAY_FILTER_USE_KEY
+        );
+        $invalidIds = array_intersect(
+            array_unique(
+                $invalidDecks['association_specific']['payload']['cards']
+            ),
+            $invalidCards
+        );
+
+        $invalidDecks['association_specific']['message']['values'] = 
+            $invalidIds;
+
+        return $this->buildPutProvider(
+            $invalidDecks,
+            self::PUT_FIXTURE_DECKS
+        );
     }
 
     /**

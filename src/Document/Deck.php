@@ -76,6 +76,9 @@ class Deck extends AbstractKotobaDocument
     public const VALIDATION_ERR_DUPLICATE =
         'another Deck with the same title {{ value }} already exists';
 
+    public const VALIDATION_ERR_CARDS_ASSOCIATION =
+        '{{ cards }} are not the same type as this Deck';
+
     /** Must be unique */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
     #[Assert\Length(
