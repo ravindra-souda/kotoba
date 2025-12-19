@@ -546,8 +546,8 @@ class DecksPutTest extends ApiTestCase
         $this->initializeCardsBeforeAllTests();
 
         $invalidDecks = self::PUT_INVALID_DECKS;
-        $invalidDecks['association_specific']['payload']['cards'] = 
-            $this->decksWithAssociations['dedup']['cards'];
+        $cards = $this->decksWithAssociations['dedup']['cards'];
+        $invalidDecks['association_specific']['payload']['cards'] = $cards;
 
         $invalidCards = array_filter(
             $this->objectIds,
@@ -555,9 +555,7 @@ class DecksPutTest extends ApiTestCase
             ARRAY_FILTER_USE_KEY
         );
         $invalidIds = array_intersect(
-            array_unique(
-                $invalidDecks['association_specific']['payload']['cards']
-            ),
+            array_unique($cards),
             $invalidCards
         );
 
