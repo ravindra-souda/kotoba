@@ -16,9 +16,10 @@ use Symfony\Component\HttpClient\Exception\ClientException;
 class DecksPostTest extends ApiTestCase
 {
     use Trait\BuildProviderTrait;
+    use Trait\CardAssociationTrait;
 
     private const POST_COMPLETE_VALID_DECK = [
-        'title' => '    My first ten animals     ',
+        'title' => '    (Post Associations): My first ten animals     ',
         'description' => 'Most common animal names',
         'type' => 'nouns',
         'color' => '#A0B0C0D0',
@@ -26,11 +27,15 @@ class DecksPostTest extends ApiTestCase
 
     private const POST_COMPLETE_EXPECTED_DECK = [
         ...self::POST_COMPLETE_VALID_DECK,
-        'title' => 'My first ten animals',
+        'title' => '(Post Associations): My first ten animals',
     ];
 
     private const POST_MINIMAL_VALID_DECK = [
-        'title' => 'Numbers',
+        'title' => '(Post Associations): Numbers',
+    ];
+
+    private const POST_DEDUP_CARDS_DECK = [
+        'title' => '(Post Associations): Catch-all',
     ];
 
     private const UNIQUE_TITLE = 'duplicate deck';
@@ -103,21 +108,147 @@ class DecksPostTest extends ApiTestCase
         ['title' => 'unique increment 2'],
     ];
 
+    private const CARDS_ATTACHED_TO_DECKS = [
+        'nouns_animals_1' => [
+            'hiragana' => 'いぬ',
+            'kanji' => '犬',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['dog'],
+            ],
+        ],
+        'nouns_animals_2' => [
+            'hiragana' => 'ねこ',
+            'kanji' => '猫',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['cat'],
+            ],
+        ],
+        'nouns_numbers_1' => [
+            'hiragana' => 'いち',
+            'kanji' => '一',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['one'],
+            ],
+        ],
+        'nouns_both_1' => [
+            'hiragana' => 'さかな',
+            'kanji' => '魚',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['fish'],
+            ],
+        ],
+        'nouns_both_2' => [
+            'hiragana' => 'とり',
+            'kanji' => '鳥',
+            'jlpt' => 5,
+            'meaning' => [
+                'en' => ['bird'],
+            ],
+        ],
+        'kanji_numbers_1' => [
+            'kanji' => '二',
+            'meaning' => [
+                'en' => ['two'],
+            ],
+            'kunyomi' => ['futa', 'futatsu', 'futatabi'],
+            'onyomi' => ['ni', 'ji'],
+        ],
+        'verbs_numbers_1' => [
+            'hiragana' => 'かぞえる',
+            'kanji' => '数える',
+            'jlpt' => 3,
+            'group' => 'ichidan',
+            'meaning' => [
+                'en' => ['to count, to enumerate'],
+            ],
+            'inflections' => [
+                'dictionary' => '数える',
+            ],
+        ],
+        'adjectives_numbers_1' => [
+            'hiragana' => 'おおい',
+            'kanji' => '多い',
+            'jlpt' => 5,
+            'group' => 'i',
+            'meaning' => [
+                'en' => ['many, numerous, a lot'],
+            ],
+        ],
+    ];
+
+    private const CARDS_ASSOCIATIONS = [
+        'any' => [
+            'nouns_numbers_1', 'kanji_numbers_1', 'nouns_both_1', 
+            'nouns_both_2', 'verbs_numbers_1', 'adjectives_numbers_1', 
+        ],
+        'specific' => [
+            'nouns_animals_1', 'nouns_animals_2', 'nouns_both_1', 
+            'nouns_both_2',
+        ],
+        'dedup' => [
+            'adjectives_numbers_1', 'nouns_numbers_1', 
+            'nouns_both_1', 'nouns_both_1', 'nouns_both_2', 'verbs_numbers_1', 
+            'verbs_numbers_1', 'verbs_numbers_1', 'kanji_numbers_1',
+        ],
+    ];
+
+    private array $decksWithAssociations = [
+        'any' => [
+            'cards' => [],
+        ],
+        'specific' => [
+            'cards' => [],
+        ],
+        'dedup' => [
+            'cards' => [],
+        ],
+    ];
+
     /**
      * @return array<array<array<string>>>
      */
     public function validDeckProvider(): array
     {
+        self::initializeCardsBeforeAllTests();
         return [
             'complete_deck' => [
-                self::POST_COMPLETE_VALID_DECK,
-                self::POST_COMPLETE_EXPECTED_DECK,
+                [
+                    ...self::POST_COMPLETE_VALID_DECK,
+                    'cards' => 
+                        $this->decksWithAssociations['specific']['cards'],
+                ],
+                [
+                    ...self::POST_COMPLETE_EXPECTED_DECK,
+                    'cards' => 
+                        $this->decksWithAssociations['specific']['cards'],
+                ],
                 'my-first-ten-animals',
             ],
             'minimal_deck' => [
-                self::POST_MINIMAL_VALID_DECK,
-                self::POST_MINIMAL_VALID_DECK,
+                [
+                    ...self::POST_MINIMAL_VALID_DECK,
+                    'cards' => $this->decksWithAssociations['any']['cards'],
+                ],
+                [
+                    ...self::POST_MINIMAL_VALID_DECK,
+                    'cards' => $this->decksWithAssociations['any']['cards'],
+                ],
                 'numbers',
+            ],
+            'dedup_deck' => [
+                [
+                    ...self::POST_DEDUP_CARDS_DECK,
+                    'cards' => $this->decksWithAssociations['dedup']['cards'],
+                ],
+                [
+                    ...self::POST_DEDUP_CARDS_DECK,
+                    'cards' => $this->decksWithAssociations['any']['cards'],
+                ],
+                'catch-all',
             ],
         ];
     }
@@ -153,6 +284,68 @@ class DecksPostTest extends ApiTestCase
         $this->assertMatchesRegularExpression(
             '/\d+-'.$code.'/',
             $content['code']
+        );
+    }
+
+    /**
+     * @depends testDecksPostValid
+     */
+    public function testDecksAssociationsOrphanRemoval(): void
+    {
+        $this->initializeCardsBeforeAllTests();
+        static::createClient()->request(
+            'DELETE',
+            $this->cardToBeRemoved['path'],
+        );
+        $this->assertResponseStatusCodeSame(204);
+
+        $response = static::createClient()->request(
+            'GET',
+            '/api/decks?title=(post associations)',
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame(
+            'content-type',
+            'application/ld+json; charset=utf-8'
+        );
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertSame($content['hydra:totalItems'], 3);
+        $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
+
+        foreach ($content['hydra:member'] as $deck) {
+            $this->assertNotContains(
+                $this->cardToBeRemoved['id'], $deck['cards']
+            );
+        }
+    }
+
+    /**
+     * @depends testDecksAssociationsOrphanRemoval
+     */
+    public function testDecksAssociationsUnknownCard(): void
+    {
+        $payload = [
+            ...self::POST_MINIMAL_VALID_DECK,
+            'title' => 'post deck unknown card',
+            'cards' => $this->decksWithAssociations['any']['cards'],
+        ];
+
+        $response = static::createClient()->request(
+            'POST',
+            '/api/decks',
+            ['json' => $payload]
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame(
+            'content-type',
+            'application/ld+json; charset=utf-8'
+        );
+        $content = json_decode($response->getContent(), true);
+        $this->assertNotContains(
+            $this->cardToBeRemoved['id'], $content['cards']
         );
     }
 

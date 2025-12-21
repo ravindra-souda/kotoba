@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Document\{Deck, Adjective, Noun, Verb};
+use App\Document\Deck;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
 class DecksPutTest extends ApiTestCase
 {
     use Trait\BuildProviderTrait;
+    use Trait\CardAssociationTrait;
 
     private const PUT_COMPLETE_VALID_DECK = [
         'title' => 'Basic vocab',
@@ -73,13 +74,13 @@ class DecksPutTest extends ApiTestCase
             'type' => Deck::ALLOWED_TYPES[0],
         ],
         'association_any' => [
-            'title' => 'Associations: Welcome to the urban jungle',
+            'title' => '(Put Associations): Welcome to the urban jungle',
             'description' => 'Surviving guide to this new city',
             'type' => 'any',
             'color' => '#2f2492e0',
         ],
         'association_specific' => [
-            'title' => 'Associations: Pets',
+            'title' => '(Put Associations): Pets',
             'description' => 'Your friendly small companions',
             'type' => 'nouns',
             'color' => '#7c280eb0',
@@ -158,7 +159,7 @@ class DecksPutTest extends ApiTestCase
         ],
     ];
 
-    private const PUT_CARDS_ATTACHED_TO_DECKS = [
+    private const CARDS_ATTACHED_TO_DECKS = [
         'nouns_city_1' => [
             'hiragana' => 'まち',
             'kanji' => '町',
@@ -242,7 +243,7 @@ class DecksPutTest extends ApiTestCase
         ],
     ];
 
-    private const PUT_DECKS_CARDS_ASSOCIATIONS = [
+    private const CARDS_ASSOCIATIONS = [
         'any' => [
             'nouns_city_1', 'nouns_city_2', 'nouns_both_1', 'nouns_both_2',
             'verbs_city_1', 'verbs_city_2', 'adjectives_city_1',
@@ -257,12 +258,6 @@ class DecksPutTest extends ApiTestCase
             'nouns_pets_2', 'nouns_both_1', 'adjectives_city_1', 'verbs_city_1',
             'verbs_city_2',
         ],
-    ];
-
-    private const CARDS_CLASSES = [
-        'adjectives' => Adjective::class,
-        'nouns' => Noun::class,
-        'verbs' => Verb::class,
     ];
 
     private array $decksWithAssociations = [
@@ -280,51 +275,6 @@ class DecksPutTest extends ApiTestCase
             'cards' => [],
         ],
     ];
-
-    private array $objectIds;
-
-    private array $cardToBeRemoved;
-
-    private bool $cardsInitializationDone = false;
-
-    private function initializeCardsBeforeAllTests(): void
-    {
-        if ($this->cardsInitializationDone) {
-            return;
-        }
-
-        foreach (self::PUT_CARDS_ATTACHED_TO_DECKS as $key => $payload) {
-            $path = explode('_', $key, 2)[0];
-            $response = static::createClient()->request(
-                'POST',
-                '/api/cards/'.$path,
-                ['json' => $payload]
-            );
-
-            $this->assertResponseStatusCodeSame(201);
-            $this->assertMatchesResourceItemJsonSchema(
-                self::CARDS_CLASSES[$path]
-            );
-
-            $content = json_decode($response->getContent(), true);
-            $this->assertArrayHasKey('id', $content);
-            
-            $this->objectIds[$key] = $content['id'];
-
-            if ($key === 'nouns_both_1') {
-                $this->cardToBeRemoved['path'] = $content['@id'];
-                $this->cardToBeRemoved['id'] = $content['id'];
-            }
-        }
-
-        foreach ($this->decksWithAssociations as $deck => $cards) {
-            $cards = self::PUT_DECKS_CARDS_ASSOCIATIONS[$deck];
-            array_walk($cards, fn (&$card) => $card = $this->objectIds[$card]);
-            $this->decksWithAssociations[$deck]['cards'] = $cards;
-        }
-        
-        $this->cardsInitializationDone = true;
-    }
 
     /**
      * @return array<array<array<string>>>
@@ -381,12 +331,12 @@ class DecksPutTest extends ApiTestCase
             'association_dedup' => [
                 [
                     ...self::PUT_VALID_DECKS['association_any'],
-                    'title' => 'association dedup',
+                    'title' => '(Put Associations): dedup',
                 ],
                 $this->decksWithAssociations['dedup'],
                 [
                     ...$this->decksWithAssociations['any'],
-                    'title' => 'association dedup',
+                    'title' => '(Put Associations): dedup',
                 ],
                 'association-dedup',
             ],
@@ -470,7 +420,7 @@ class DecksPutTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'GET',
-            '/api/decks?title=associations',
+            '/api/decks?title=(put associations)',
         );
 
         $this->assertResponseStatusCodeSame(200);
