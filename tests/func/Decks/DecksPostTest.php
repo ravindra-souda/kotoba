@@ -92,6 +92,18 @@ class DecksPostTest extends ApiTestCase
                 'values' => Deck::ALLOWED_TYPES,
             ],
         ],
+        'association_specific' => [
+            'fixture' => 'association_specific',
+            'payload' => [
+                ...self::POST_COMPLETE_VALID_DECK,
+                'title' => 'A deck with wrong cards associations',
+                'cards' => '*',
+            ],
+            'message' => [
+                'text' => 'cards: '.Deck::VALIDATION_ERR_CARDS_ASSOCIATION,
+                'values' => '*',
+            ],
+        ],
         'color' => [
             'payload' => [
                 ...self::POST_COMPLETE_VALID_DECK,
@@ -354,7 +366,26 @@ class DecksPostTest extends ApiTestCase
      */
     public function invalidDeckProvider(): array
     {
-        return $this->buildPostProvider(self::POST_INVALID_DECKS);
+        $this->initializeCardsBeforeAllTests();
+
+        $invalidDecks = self::POST_INVALID_DECKS;
+        $cards = $this->decksWithAssociations['dedup']['cards'];
+        $invalidDecks['association_specific']['payload']['cards'] = $cards;
+
+        $invalidCards = array_filter(
+            $this->objectIds,
+            fn ($key) => !str_contains($key, 'nouns_'),
+            ARRAY_FILTER_USE_KEY
+        );
+        $invalidIds = array_intersect(
+            array_unique($cards),
+            $invalidCards
+        );
+
+        $invalidDecks['association_specific']['message']['values'] = 
+            $invalidIds;
+        
+        return $this->buildPostProvider($invalidDecks);
     }
 
     /**
