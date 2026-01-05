@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Put;
 use App\Controller\FetchDeckByCode;
 use App\State\SaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -122,12 +123,14 @@ class Deck extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'string')]
     protected ?string $color = '#ffffffff';
 
-    /** @var array<string> */
-    protected iterable $words;
+    /** @var array<int,Card> */
+    #[Groups(['read', 'write'])]
+    #[MongoDB\ReferenceMany(targetDocument: Card::class, mappedBy:'deck', cascade:['persist'], storeAs:'id')]
+    public Collection $cards;
 
     public function __construct()
     {
-        $this->words = new ArrayCollection();
+        $this->cards = new ArrayCollection();
     }
 
     public function getCode(): ?string
@@ -179,6 +182,18 @@ class Deck extends AbstractKotobaDocument
     public function getSlugReference(): string
     {
         return $this->title;
+    }
+
+    public function addCard(Card $card): void
+    {
+        $card->deck = $this;
+        $this->cards->add($card);
+    }
+
+    public function removeCard(Card $card): void
+    {
+        $card->deck = null;
+        $this->cards->removeElement($card);
     }
 
     public function setCode(string $code): Deck

@@ -35,6 +35,9 @@ abstract class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'int')]
     protected ?int $jlpt = 5;
 
+    #[MongoDB\ReferenceOne(targetDocument: Deck::class, inversedBy:'cards', storeAs:'id')]
+    public ?Deck $deck;
+
     public function getCode(): ?string
     {
         return $this->code;
