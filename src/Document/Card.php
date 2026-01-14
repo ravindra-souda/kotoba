@@ -5,9 +5,39 @@ declare(strict_types=1);
 namespace App\Document;
 
 use ApiPlatform\Metadata\ApiProperty;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+
+
+//#[MongoDB\MappedSuperclass]
+#[MongoDB\Document]
+/*
+#[ApiResource(
+    collectionOperations: ['get', 'post'],
+    itemOperations: ['get', 'put', 'delete'],
+)]
+*/
+#[MongoDB\InheritanceType('SINGLE_COLLECTION')]
+#[MongoDB\DiscriminatorField('type')]
+/*
+#[MongoDB\DiscriminatorMap([
+    'adjective' => "App\Document\Adjective",
+    'kana' => "App\Document\Kana",
+    'kanji' => "App\Document\Kanji",
+    'noun' => "App\Document\Noun",
+    'verb' => "App\Document\Verb",
+])]
+*/
+#[MongoDB\DiscriminatorMap([
+    'adjective' => Adjective::class,
+    'kana' => Kana::class,
+    'kanji' => Kanji::class,
+    'noun' => Noun::class,
+    'verb' => Verb::class,
+])]
 
 abstract class Card extends AbstractKotobaDocument
 {
@@ -35,8 +65,15 @@ abstract class Card extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'int')]
     protected ?int $jlpt = 5;
 
-    #[MongoDB\ReferenceOne(targetDocument: Deck::class, inversedBy:'cards', storeAs:'id')]
-    public ?Deck $deck;
+    #[MongoDB\ReferenceMany(
+        targetDocument: Deck::class, inversedBy:'cards', storeAs:'id'
+    )]
+    protected Collection $decks;
+
+    public function __construct()
+    {
+        $this->decks = new ArrayCollection();
+    }
 
     public function getCode(): ?string
     {
@@ -58,6 +95,24 @@ abstract class Card extends AbstractKotobaDocument
     public function setJlpt(?int $jlpt): Card
     {
         $this->jlpt = $jlpt;
+
+        return $this;
+    }
+
+    public function addDeck(Deck $deck): Card
+    {
+        if ($this->decks->contains($deck)) {
+            return $this;
+        }
+
+        $this->decks->add($deck);
+
+        return $this;
+    }
+
+    public function removeDeck(Deck $deck): Card
+    {
+        $this->decks->removeElement($deck);
 
         return $this;
     }

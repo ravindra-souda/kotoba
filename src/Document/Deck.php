@@ -123,14 +123,22 @@ class Deck extends AbstractKotobaDocument
     #[MongoDB\Field(type: 'string')]
     protected ?string $color = '#ffffffff';
 
-    /** @var array<int,Card> */
+    /** @var Collection<int,Card> */
     #[Groups(['read', 'write'])]
-    #[MongoDB\ReferenceMany(targetDocument: Card::class, mappedBy:'deck', cascade:['persist'], storeAs:'id')]
+    #[MongoDB\ReferenceMany(
+        targetDocument: "App\Document\Card", 
+        mappedBy:'decks', cascade:['persist'], storeAs:'id'
+    )]
     public Collection $cards;
 
     public function __construct()
     {
         $this->cards = new ArrayCollection();
+    }
+
+    public function getCards(): Collection
+    {
+        return $this->cards;
     }
 
     public function getCode(): ?string
@@ -184,16 +192,40 @@ class Deck extends AbstractKotobaDocument
         return $this->title;
     }
 
+    /*
     public function addCard(Card $card): void
     {
         $card->deck = $this;
         $this->cards->add($card);
     }
+    */
 
+    public function addCard(Card $card): Deck
+    {
+        if ($this->cards->contains($card)) {
+            return $this;
+        }
+
+        $card->addDeck($this);
+        $this->cards->add($card);
+
+        return $this;
+    }
+
+    /*
     public function removeCard(Card $card): void
     {
         $card->deck = null;
         $this->cards->removeElement($card);
+    }
+    */
+
+    public function removeCard(Card $card): Deck
+    {
+        $card->removeDeck($this);
+        $this->cards->removeElement($card);
+
+        return $this;
     }
 
     public function setCode(string $code): Deck

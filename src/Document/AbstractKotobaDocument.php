@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+#[MongoDB\MappedSuperclass]
 abstract class AbstractKotobaDocument
 {
     public const VALIDATION_ERR_EMPTY =

@@ -42,9 +42,10 @@ trait CardAssociationTrait
             );
 
             $content = json_decode($response->getContent(), true);
-            $this->assertArrayHasKey('id', $content);
+            //var_dump($content);
+            $this->assertArrayHasKey('@id', $content);
             
-            $this->objectIds[$key] = $content['id'];
+            $this->objectIds[$key] = $content['@id'];
 
             if ($key === 'nouns_both_1') {
                 $this->cardToBeRemoved['path'] = $content['@id'];
