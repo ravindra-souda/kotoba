@@ -5,38 +5,23 @@ declare(strict_types=1);
 namespace App\Document;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-//#[MongoDB\MappedSuperclass]
+#[ApiResource]
 #[MongoDB\Document]
-/*
-#[ApiResource(
-    collectionOperations: ['get', 'post'],
-    itemOperations: ['get', 'put', 'delete'],
-)]
-*/
 #[MongoDB\InheritanceType('SINGLE_COLLECTION')]
 #[MongoDB\DiscriminatorField('type')]
-/*
 #[MongoDB\DiscriminatorMap([
     'adjective' => "App\Document\Adjective",
     'kana' => "App\Document\Kana",
     'kanji' => "App\Document\Kanji",
     'noun' => "App\Document\Noun",
     'verb' => "App\Document\Verb",
-])]
-*/
-#[MongoDB\DiscriminatorMap([
-    'adjective' => Adjective::class,
-    'kana' => Kana::class,
-    'kanji' => Kanji::class,
-    'noun' => Noun::class,
-    'verb' => Verb::class,
 ])]
 
 abstract class Card extends AbstractKotobaDocument
