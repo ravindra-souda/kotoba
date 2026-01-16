@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\FetchDeckByCode;
+use App\Dto\DeckDto;
 use App\State\SaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\Common\Collections\Collection;
@@ -38,6 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     arguments: ['orderParameterName' => 'order'],
 )]
 #[ApiResource(
+    input: DeckDto::class,
     operations: [
         new Post(),
         new Delete(),

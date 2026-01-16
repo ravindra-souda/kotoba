@@ -13,6 +13,9 @@ use App\Document\Kana;
 use App\Document\Kanji;
 use App\Document\Noun;
 use App\Document\Verb;
+use App\Document\Card;
+use App\Dto\DeckDto;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * @template T
@@ -28,6 +31,7 @@ final class SaveProcessor implements ProcessorInterface
     public function __construct(
         private ProcessorInterface $persistProcessor,
         private ProcessorInterface $removeProcessor,
+        private DocumentManager $dm,
     ) {}
 
     public function process(
@@ -35,7 +39,7 @@ final class SaveProcessor implements ProcessorInterface
         Operation $operation,
         array $uriVariables = [],
         array $context = [],
-    ): Adjective|Deck|Kana|Kanji|Noun|Verb|null {
+    ): Adjective|Deck|Kana|Kanji|Noun|Verb|DeckDto|null {
         if ($operation instanceof DeleteOperationInterface) {
             return $this
                 ->removeProcessor
@@ -43,10 +47,31 @@ final class SaveProcessor implements ProcessorInterface
             ;
         }
 
-        $data
-            ->trimFields()
-            ->finalizeTasks()
-        ;
+        // $noun = $this->dm->getRepository(Noun::class)->findOneBy(['hiragana' => 'いぬ']); // ok
+        $noun = $this->dm->getRepository(Noun::class)->findOneBy(['hiragana' => 'いぬ']);
+        //var_dump(get_class($data));
+        if ($noun !== null) {
+            var_dump(get_class($data));
+            $code = $noun->getCode();
+            //var_dump($code);
+        } else {
+            var_dump('lol:'.get_class($data));
+        }
+
+        if ($data instanceof DeckDto) {
+            //var_dump($data->cards);
+            foreach ($data->cards as $iri) {
+                //var_dump($iri);
+                //$card = $this->dm->getRepository(Noun::class)->find();
+                $found = $this->dm->getRepository(Noun::class)->findOneBy(['hiragana' => 'いぬ']);
+                //var_dump($found);
+            }
+        } else {
+            $data
+                ->trimFields()
+                ->finalizeTasks()
+            ;
+        }
 
         return $this
             ->persistProcessor
