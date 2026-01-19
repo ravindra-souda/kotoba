@@ -237,14 +237,14 @@ class Deck extends AbstractKotobaDocument
         return $this;
     }
 
-    public function setColor(string $color): Deck
+    public function setColor(?string $color): Deck
     {
         $this->color = $color;
 
         return $this;
     }
 
-    public function setDescription(string $description): Deck
+    public function setDescription(?string $description): Deck
     {
         $this->description = $description;
 
