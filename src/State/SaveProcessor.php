@@ -48,30 +48,42 @@ final class SaveProcessor implements ProcessorInterface
         }
 
         // $noun = $this->dm->getRepository(Noun::class)->findOneBy(['hiragana' => 'いぬ']); // ok
-        $noun = $this->dm->getRepository(Noun::class)->findOneBy(['hiragana' => 'いぬ']);
+        $noun = $this->dm->getRepository(Noun::class)->findOneBy(['hiragana' => 'いち']);
+        $deck = $this->dm->getRepository(Deck::class)->findOneBy(['title' => 'dummy']);
         //var_dump(get_class($data));
         if ($noun !== null) {
-            var_dump(get_class($data));
-            $code = $noun->getCode();
+            //var_dump([$noun->getHiragana(), get_class($data)]);
+            //var_dump(get_class($data));
+            //$code = $noun->getCode();
             //var_dump($code);
         } else {
             var_dump('lol:'.get_class($data));
         }
 
         if ($data instanceof DeckDto) {
+            $deck = new Deck();
+            $deck
+                ->setTitle($data->title)
+                ->setDescription($data->description)
+                ->setType($data->type)
+                ->setColor($data->color)
+            ;
+
             //var_dump($data->cards);
             foreach ($data->cards as $iri) {
                 //var_dump($iri);
                 //$card = $this->dm->getRepository(Noun::class)->find();
-                $found = $this->dm->getRepository(Noun::class)->findOneBy(['hiragana' => 'いぬ']);
-                //var_dump($found);
+                $card = $this->dm->getRepository(Noun::class)->findOneBy(['hiragana' => 'いち']);
+                var_dump([$card->getHiragana(), $iri]);
+                $deck->addCard($card);
             }
-        } else {
-            $data
-                ->trimFields()
-                ->finalizeTasks()
-            ;
+            $data = $deck;
         }
+        
+        $data
+            ->trimFields()
+            ->finalizeTasks()
+        ;
 
         return $this
             ->persistProcessor

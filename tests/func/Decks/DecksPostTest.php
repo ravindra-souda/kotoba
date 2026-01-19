@@ -38,6 +38,10 @@ class DecksPostTest extends ApiTestCase
         'title' => '(Post Associations): Catch-all',
     ];
 
+    private const DUMMY = [
+        'title' => 'dummy',
+    ];
+
     private const UNIQUE_TITLE = 'duplicate deck';
 
     private const POST_INVALID_DECKS = [
@@ -276,6 +280,16 @@ class DecksPostTest extends ApiTestCase
         array $expected,
         string $code
     ): void {
+        $response = static::createClient()->request(
+            'POST',
+            '/api/cards/nouns',
+            ['json' => self::CARDS_ATTACHED_TO_DECKS['nouns_numbers_1']]
+        );
+
+        $this->assertResponseStatusCodeSame(201);
+        $content = json_decode($response->getContent(), true);
+        //var_dump($content);
+
         $response = static::createClient()->request(
             'POST',
             '/api/decks',
