@@ -212,7 +212,7 @@ class DecksPostTest extends ApiTestCase
         ],
     ];
 
-    private array $decksWithAssociations = [
+    private static array $decksWithAssociations = [
         'any' => [
             'cards' => [],
         ],
@@ -224,48 +224,39 @@ class DecksPostTest extends ApiTestCase
         ],
     ];
 
+    public static function setUpBeforeClass(): void
+    {
+        fwrite(STDOUT, __METHOD__ . "\n");
+        self::initializeCardsBeforeAllTests();
+    }
+
     /**
      * @return array<array<array<string>>>
      */
     public function validDeckProvider(): array
     {
-        self::initializeCardsBeforeAllTests();
         return [
             'complete_deck' => [
-                [
-                    ...self::POST_COMPLETE_VALID_DECK,
-                    'cards' => 
-                        $this->decksWithAssociations['specific']['cards'],
-                ],
-                [
-                    ...self::POST_COMPLETE_EXPECTED_DECK,
-                    'cards' => 
-                        $this->decksWithAssociations['specific']['cards'],
-                ],
-                'my-first-ten-animals',
+                self::POST_COMPLETE_VALID_DECK,
+                'specific',
+                self::POST_COMPLETE_EXPECTED_DECK,
+                'specific',
+                'post-associations-my-first-ten-animals',
             ],
             'minimal_deck' => [
-                [
-                    ...self::POST_MINIMAL_VALID_DECK,
-                    'cards' => $this->decksWithAssociations['any']['cards'],
-                ],
-                [
-                    ...self::POST_MINIMAL_VALID_DECK,
-                    'cards' => $this->decksWithAssociations['any']['cards'],
-                ],
-                'numbers',
+                self::POST_MINIMAL_VALID_DECK,
+                'any',
+                self::POST_MINIMAL_VALID_DECK,
+                'any',
+                'post-associations-numbers',
             ],
             'dedup_deck' => [
-                [
-                    ...self::POST_DEDUP_CARDS_DECK,
-                    'cards' => $this->decksWithAssociations['dedup']['cards'],
-                ],
-                [
-                    ...self::POST_DEDUP_CARDS_DECK,
-                    'cards' => $this->decksWithAssociations['any']['cards'],
-                ],
-                'catch-all',
-            ],
+                self::POST_DEDUP_CARDS_DECK,
+                'dedup',
+                self::POST_DEDUP_CARDS_DECK,
+                'any',
+                'post-associations-catch-all',
+            ]
         ];
     }
 
@@ -277,18 +268,15 @@ class DecksPostTest extends ApiTestCase
      */
     public function testDecksPostValid(
         array $payload,
+        string $payloadCardsKey,
         array $expected,
+        string $expectedCardsKey,
         string $code
     ): void {
-        $response = static::createClient()->request(
-            'POST',
-            '/api/cards/nouns',
-            ['json' => self::CARDS_ATTACHED_TO_DECKS['nouns_numbers_1']]
-        );
-
-        $this->assertResponseStatusCodeSame(201);
-        $content = json_decode($response->getContent(), true);
-        //var_dump($content);
+        $payload['cards'] =
+            self::$decksWithAssociations[$payloadCardsKey]['cards'];
+        $expected['cards'] = 
+            self::$decksWithAssociations[$expectedCardsKey]['cards'];
 
         $response = static::createClient()->request(
             'POST',
@@ -318,7 +306,7 @@ class DecksPostTest extends ApiTestCase
      */
     public function testDecksAssociationsOrphanRemoval(): void
     {
-        $this->initializeCardsBeforeAllTests();
+        // $this->initializeCardsBeforeAllTests();
         static::createClient()->request(
             'DELETE',
             $this->cardToBeRemoved['path'],
@@ -380,14 +368,14 @@ class DecksPostTest extends ApiTestCase
      */
     public function invalidDeckProvider(): array
     {
-        $this->initializeCardsBeforeAllTests();
+        // $this->initializeCardsBeforeAllTests();
 
         $invalidDecks = self::POST_INVALID_DECKS;
-        $cards = $this->decksWithAssociations['dedup']['cards'];
+        $cards = self::$decksWithAssociations['dedup']['cards'];
         $invalidDecks['association_specific']['payload']['cards'] = $cards;
 
         $invalidCards = array_filter(
-            $this->objectIds,
+            self::$cardIRIs,
             fn ($key) => !str_contains($key, 'nouns_'),
             ARRAY_FILTER_USE_KEY
         );
@@ -479,4 +467,6 @@ class DecksPostTest extends ApiTestCase
         );
         $this->assertSame($increments, array_unique($increments));
     }
+
+    // TODO: Unknown card type should raise an exception
 }

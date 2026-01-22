@@ -16,18 +16,19 @@ trait CardAssociationTrait
         'verbs' => Verb::class,
     ];
     
-    private array $objectIds;
+    private static array $cardIRIs = [];
 
-    private array $cardToBeRemoved;
+    private static array $cardToBeRemoved = [];
 
-    private bool $cardsInitializationDone = false;
+    private static bool $cardsInitializationDone = false;
 
-    private function initializeCardsBeforeAllTests(): void
+    private static function initializeCardsBeforeAllTests(): void
     {
-        if ($this->cardsInitializationDone) {
+        /*
+        if (self::cardsInitializationDone) {
             return;
         }
-
+        */
         foreach (self::CARDS_ATTACHED_TO_DECKS as $key => $payload) {
             $path = explode('_', $key, 2)[0];
             $response = static::createClient()->request(
@@ -36,29 +37,28 @@ trait CardAssociationTrait
                 ['json' => $payload]
             );
 
-            $this->assertResponseStatusCodeSame(201);
-            $this->assertMatchesResourceItemJsonSchema(
+            static::assertResponseStatusCodeSame(201);
+            static::assertMatchesResourceItemJsonSchema(
                 self::CARDS_CLASSES[$path]
             );
 
             $content = json_decode($response->getContent(), true);
-            //var_dump($content);
-            $this->assertArrayHasKey('@id', $content);
+            static::assertArrayHasKey('@id', $content);
             
-            $this->objectIds[$key] = $content['@id'];
+            self::$cardIRIs[$key] = $content['@id'];
 
             if ($key === 'nouns_both_1') {
-                $this->cardToBeRemoved['path'] = $content['@id'];
-                $this->cardToBeRemoved['id'] = $content['id'];
+                self::$cardToBeRemoved['path'] = $content['@id'];
+                self::$cardToBeRemoved['id'] = $content['id'];
             }
         }
 
-        foreach ($this->decksWithAssociations as $deck => $cards) {
+        foreach (self::$decksWithAssociations as $deck => $cards) {
             $cards = self::CARDS_ASSOCIATIONS[$deck];
-            array_walk($cards, fn (&$card) => $card = $this->objectIds[$card]);
-            $this->decksWithAssociations[$deck]['cards'] = $cards;
+            array_walk($cards, fn (&$card) => $card = self::$cardIRIs[$card]);
+            self::$decksWithAssociations[$deck]['cards'] = $cards;
         }
-        
-        $this->cardsInitializationDone = true;
+        var_dump('done');
+        // self::cardsInitializationDone->true;
     }
 }
