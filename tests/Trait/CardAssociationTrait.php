@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Trait;
 
-use App\Document\{Adjective, Kana, Kanji, Noun, Verb};
+use App\Document\{Adjective, Card, Kana, Kanji, Noun, Verb};
 
 trait CardAssociationTrait
 {
@@ -16,6 +16,8 @@ trait CardAssociationTrait
         'verbs' => Verb::class,
     ];
     
+    private static array $postedCards = [];
+
     private static array $cardIRIs = [];
 
     private static array $cardToBeRemoved = [];
@@ -43,12 +45,14 @@ trait CardAssociationTrait
             );
 
             $content = json_decode($response->getContent(), true);
-            static::assertArrayHasKey('@id', $content);
+            static::assertMatchesResourceItemJsonSchema(Card::class);
             
-            self::$cardIRIs[$key] = $content['@id'];
+            $iri = $content['@id'];
+            self::$postedCards[$iri] = $content;
+            self::$cardIRIs[$key] = $iri;
 
             if ($key === 'nouns_both_1') {
-                self::$cardToBeRemoved['path'] = $content['@id'];
+                self::$cardToBeRemoved['path'] = $iri;
                 self::$cardToBeRemoved['id'] = $content['id'];
             }
         }
@@ -58,7 +62,5 @@ trait CardAssociationTrait
             array_walk($cards, fn (&$card) => $card = self::$cardIRIs[$card]);
             self::$decksWithAssociations[$deck]['cards'] = $cards;
         }
-        var_dump('done');
-        // self::cardsInitializationDone->true;
     }
 }

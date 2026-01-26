@@ -278,6 +278,11 @@ class DecksPostTest extends ApiTestCase
         $expected['cards'] = 
             self::$decksWithAssociations[$expectedCardsKey]['cards'];
 
+        //sort($expected['cards'], SORT_NATURAL);
+        array_walk(
+            $expected['cards'], fn(&$card) => $card = self::$postedCards[$card]
+        );
+
         $response = static::createClient()->request(
             'POST',
             '/api/decks',
@@ -293,6 +298,7 @@ class DecksPostTest extends ApiTestCase
         $this->assertMatchesResourceItemJsonSchema(Deck::class);
 
         $content = json_decode($response->getContent(), true);
+        $this->assertContainsOnlyInstancesOf(Card::class, $content['cards']);
         $this->assertArrayHasKey('createdAt', $content);
         $this->assertStringStartsWith(date('Y-m-d'), $content['createdAt']);
         $this->assertMatchesRegularExpression(
