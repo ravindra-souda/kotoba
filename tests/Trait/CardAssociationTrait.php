@@ -47,6 +47,7 @@ trait CardAssociationTrait
             $content = json_decode($response->getContent(), true);
             static::assertMatchesResourceItemJsonSchema(Card::class);
             
+            unset($content['@context']);
             $iri = $content['@id'];
             self::$postedCards[$iri] = $content;
             self::$cardIRIs[$key] = $iri;

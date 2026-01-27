@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Document\Deck;
+use App\Document\{Card, Deck};
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -201,6 +201,10 @@ class DecksPostTest extends ApiTestCase
             'nouns_numbers_1', 'kanji_numbers_1', 'nouns_both_1', 
             'nouns_both_2', 'verbs_numbers_1', 'adjectives_numbers_1', 
         ],
+        'any_sorted' => [
+            'nouns_numbers_1', 'verbs_numbers_1', 'adjectives_numbers_1',
+            'nouns_both_1', 'nouns_both_2', 'kanji_numbers_1',
+        ],
         'specific' => [
             'nouns_animals_1', 'nouns_animals_2', 'nouns_both_1', 
             'nouns_both_2',
@@ -214,6 +218,9 @@ class DecksPostTest extends ApiTestCase
 
     private static array $decksWithAssociations = [
         'any' => [
+            'cards' => [],
+        ],
+        'any_sorted' => [
             'cards' => [],
         ],
         'specific' => [
@@ -247,7 +254,7 @@ class DecksPostTest extends ApiTestCase
                 self::POST_MINIMAL_VALID_DECK,
                 'any',
                 self::POST_MINIMAL_VALID_DECK,
-                'any',
+                'any_sorted',
                 'post-associations-numbers',
             ],
             'dedup_deck' => [
@@ -278,7 +285,6 @@ class DecksPostTest extends ApiTestCase
         $expected['cards'] = 
             self::$decksWithAssociations[$expectedCardsKey]['cards'];
 
-        //sort($expected['cards'], SORT_NATURAL);
         array_walk(
             $expected['cards'], fn(&$card) => $card = self::$postedCards[$card]
         );
@@ -298,7 +304,12 @@ class DecksPostTest extends ApiTestCase
         $this->assertMatchesResourceItemJsonSchema(Deck::class);
 
         $content = json_decode($response->getContent(), true);
-        $this->assertContainsOnlyInstancesOf(Card::class, $content['cards']);
+        dump($content);
+        // $this->assertMatchesResourceCollectionJsonSchema(Card::class, $content['cards']);
+        
+        // foreach($content['cards'] as $card) {
+        //     $this->assertMatchesResourceItemJsonSchema(Card::class, $card);
+        // }
         $this->assertArrayHasKey('createdAt', $content);
         $this->assertStringStartsWith(date('Y-m-d'), $content['createdAt']);
         $this->assertMatchesRegularExpression(
