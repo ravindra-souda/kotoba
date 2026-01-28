@@ -206,6 +206,10 @@ class DecksPostTest extends ApiTestCase
             'nouns_both_1', 'nouns_both_2', 'kanji_numbers_1',
         ],
         'specific' => [
+            'nouns_both_2', 'nouns_both_1', 'nouns_animals_2', 
+            'nouns_animals_1',
+        ],
+        'specific_sorted' => [
             'nouns_animals_1', 'nouns_animals_2', 'nouns_both_1', 
             'nouns_both_2',
         ],
@@ -226,6 +230,9 @@ class DecksPostTest extends ApiTestCase
         'specific' => [
             'cards' => [],
         ],
+        'specific_sorted' => [
+            'cards' => [],
+        ],
         'dedup' => [
             'cards' => [],
         ],
@@ -233,7 +240,6 @@ class DecksPostTest extends ApiTestCase
 
     public static function setUpBeforeClass(): void
     {
-        fwrite(STDOUT, __METHOD__ . "\n");
         self::initializeCardsBeforeAllTests();
     }
 
@@ -247,7 +253,7 @@ class DecksPostTest extends ApiTestCase
                 self::POST_COMPLETE_VALID_DECK,
                 'specific',
                 self::POST_COMPLETE_EXPECTED_DECK,
-                'specific',
+                'specific_sorted',
                 'post-associations-my-first-ten-animals',
             ],
             'minimal_deck' => [
@@ -261,7 +267,7 @@ class DecksPostTest extends ApiTestCase
                 self::POST_DEDUP_CARDS_DECK,
                 'dedup',
                 self::POST_DEDUP_CARDS_DECK,
-                'any',
+                'any_sorted',
                 'post-associations-catch-all',
             ]
         ];
@@ -304,12 +310,7 @@ class DecksPostTest extends ApiTestCase
         $this->assertMatchesResourceItemJsonSchema(Deck::class);
 
         $content = json_decode($response->getContent(), true);
-        dump($content);
-        // $this->assertMatchesResourceCollectionJsonSchema(Card::class, $content['cards']);
-        
-        // foreach($content['cards'] as $card) {
-        //     $this->assertMatchesResourceItemJsonSchema(Card::class, $card);
-        // }
+
         $this->assertArrayHasKey('createdAt', $content);
         $this->assertStringStartsWith(date('Y-m-d'), $content['createdAt']);
         $this->assertMatchesRegularExpression(

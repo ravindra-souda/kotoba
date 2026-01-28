@@ -131,7 +131,6 @@ class Deck extends AbstractKotobaDocument
         targetDocument: "App\Document\Card", 
         mappedBy:'decks', cascade:['persist'], storeAs:'id'
     )]
-    // #[ApiResource(order: ['code' => 'DESC'])]
     public Collection $cards;
 
     public function __construct()
@@ -140,8 +139,8 @@ class Deck extends AbstractKotobaDocument
     }
 
     public function getCards(): Collection
-    {
-        return $this->cards;
+    {        
+        return $this->sortCards();
     }
 
     public function getCode(): ?string
@@ -195,14 +194,6 @@ class Deck extends AbstractKotobaDocument
         return $this->title;
     }
 
-    /*
-    public function addCard(Card $card): void
-    {
-        $card->deck = $this;
-        $this->cards->add($card);
-    }
-    */
-
     public function addCard(Card $card): Deck
     {
         if ($this->cards->contains($card)) {
@@ -215,14 +206,6 @@ class Deck extends AbstractKotobaDocument
         return $this;
     }
 
-    /*
-    public function removeCard(Card $card): void
-    {
-        $card->deck = null;
-        $this->cards->removeElement($card);
-    }
-    */
-
     public function removeCard(Card $card): Deck
     {
         $card->removeDeck($this);
@@ -231,11 +214,11 @@ class Deck extends AbstractKotobaDocument
         return $this;
     }
 
-    public function sortCards(): Deck
+    private function sortCards(): Collection
     {
         $cards = $this->cards->getValues();
         if (count($cards) < 2) {
-            return $this;
+            return $this->cards;
         }
 
         usort($cards, function(Card $card1, Card $card2) {
@@ -249,7 +232,7 @@ class Deck extends AbstractKotobaDocument
             $this->cards->add($card);
         }
 
-        return $this;
+        return $this->cards;
     }
 
     public function setCode(string $code): Deck

@@ -66,7 +66,7 @@ final class SaveProcessor implements ProcessorInterface
 
             $deck->addCard($card);
         }
-        return $deck->sortCards();
+        return $deck;
     }
 
     public function process(
