@@ -41,7 +41,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -67,7 +67,7 @@ class Kanji extends Card
 
     /** Must be written using only kanji */
     #[Assert\NotBlank(message: Card::VALIDATION_ERR_EMPTY)]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected string $kanji = '';
 
@@ -82,7 +82,7 @@ class Kanji extends Card
             message: self::VALIDATION_ERR_KUNYOMI
         ),
     ])]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
     #[ApiFilter(YomiFilter::class)]
     protected ?array $kunyomi = null;
@@ -98,7 +98,7 @@ class Kanji extends Card
             message: self::VALIDATION_ERR_ONYOMI
         ),
     ])]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
     #[ApiFilter(YomiFilter::class)]
     protected ?array $onyomi = null;

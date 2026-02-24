@@ -20,7 +20,7 @@ trait HiraganaTrait
         max: self::HIRAGANA_MAXLENGTH,
         maxMessage: Card::VALIDATION_ERR_MAXLENGTH,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected ?string $hiragana = null;
 

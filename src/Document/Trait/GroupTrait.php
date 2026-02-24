@@ -16,7 +16,7 @@ trait GroupTrait
         choices: self::ALLOWED_GROUPS,
         message: Card::VALIDATION_ERR_ENUM,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field]
     protected string $group = '';
 

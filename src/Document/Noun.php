@@ -50,7 +50,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -79,7 +79,7 @@ class Noun extends Card
         choices: self::ALLOWED_BIKAGO,
         message: self::VALIDATION_ERR_ENUM,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field]
     protected ?string $bikago = null;
 
