@@ -53,7 +53,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -100,7 +100,7 @@ class Adjective extends Card
         type: 'array',
         message: Card::VALIDATION_ERR_NOT_AN_ARRAY,
     )]
-    #[Groups(['read'])]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'hash')]
     #[ApiProperty(
         /* needed for unit-testing
@@ -123,7 +123,7 @@ class Adjective extends Card
     /**
      * @var array<string>
      */
-    #[Groups(['read'])]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'collection')]
     protected array $searchInflections = [];
 

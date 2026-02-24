@@ -13,13 +13,15 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Controller\FetchDeckByCode;
+use App\Document\Dto\DeckInput;
 use App\State\SaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiFilter(
     SearchFilter::class,
@@ -36,20 +38,23 @@ use Symfony\Component\Validator\Constraints as Assert;
     arguments: ['orderParameterName' => 'order'],
 )]
 #[ApiResource(
+    /* using a DTO to prevent automatic deserialization, allowing us to apply
+       our business logic without throwing HTTP 500 errors
+       -> see src/State/SaveProcessor.php validateCards() */
+    input: DeckInput::class,
     operations: [
         new Post(),
         new Delete(),
         new Put(
-            controller: FetchDeckByCode::class,
-            uriTemplate: '/decks/{code}',
             /* bypassing faulty internal document fetching with our custom
-               controller */
+               state provider
+               -> see src/State/SaveProcessor.php fetchDeck() */
             read: false
         ),
         new Get(),
         new GetCollection(),
     ],
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['deck:read']],
     denormalizationContext: ['groups' => ['write']],
     processor: SaveProcessor::class,
 )]
@@ -61,6 +66,8 @@ class Deck extends AbstractKotobaDocument
 
     public const DESCRIPTION_MAXLENGTH = 500;
 
+    public const DEFAULT_TYPE = 'any';
+
     public const ALLOWED_TYPES = [
         'adjectives',
         'any',
@@ -70,11 +77,24 @@ class Deck extends AbstractKotobaDocument
         'verbs',
     ];
 
+    public const CARDS_CLASSES = [
+        'adjectives' => Adjective::class,
+        'kana' => Kana::class,
+        'kanji' => Kanji::class,
+        'nouns' => Noun::class,
+        'verbs' => Verb::class,
+    ];
+
+    public const ROUTE_PREFIX = '/api/cards/';
+
     public const VALIDATION_ERR_COLOR =
         'must be a 8-character hexadecimal color (rgba)';
 
     public const VALIDATION_ERR_DUPLICATE =
         'another Deck with the same title {{ value }} already exists';
+
+    public const VALIDATION_ERR_CARDS_ASSOCIATIONS =
+        '{{ cards }} are not the same type as this Deck';
 
     /** Must be unique */
     #[Assert\NotBlank(message: self::VALIDATION_ERR_EMPTY)]
@@ -82,7 +102,7 @@ class Deck extends AbstractKotobaDocument
         max: self::TITLE_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected string $title = '';
 
@@ -91,7 +111,7 @@ class Deck extends AbstractKotobaDocument
         max: self::DESCRIPTION_MAXLENGTH,
         maxMessage: self::VALIDATION_ERR_MAXLENGTH,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected ?string $description = null;
 
@@ -100,25 +120,42 @@ class Deck extends AbstractKotobaDocument
         choices: self::ALLOWED_TYPES,
         message: self::VALIDATION_ERR_ENUM,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field]
-    protected string $type = 'any';
+    protected string $type = self::DEFAULT_TYPE;
 
     /** rgba color in hex format */
     #[Assert\CssColor(
         formats: Assert\CssColor::HEX_LONG_WITH_ALPHA,
         message: self::VALIDATION_ERR_COLOR,
     )]
-    #[Groups(['read', 'write'])]
+    #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'string')]
     protected ?string $color = '#ffffffff';
 
-    /** @var array<string> */
-    protected iterable $words;
+    /** @var Collection<int,Card> */
+    /* only [deck:read] here to avoid circular references:
+    (Deck document containing a cards array showing again our Deck) */
+    #[Groups(['deck:read'])]
+    #[MongoDB\ReferenceMany(
+        targetDocument: Card::class,
+        mappedBy: 'decks',
+        storeAs: 'id',
+        sort: ['slug' => 'asc'],
+        // preferred strategy if we want to use sort
+        strategy: 'setArray',
+    )]
+    protected Collection $cards;
 
     public function __construct()
     {
-        $this->words = new ArrayCollection();
+        $this->cards = new ArrayCollection();
+    }
+
+    /** @return Collection<int,Card> */
+    public function getCards(): Collection
+    {
+        return $this->cards;
     }
 
     public function getColor(): ?string
@@ -147,6 +184,12 @@ class Deck extends AbstractKotobaDocument
         return $this;
     }
 
+    // called right before deletion, see App\State\SaveProcessor
+    public function onDelete(): void
+    {
+        $this->detachCardsFromDeckBeforeDeletion();
+    }
+
     /**
      * @return array<string,array<string,array<string>>>
      */
@@ -165,6 +208,26 @@ class Deck extends AbstractKotobaDocument
     public function getSlugReference(): string
     {
         return $this->title;
+    }
+
+    public function addCard(Card $card): static
+    {
+        if ($this->cards->contains($card)) {
+            return $this;
+        }
+
+        $card->addDeck($this);
+        $this->cards->add($card);
+
+        return $this;
+    }
+
+    public function clearCards(): static
+    {
+        $cards = $this->cards->getValues();
+        array_walk($cards, [$this, 'removeCard']);
+
+        return $this;
     }
 
     public function setColor(?string $color): static
@@ -193,5 +256,55 @@ class Deck extends AbstractKotobaDocument
         $this->type = $type;
 
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateCardsAssociations(
+        ExecutionContextInterface $context,
+        mixed $payload
+    ): void {
+        if (self::DEFAULT_TYPE === $this->type) {
+            return;
+        }
+
+        $invalidCards = array_filter(
+            $this->cards->toArray(),
+            fn ($card) => get_class($card) !== self::CARDS_CLASSES[$this->type]
+        );
+
+        if (empty($invalidCards)) {
+            return;
+        }
+
+        $invalidIris = [];
+        $invertedCardsClasses = array_flip(self::CARDS_CLASSES);
+
+        foreach ($invalidCards as $invalidCard) {
+            $class = $invertedCardsClasses[get_class($invalidCard)];
+            $invalidIris[] =
+                self::ROUTE_PREFIX.$class.'/'.$invalidCard->getCode();
+        }
+
+        $errMessage = $this->formatMsg(
+            self::VALIDATION_ERR_CARDS_ASSOCIATIONS,
+            $this->sortByIri($invalidIris)
+        );
+
+        $context
+            ->buildViolation($errMessage)
+            ->atPath('cards')
+            ->addViolation()
+        ;
+    }
+
+    private function detachCardsFromDeckBeforeDeletion(): void
+    {
+        $this->cards->map(fn ($card) => $card->removeDeck($this));
+    }
+
+    private function removeCard(Card $card): void
+    {
+        $card->removeDeck($this);
+        $this->cards->removeElement($card);
     }
 }

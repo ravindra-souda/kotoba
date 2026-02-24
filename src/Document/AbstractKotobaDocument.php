@@ -21,27 +21,30 @@ abstract class AbstractKotobaDocument
 
     /** Slugified by the API from reference field */
     #[ApiProperty(identifier: true)]
-    #[Groups('read')]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'string')]
     protected string $code = '';
 
     /** set by MongoDB */
-    #[Groups('read')]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'date_immutable')]
     protected ?\DateTimeImmutable $createdAt = null;
 
     /** set by MongoDB */
-    #[Groups('read')]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Field(type: 'date_immutable')]
     protected ?\DateTimeImmutable $updatedAt = null;
 
     #[ApiProperty(identifier: false)]
-    #[Groups('read')]
+    #[Groups(['card:read', 'deck:read'])]
     #[MongoDB\Id(strategy: 'AUTO', type: 'object_id')]
     protected string $id;
 
     #[MongoDB\Field(type: 'int')]
     protected int $increment;
+
+    #[MongoDB\Field(type: 'string')]
+    protected string $slug;
 
     abstract public function finalizeTasks(): static;
 
@@ -51,6 +54,8 @@ abstract class AbstractKotobaDocument
     abstract public static function getFields(): array;
 
     abstract public function getSlugReference(): string;
+
+    public function onDelete(): void {}
 
     final public function trimFields(): static
     {
@@ -140,12 +145,35 @@ abstract class AbstractKotobaDocument
         return $this;
     }
 
+    // see App\EventListener\Trait\SlugifyCodeTrait
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
     // see App\EventListener\PreUpdateListener
     public function setUpdatedAt(\DateTimeImmutable $date): static
     {
         $this->updatedAt = $date;
 
         return $this;
+    }
+
+    /** @param array<string> $iris
+     *
+     * @return array<string>
+     */
+    final public static function sortByIri(array $iris): array
+    {
+        usort(
+            $iris,
+            fn (string $i1, string $i2) => preg_replace('/\d+-/', '', $i1)
+                <=> preg_replace('/\d+-/', '', $i2)
+        );
+
+        return $iris;
     }
 
     /**

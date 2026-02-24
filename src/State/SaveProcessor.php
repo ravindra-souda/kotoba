@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\State;
 
-use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Document\Adjective;
 use App\Document\Deck;
+use App\Document\Dto\DeckInput;
 use App\Document\Kana;
 use App\Document\Kanji;
 use App\Document\Noun;
@@ -28,6 +29,7 @@ final class SaveProcessor implements ProcessorInterface
     public function __construct(
         private ProcessorInterface $persistProcessor,
         private ProcessorInterface $removeProcessor,
+        private DtoToDeckHelper $dtoToDeck,
     ) {}
 
     public function process(
@@ -36,10 +38,19 @@ final class SaveProcessor implements ProcessorInterface
         array $uriVariables = [],
         array $context = [],
     ): Adjective|Deck|Kana|Kanji|Noun|Verb|null {
-        if ($operation instanceof DeleteOperationInterface) {
+        if ($operation instanceof Delete) {
+            $data->onDelete();
+
             return $this
                 ->removeProcessor
                 ->process($data, $operation, $uriVariables, $context)
+            ;
+        }
+
+        if ($data instanceof DeckInput) {
+            $data = $this
+                ->dtoToDeck
+                ->processDeckFromDto($data, $operation, $uriVariables)
             ;
         }
 
