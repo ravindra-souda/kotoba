@@ -6,3 +6,6 @@ services:
     ports:
       - "5432"
 ###< doctrine/doctrine-bundle ###
+    healthcheck:
+      interval: 5s
+      #start_interval: 2s
