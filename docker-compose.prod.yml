@@ -1,0 +1,10 @@
+# prod, see hajime.sh
+version: '3'
+
+services:
+  database:
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PWD}
+    ports:
+      - "27017:27017"

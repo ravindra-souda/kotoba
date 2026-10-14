@@ -1,17 +1,12 @@
+# common config
 version: '3'
 
 services:
-###> doctrine/doctrine-bundle ###
   database:
     image: mongo:${MONGO_VERSION}
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      MONGO_INITDB_ROOT_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
       MONGO_INITDB_DATABASE: ${MONGODB_DB}
-    ports:
-      - "27018:27017"
     volumes:
       - database_data:/data/db:rw
       # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
@@ -22,9 +17,23 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
-###< doctrine/doctrine-bundle ###
+    networks:
+      - app-network
+
+  app:
+    image: php:8.2
+    #restart: unless-stopped
+    environment:
+      MONGODB_URI: mongodb://localhost:27017
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - app-network
 
 volumes:
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
+
+networks:
+  app-network:
+    driver: bridge
