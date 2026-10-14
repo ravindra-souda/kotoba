@@ -21,8 +21,10 @@ services:
       - app-network
 
   app:
-    image: php:8.2
-    #restart: unless-stopped
+    image: kotoba:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"
     environment:
       MONGODB_URI: mongodb://localhost:27017
     depends_on:
