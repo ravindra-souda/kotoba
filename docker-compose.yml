@@ -31,7 +31,6 @@ services:
       - ./:/app/public
       - caddy_data:/data
       - caddy_config:/config
-    tty: true
     environment:
       MONGODB_URI: mongodb://localhost:27017
     depends_on:
