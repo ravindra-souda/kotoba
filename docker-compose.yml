@@ -21,10 +21,17 @@ services:
       - app-network
 
   app:
-    image: kotoba:latest
+    image: dunglas/frankenphp:1-php8.2-alpine
     restart: unless-stopped
     ports:
       - "8080:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./:/app/public
+      - caddy_data:/data
+      - caddy_config:/config
+    tty: true
     environment:
       MONGODB_URI: mongodb://localhost:27017
     depends_on:
@@ -35,6 +42,8 @@ services:
 
 volumes:
   database_data:
+  caddy_data:
+  caddy_config:
 
 networks:
   app-network:
