@@ -7,7 +7,7 @@ services:
       - "127.0.0.1:27018:27017"
     healthcheck:
       interval: 5s
-      #start_interval: 2s
+      start_interval: 2s
 
   app:
     # human-readable logs
