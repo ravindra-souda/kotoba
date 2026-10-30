@@ -1,15 +1,15 @@
-FROM dunglas/frankenphp:sha-69416cc-php8.2-alpine@sha256:a5b9d58f6ee3298b05cf3113c76267b6d5a34afe8259e0a37089001beb614d9c AS base
+FROM dunglas/frankenphp:1.13.4-php8.5-alpine@sha256:974e767f7694964fdb23ead3172dd0a12cedefbd929fbe0db7f69a680663295d AS base
 
-RUN install-php-extensions mongodb-1.16.2
+RUN install-php-extensions mongodb-2.5.5
 WORKDIR /app
 
 # dev: Get Composer and ends here
 FROM base AS dev
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.11 /usr/bin/composer /usr/bin/composer
 
 # vendor: Used for prod, get dependencies without any dev tools or scripts
 FROM base AS vendor
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.11 /usr/bin/composer /usr/bin/composer
 
 # user for Composer
 ARG USER=appuser

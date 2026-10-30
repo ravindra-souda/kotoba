@@ -1,6 +1,4 @@
 # common config
-version: '3'
-
 services:
   database:
     image: mongo:6.0.9@sha256:7dadc8a3463baf51be3ad4fa8e3fdbf019ee014c7e6383158a231c68827ec85b
