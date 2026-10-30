@@ -1,6 +1,4 @@
 # prod, see hajime shell script
-version: '3'
-
 services:
   database:
     environment:

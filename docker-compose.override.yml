@@ -1,6 +1,4 @@
 # dev, automatically loaded
-version: '3'
-
 services:
   database:
     ports:
