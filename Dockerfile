@@ -15,14 +15,16 @@ RUN chown -R ${APP_USER}:${APP_USER} /config/caddy /data/caddy
 ENV SERVER_NAME=:8080
 EXPOSE 8080
 
-# dev: Get Composer and ends here
+# dev: Get Composer, Git and ends here
 FROM base AS dev
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+RUN apk add --no-cache git unzip
 USER ${APP_USER}
 
 # vendor: Used for prod, get dependencies without any dev tools or scripts
 FROM base AS vendor
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+RUN apk add --no-cache git unzip
 
 RUN chown ${APP_USER}:${APP_USER} /app
 COPY composer.json composer.lock ./
@@ -33,7 +35,7 @@ RUN composer install --no-dev --no-scripts --no-autoloader
 COPY --chown=${APP_USER}:${APP_USER} . .
 RUN composer dump-autoload --no-dev --optimize
 
-# prod: Without Composer, only dependencies are copied
+# prod: Without Composer or Git, only dependencies are copied
 FROM base AS prod
 COPY --from=vendor /app /app
 USER ${APP_USER}
