@@ -20,7 +20,7 @@ Les projets open source suivants donnent vie à kotoba :
 
 ## Documentation OpenAPI
 
-https://localhost/api
+http://localhost:8080/api
 
 ## Installation
 

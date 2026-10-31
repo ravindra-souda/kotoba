@@ -3,26 +3,37 @@ FROM dunglas/frankenphp:sha-69416cc-php8.2-alpine@sha256:a5b9d58f6ee3298b05cf311
 RUN install-php-extensions mongodb-1.16.2
 WORKDIR /app
 
+# running as a non-root user
+ENV APP_USER=kotoba
+RUN adduser -D ${APP_USER}
+
+# remove capability to bind the web server on privileged ports (80 and 443)
+RUN setcap -r /usr/local/bin/frankenphp
+
+RUN chown -R ${APP_USER}:${APP_USER} /config/caddy /data/caddy
+
+ENV SERVER_NAME=:8080
+EXPOSE 8080
+
 # dev: Get Composer and ends here
 FROM base AS dev
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+USER ${APP_USER}
 
 # vendor: Used for prod, get dependencies without any dev tools or scripts
 FROM base AS vendor
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# user for Composer
-ARG USER=appuser
-RUN adduser -D ${USER}
-RUN chown ${USER}:${USER} /app
+RUN chown ${APP_USER}:${APP_USER} /app
 COPY composer.json composer.lock ./
 
-USER ${USER}
+USER ${APP_USER}
 RUN composer install --no-dev --no-scripts --no-autoloader
 
-COPY --chown=${USER}:${USER} . .
+COPY --chown=${APP_USER}:${APP_USER} . .
 RUN composer dump-autoload --no-dev --optimize
 
 # prod: Without Composer, only dependencies are copied
 FROM base AS prod
 COPY --from=vendor /app /app
+USER ${APP_USER}

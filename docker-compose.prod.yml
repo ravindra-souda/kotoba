@@ -13,10 +13,6 @@ services:
   app:
     build:
       target: prod
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
 
 secrets:
   db_username:
