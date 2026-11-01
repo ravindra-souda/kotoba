@@ -17,13 +17,13 @@ EXPOSE 8080
 
 # dev: Get Composer and ends here
 FROM base AS dev
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.11 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_HOME=/home/${APP_USER}/.composer
 USER ${APP_USER}
 
 # vendor: Used for prod, get dependencies without any dev tools or scripts
 FROM base AS vendor
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.11 /usr/bin/composer /usr/bin/composer
 
 RUN chown ${APP_USER}:${APP_USER} /app
 COPY composer.json composer.lock ./
