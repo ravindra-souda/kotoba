@@ -28,6 +28,10 @@
 /secrets/*
 ###< docker compose secrets ###
 
+###> docker compose dev tokens ###
+/.env.docker
+###< docker compose dev tokens ###
+
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###

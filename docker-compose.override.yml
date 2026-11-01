@@ -16,3 +16,6 @@ services:
       - ./:/app
     # human-readable logs
     tty: true
+    # never commit that .env.docker file !
+    env_file:
+      - .env.docker
