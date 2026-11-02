@@ -26,7 +26,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     environment:
-      MONGODB_URL: mongodb://database:27017
+      MONGODB_URI: mongodb://database:27017
     depends_on:
       database:
         condition: service_healthy

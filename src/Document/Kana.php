@@ -16,7 +16,7 @@ use ApiPlatform\Metadata\Put;
 use App\Controller\FetchKanaByCode;
 use App\Exception\EmptySlugException;
 use App\State\SaveProcessor;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 

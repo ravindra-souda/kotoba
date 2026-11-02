@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Document;
 
 use ApiPlatform\Metadata\ApiProperty;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 abstract class AbstractKotobaDocument

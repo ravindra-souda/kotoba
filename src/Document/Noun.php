@@ -17,7 +17,7 @@ use App\Controller\FetchNounByCode;
 use App\Exception\EmptySlugException;
 use App\Filter\WithBikagoFilter;
 use App\State\SaveProcessor;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
