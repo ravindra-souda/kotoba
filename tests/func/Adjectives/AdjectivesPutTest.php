@@ -455,8 +455,10 @@ class AdjectivesPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/adjectives',
-            ['json' => $fixture]
+            '/api/cards/adjectives', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -518,8 +520,10 @@ class AdjectivesPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/adjectives',
-            ['json' => $fixture]
+            '/api/cards/adjectives', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -543,7 +547,7 @@ class AdjectivesPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -554,8 +558,8 @@ class AdjectivesPutTest extends ApiTestCase
     {
         static::createClient()->request(
             'PUT',
-            'api/cards/adjectives/dummy',
-            [
+            'api/cards/adjectives/dummy', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => self::PUT_FIXTURE_ADJECTIVES['i_adjective'],
             ]
         );
@@ -566,8 +570,8 @@ class AdjectivesPutTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/adjectives',
-            [
+            '/api/cards/adjectives', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => self::PUT_FIXTURE_ADJECTIVES['i_adjective'],
             ]
         );

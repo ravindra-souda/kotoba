@@ -671,8 +671,10 @@ class DecksPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => $fixture]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -715,8 +717,10 @@ class DecksPutTest extends ApiTestCase
             // setting up fixture
             $response = static::createClient()->request(
                 'POST',
-                '/api/decks',
-                ['json' => $payload]
+                '/api/decks', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
             $this->assertResponseStatusCodeSame(201);
             $_id = json_decode($response->getContent(), true)['@id'];
@@ -755,10 +759,10 @@ class DecksPutTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertSame($content['hydra:totalItems'], 3);
+        $this->assertSame($content['totalItems'], 3);
         $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
 
-        foreach ($content['hydra:member'] as $deck) {
+        foreach ($content['member'] as $deck) {
             $this->assertNotContains(
                 self::$cardsToBeRemoved['kana_to_delete']['content'],
                 $deck['cards']
@@ -805,8 +809,10 @@ class DecksPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => $fixture]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -815,8 +821,10 @@ class DecksPutTest extends ApiTestCase
             && self::UNIQUE_TITLE === $payload['title']) {
             $response = static::createClient()->request(
                 'POST',
-                '/api/decks',
-                ['json' => $payload]
+                '/api/decks', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
 
             // needed because request() is asynchronous
@@ -842,7 +850,7 @@ class DecksPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -854,8 +862,10 @@ class DecksPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => self::PUT_INVALID_ASSOCIATIONS_DECK]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => self::PUT_INVALID_ASSOCIATIONS_DECK
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -897,7 +907,7 @@ class DecksPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -910,11 +920,12 @@ class DecksPutTest extends ApiTestCase
         $title = "Let's send a bunch of invalid IRI and see what happens";
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => [
-                ...self::PUT_COMPLETE_VALID_DECK,
-                'title' => $title,
-            ],
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => [
+                    ...self::PUT_COMPLETE_VALID_DECK,
+                    'title' => $title,
+                ],
             ],
         );
         $this->assertResponseStatusCodeSame(201);
@@ -972,7 +983,7 @@ class DecksPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -990,8 +1001,10 @@ class DecksPutTest extends ApiTestCase
         foreach (self::PUT_REVERSE_MAPPING_DECKS as $key => $payload) {
             $response = static::createClient()->request(
                 'POST',
-                '/api/decks',
-                ['json' => $payload]
+                '/api/decks', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
             $this->assertResponseStatusCodeSame(201);
             $_id = json_decode($response->getContent(), true)['@id'];
@@ -1074,8 +1087,8 @@ class DecksPutTest extends ApiTestCase
     {
         static::createClient()->request(
             'PUT',
-            'api/decks/dummy',
-            [
+            'api/decks/dummy', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => [
                     ...self::PUT_COMPLETE_VALID_DECK,
                     'title' => 'Unknown deck',
@@ -1089,8 +1102,8 @@ class DecksPutTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            [
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => [
                     ...self::PUT_COMPLETE_VALID_DECK,
                     'title' => 'is patch allowed ?',

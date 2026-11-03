@@ -113,8 +113,10 @@ class DecksGetTest extends ApiTestCase
         foreach ($fixtures as $payload) {
             static::createClient()->request(
                 'POST',
-                '/api/decks',
-                ['json' => $payload]
+                '/api/decks', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
 
             static::assertResponseStatusCodeSame(201);
@@ -163,8 +165,8 @@ class DecksGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertSame($content['hydra:totalItems'], 1);
-        $this->assertArraySubset($expected, $content['hydra:member'][0]);
+        $this->assertSame($content['totalItems'], 1);
+        $this->assertArraySubset($expected, $content['member'][0]);
         $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
     }
 
@@ -241,11 +243,11 @@ class DecksGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertSame($content['hydra:totalItems'], count($expected));
+        $this->assertSame($content['totalItems'], count($expected));
         for ($i = 0; $i < count($expected); ++$i) {
             $this->assertArraySubset(
                 $expected[$i],
-                $content['hydra:member'][$i]
+                $content['member'][$i]
             );
         }
         $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
@@ -265,14 +267,14 @@ class DecksGetTest extends ApiTestCase
         );
 
         $content = json_decode($response->getContent(), true);
-        $this->assertSame($content['hydra:totalItems'], 1);
+        $this->assertSame($content['totalItems'], 1);
         $this->assertArraySubset(
             self::GET_SORT_FIXTURES['search and sort'][1],
-            $content['hydra:member'][0]
+            $content['member'][0]
         );
         $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
 
-        return $content['hydra:member'][0]['@id'];
+        return $content['member'][0]['@id'];
     }
 
     /**
@@ -291,7 +293,7 @@ class DecksGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertArrayNotHasKey('hydra:totalItems', $content);
+        $this->assertArrayNotHasKey('totalItems', $content);
         $this->assertJsonContains(
             self::GET_SORT_FIXTURES['search and sort'][1]
         );
@@ -335,8 +337,8 @@ class DecksGetTest extends ApiTestCase
         );
 
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 0,
+            '@type' => 'Collection',
+            'totalItems' => 0,
         ]);
     }
 
@@ -359,18 +361,18 @@ class DecksGetTest extends ApiTestCase
             'application/ld+json; charset=utf-8'
         );
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
-            'hydra:view' => [
-                '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/api/decks?description=pagination&page=1',
-                'hydra:last' => '/api/decks?description=pagination&page='
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
+            'view' => [
+                '@type' => 'PartialCollectionView',
+                'first' => '/api/decks?description=pagination&page=1',
+                'last' => '/api/decks?description=pagination&page='
                     .$lastPage,
-                'hydra:next' => '/api/decks?description=pagination&page=2',
+                'next' => '/api/decks?description=pagination&page=2',
             ],
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
 
         $response = static::createClient()->request(
             'GET',
@@ -378,10 +380,10 @@ class DecksGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
         $this->assertArraySubset(
             self::GET_SORT_FIXTURES['description_desc'][2],
-            $content['hydra:member'][2]
+            $content['member'][2]
         );
 
         // client-side pagination options should be disabled
@@ -391,11 +393,11 @@ class DecksGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
 
         $response = static::createClient()->request(
             'GET',
@@ -403,11 +405,11 @@ class DecksGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
     }
 
     private function getItemsPerPage(): int

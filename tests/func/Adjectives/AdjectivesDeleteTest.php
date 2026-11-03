@@ -23,8 +23,10 @@ class AdjectivesDeleteTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/adjectives',
-            ['json' => self::DELETE_VALID_ADJECTIVE]
+            '/api/cards/adjectives', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => self::DELETE_VALID_ADJECTIVE
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];

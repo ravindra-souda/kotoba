@@ -41,8 +41,10 @@ trait CardAssociationTrait
             $path = explode('_', $key, 2)[0];
             $response = static::createClient()->request(
                 'POST',
-                '/api/cards/'.$path,
-                ['json' => $payload]
+                '/api/cards/'.$path, [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
 
             static::assertResponseStatusCodeSame(201);

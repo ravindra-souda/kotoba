@@ -698,8 +698,10 @@ class VerbsPostTest extends ApiTestCase
     ): void {
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/verbs',
-            ['json' => $payload]
+            '/api/cards/verbs', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $payload
+            ]
         );
 
         $this->assertResponseStatusCodeSame(201);
@@ -739,14 +741,16 @@ class VerbsPostTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/verbs',
-            ['json' => $payload]
+            '/api/cards/verbs', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $payload
+            ]
         );
 
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception

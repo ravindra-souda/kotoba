@@ -26,8 +26,10 @@ class VerbsDeleteTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/verbs',
-            ['json' => self::DELETE_VALID_VERB]
+            '/api/cards/verbs', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => self::DELETE_VALID_VERB
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];

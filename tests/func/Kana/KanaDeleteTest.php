@@ -19,8 +19,10 @@ class KanaDeleteTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/kana',
-            ['json' => self::DELETE_VALID_KANA]
+            '/api/cards/kana', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => self::DELETE_VALID_KANA
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];

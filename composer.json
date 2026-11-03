@@ -7,7 +7,7 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "api-platform/core": "^3.1",
+        "api-platform/core": "^3.4",
         "cocur/slugify": "^4.5",
         "doctrine/mongodb-odm-bundle": "^5.0",
         "nelmio/cors-bundle": "^2.3",
@@ -24,6 +24,7 @@
         "symfony/runtime": "6.4.*",
         "symfony/security-bundle": "6.4.*",
         "symfony/serializer": "6.4.*",
+        "symfony/string": "6.4.*",
         "symfony/twig-bundle": "6.4.*",
         "symfony/validator": "6.4.*",
         "symfony/yaml": "6.4.*"

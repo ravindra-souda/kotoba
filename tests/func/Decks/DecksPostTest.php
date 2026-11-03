@@ -398,8 +398,10 @@ class DecksPostTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => $payload]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $payload
+            ]
         );
 
         $this->assertResponseStatusCodeSame(201);
@@ -427,8 +429,10 @@ class DecksPostTest extends ApiTestCase
             $payload['cards'] = self::$decksWithAssociations[$key]['cards'];
             static::createClient()->request(
                 'POST',
-                '/api/decks',
-                ['json' => $payload]
+                '/api/decks', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
 
             $this->assertResponseStatusCodeSame(201);
@@ -452,10 +456,10 @@ class DecksPostTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertSame($content['hydra:totalItems'], 3);
+        $this->assertSame($content['totalItems'], 3);
         $this->assertMatchesResourceCollectionJsonSchema(Deck::class);
 
-        foreach ($content['hydra:member'] as $deck) {
+        foreach ($content['member'] as $deck) {
             $this->assertNotContains(
                 self::$cardsToBeRemoved['kanji_to_delete']['content'],
                 $deck['cards']
@@ -497,23 +501,27 @@ class DecksPostTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => $payload]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $payload
+            ]
         );
 
         if (isset($payload['title'])
             && self::UNIQUE_TITLE === $payload['title']) {
             $response = static::createClient()->request(
                 'POST',
-                '/api/decks',
-                ['json' => $payload]
+                '/api/decks', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
         }
 
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -545,14 +553,16 @@ class DecksPostTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => $payload]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $payload
+            ]
         );
 
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -593,14 +603,16 @@ class DecksPostTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => $payload]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $payload
+            ]
         );
 
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -620,8 +632,10 @@ class DecksPostTest extends ApiTestCase
 
             $response = static::createClient()->request(
                 'POST',
-                '/api/decks',
-                ['json' => $payload]
+                '/api/decks', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
 
             $this->assertResponseStatusCodeSame(201);
@@ -692,8 +706,10 @@ class DecksPostTest extends ApiTestCase
         foreach (array_slice(self::UNIQUE_INCREMENT_DECKS, 0, 2) as $deck) {
             $response = static::createClient()->request(
                 'POST',
-                '/api/decks',
-                ['json' => $deck]
+                '/api/decks', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $deck
+                ]
             );
             $this->assertResponseStatusCodeSame(201);
             $increments[] = strstr(
@@ -717,8 +733,10 @@ class DecksPostTest extends ApiTestCase
 
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => self::UNIQUE_INCREMENT_DECKS[2]]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => self::UNIQUE_INCREMENT_DECKS[2]
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
 

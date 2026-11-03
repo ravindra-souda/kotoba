@@ -976,8 +976,10 @@ class VerbsPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/verbs',
-            ['json' => $fixture]
+            '/api/cards/verbs', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -1039,8 +1041,10 @@ class VerbsPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/verbs',
-            ['json' => $fixture]
+            '/api/cards/verbs', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -1064,7 +1068,7 @@ class VerbsPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -1075,8 +1079,8 @@ class VerbsPutTest extends ApiTestCase
     {
         static::createClient()->request(
             'PUT',
-            'api/cards/verbs/dummy',
-            [
+            'api/cards/verbs/dummy', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => self::PUT_FIXTURE_VERBS['godan'],
             ]
         );
@@ -1087,8 +1091,8 @@ class VerbsPutTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/verbs',
-            [
+            '/api/cards/verbs', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => self::PUT_FIXTURE_VERBS['ichidan'],
             ]
         );

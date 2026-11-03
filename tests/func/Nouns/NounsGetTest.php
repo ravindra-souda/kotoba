@@ -148,8 +148,10 @@ class NounsGetTest extends ApiTestCase
         foreach ($fixtures as $payload) {
             static::createClient()->request(
                 'POST',
-                '/api/cards/nouns',
-                ['json' => $payload]
+                '/api/cards/nouns', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
 
             static::assertResponseStatusCodeSame(201);
@@ -309,10 +311,10 @@ class NounsGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertSame($content['hydra:totalItems'], count($expected));
+        $this->assertSame($content['totalItems'], count($expected));
         $this->assertArraySubset(
             array_slice($expected, 0, $this->getItemsPerPage()),
-            $content['hydra:member']
+            $content['member']
         );
         $this->assertMatchesResourceCollectionJsonSchema(Noun::class);
     }
@@ -371,11 +373,11 @@ class NounsGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertSame($content['hydra:totalItems'], count($expected));
+        $this->assertSame($content['totalItems'], count($expected));
         for ($i = 0; $i < count($expected); ++$i) {
             $this->assertArraySubset(
                 $expected[$i],
-                $content['hydra:member'][$i]
+                $content['member'][$i]
             );
         }
         $this->assertMatchesResourceCollectionJsonSchema(Noun::class);
@@ -395,14 +397,14 @@ class NounsGetTest extends ApiTestCase
         );
 
         $content = json_decode($response->getContent(), true);
-        $this->assertSame($content['hydra:totalItems'], 1);
+        $this->assertSame($content['totalItems'], 1);
         $this->assertArraySubset(
             self::GET_SEARCH_FIXTURES['kanji_3'],
-            $content['hydra:member'][0]
+            $content['member'][0]
         );
         $this->assertMatchesResourceCollectionJsonSchema(Noun::class);
 
-        return $content['hydra:member'][0]['@id'];
+        return $content['member'][0]['@id'];
     }
 
     /**
@@ -421,7 +423,7 @@ class NounsGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertArrayNotHasKey('hydra:totalItems', $content);
+        $this->assertArrayNotHasKey('totalItems', $content);
         $this->assertJsonContains(
             self::GET_SEARCH_FIXTURES['kanji_3']
         );
@@ -465,8 +467,8 @@ class NounsGetTest extends ApiTestCase
         );
 
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 0,
+            '@type' => 'Collection',
+            'totalItems' => 0,
         ]);
     }
 
@@ -486,18 +488,18 @@ class NounsGetTest extends ApiTestCase
             'application/ld+json; charset=utf-8'
         );
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
-            'hydra:view' => [
-                '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/api/cards/nouns?romaji=pagination&page=1',
-                'hydra:last' => '/api/cards/nouns?romaji=pagination&page='.
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
+            'view' => [
+                '@type' => 'PartialCollectionView',
+                'first' => '/api/cards/nouns?romaji=pagination&page=1',
+                'last' => '/api/cards/nouns?romaji=pagination&page='.
                     $lastPage,
-                'hydra:next' => '/api/cards/nouns?romaji=pagination&page=2',
+                'next' => '/api/cards/nouns?romaji=pagination&page=2',
             ],
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
 
         $response = static::createClient()->request(
             'GET',
@@ -505,10 +507,10 @@ class NounsGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
         $this->assertArraySubset(
             self::GET_SEARCH_FIXTURES['romaji_2'],
-            $content['hydra:member'][2]
+            $content['member'][2]
         );
 
         // client-side pagination options should be disabled
@@ -518,11 +520,11 @@ class NounsGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
 
         $response = static::createClient()->request(
             'GET',
@@ -530,11 +532,11 @@ class NounsGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
     }
 
     private function getItemsPerPage(): int

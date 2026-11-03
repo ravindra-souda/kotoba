@@ -156,8 +156,10 @@ class KanjiGetTest extends ApiTestCase
         foreach (self::GET_SEARCH_FIXTURES as $payload) {
             static::createClient()->request(
                 'POST',
-                '/api/cards/kanji',
-                ['json' => $payload]
+                '/api/cards/kanji', [
+                    'headers' => ['Content-Type' => 'application/ld+json'],
+                    'json' => $payload
+                ]
             );
 
             static::assertResponseStatusCodeSame(201);
@@ -270,10 +272,10 @@ class KanjiGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertSame($content['hydra:totalItems'], count($expected));
+        $this->assertSame($content['totalItems'], count($expected));
         $this->assertArraySubset(
             array_slice($expected, 0, $this->getItemsPerPage()),
-            $content['hydra:member']
+            $content['member']
         );
         $this->assertMatchesResourceCollectionJsonSchema(Kanji::class);
     }
@@ -291,14 +293,14 @@ class KanjiGetTest extends ApiTestCase
         );
 
         $content = json_decode($response->getContent(), true);
-        $this->assertSame($content['hydra:totalItems'], 1);
+        $this->assertSame($content['totalItems'], 1);
         $this->assertArraySubset(
             self::GET_EXPECTED_KANJI['meaning'],
-            $content['hydra:member'][0]
+            $content['member'][0]
         );
         $this->assertMatchesResourceCollectionJsonSchema(Kanji::class);
 
-        return $content['hydra:member'][0]['@id'];
+        return $content['member'][0]['@id'];
     }
 
     /**
@@ -317,7 +319,7 @@ class KanjiGetTest extends ApiTestCase
         );
         $content = json_decode($response->getContent(), true);
 
-        $this->assertArrayNotHasKey('hydra:totalItems', $content);
+        $this->assertArrayNotHasKey('totalItems', $content);
         $this->assertJsonContains(
             self::GET_EXPECTED_KANJI['meaning']
         );
@@ -361,8 +363,8 @@ class KanjiGetTest extends ApiTestCase
         );
 
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 0,
+            '@type' => 'Collection',
+            'totalItems' => 0,
         ]);
     }
 
@@ -387,20 +389,20 @@ class KanjiGetTest extends ApiTestCase
             'application/ld+json; charset=utf-8'
         );
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
-            'hydra:view' => [
-                '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/api/cards/kanji?onyomi='.
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
+            'view' => [
+                '@type' => 'PartialCollectionView',
+                'first' => '/api/cards/kanji?onyomi='.
                     urlencode('タイ').'&page=1',
-                'hydra:last' => '/api/cards/kanji?onyomi='.
+                'last' => '/api/cards/kanji?onyomi='.
                     urlencode('タイ').'&page='.$lastPage,
-                'hydra:next' => '/api/cards/kanji?onyomi='.
+                'next' => '/api/cards/kanji?onyomi='.
                     urlencode('タイ').'&page=2',
             ],
         ]);
         $firstPageContent = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $firstPageContent['hydra:member']);
+        $this->assertCount($itemsPerPage, $firstPageContent['member']);
 
         $response = static::createClient()->request(
             'GET',
@@ -410,12 +412,12 @@ class KanjiGetTest extends ApiTestCase
         $secondPageContent = json_decode($response->getContent(), true);
         $this->assertCount(
             $itemsOnSecondPage,
-            $secondPageContent['hydra:member']
+            $secondPageContent['member']
         );
 
         // first page results shouldn't be on second page
-        $firstPageIds = $this->getIds($firstPageContent['hydra:member']);
-        $secondPageIds = $this->getIds($secondPageContent['hydra:member']);
+        $firstPageIds = $this->getIds($firstPageContent['member']);
+        $secondPageIds = $this->getIds($secondPageContent['member']);
         $this->assertSame(
             $firstPageIds,
             array_diff($firstPageIds, $secondPageIds)
@@ -428,11 +430,11 @@ class KanjiGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
 
         $response = static::createClient()->request(
             'GET',
@@ -440,11 +442,11 @@ class KanjiGetTest extends ApiTestCase
         );
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => $totalItems,
+            '@type' => 'Collection',
+            'totalItems' => $totalItems,
         ]);
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($itemsPerPage, $content['hydra:member']);
+        $this->assertCount($itemsPerPage, $content['member']);
     }
 
     private function getItemsPerPage(): int

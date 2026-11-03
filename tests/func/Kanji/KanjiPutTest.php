@@ -336,8 +336,10 @@ class KanjiPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/kanji',
-            ['json' => $fixture]
+            '/api/cards/kanji', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -399,8 +401,10 @@ class KanjiPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/kanji',
-            ['json' => $fixture]
+            '/api/cards/kanji', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -424,7 +428,7 @@ class KanjiPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -435,8 +439,8 @@ class KanjiPutTest extends ApiTestCase
     {
         static::createClient()->request(
             'PUT',
-            'api/cards/kanji/dummy',
-            [
+            'api/cards/kanji/dummy', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => self::PUT_VALID_KANJI['kanji'],
             ]
         );
@@ -447,8 +451,8 @@ class KanjiPutTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/kanji',
-            [
+            '/api/cards/kanji', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => self::PUT_FIXTURE_KANJI['default'],
             ]
         );

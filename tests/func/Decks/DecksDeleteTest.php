@@ -19,8 +19,10 @@ class DecksDeleteTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/decks',
-            ['json' => self::DELETE_VALID_DECK]
+            '/api/decks', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => self::DELETE_VALID_DECK
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];

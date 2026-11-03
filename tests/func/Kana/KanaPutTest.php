@@ -241,8 +241,10 @@ class KanaPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/kana',
-            ['json' => $fixture]
+            '/api/cards/kana', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -305,8 +307,10 @@ class KanaPutTest extends ApiTestCase
         // setting up fixture
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/kana',
-            ['json' => $fixture]
+            '/api/cards/kana', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
+                'json' => $fixture
+            ]
         );
         $this->assertResponseStatusCodeSame(201);
         $_id = json_decode($response->getContent(), true)['@id'];
@@ -330,7 +334,7 @@ class KanaPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/problem+json; charset=utf-8'
         );
 
         // needed to trigger the exception
@@ -341,8 +345,8 @@ class KanaPutTest extends ApiTestCase
     {
         static::createClient()->request(
             'PUT',
-            'api/cards/kana/dummy',
-            [
+            'api/cards/kana/dummy', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => self::PUT_VALID_KANA['hiragana'],
             ]
         );
@@ -353,8 +357,8 @@ class KanaPutTest extends ApiTestCase
     {
         $response = static::createClient()->request(
             'POST',
-            '/api/cards/kana',
-            [
+            '/api/cards/kana', [
+                'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => self::PUT_FIXTURE_KANA['hiragana'],
             ]
         );
