@@ -45,12 +45,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     operations: [
         new Post(),
         new Delete(),
-        new Put(
-            /* bypassing faulty internal document fetching with our custom
-               state provider
-               -> see src/State/SaveProcessor.php fetchDeck() */
-            read: false
-        ),
+        new Put(),
         new Get(),
         new GetCollection(),
     ],

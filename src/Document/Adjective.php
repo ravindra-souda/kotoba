@@ -14,7 +14,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Controller\FetchAdjectiveByCode;
 use App\Exception\EmptySlugException;
 use App\Filter\WithInflectionsFilter;
 use App\State\SaveProcessor;
@@ -43,13 +42,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     operations: [
         new Post(),
         new Delete(),
-        new Put(
-            controller: FetchAdjectiveByCode::class,
-            uriTemplate: '/adjectives/{code}',
-            /* bypassing faulty internal document fetching with our custom
-               controller */
-            read: false
-        ),
+        new Put(),
         new Get(),
         new GetCollection(),
     ],

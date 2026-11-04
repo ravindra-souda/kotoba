@@ -13,7 +13,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Controller\FetchKanaByCode;
 use App\Exception\EmptySlugException;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
@@ -38,13 +37,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     operations: [
         new Post(),
         new Delete(),
-        new Put(
-            controller: FetchKanaByCode::class,
-            uriTemplate: '/kana/{code}',
-            /* bypassing faulty internal document fetching with our custom
-               controller */
-            read: false
-        ),
+        new Put(),
         new Get(),
         new GetCollection(),
     ],

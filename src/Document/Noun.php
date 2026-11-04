@@ -13,7 +13,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Controller\FetchNounByCode;
 use App\Exception\EmptySlugException;
 use App\Filter\WithBikagoFilter;
 use App\State\SaveProcessor;
@@ -40,13 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Post(),
         new Delete(),
-        new Put(
-            controller: FetchNounByCode::class,
-            uriTemplate: '/nouns/{code}',
-            /* bypassing faulty internal document fetching with our custom
-               controller */
-            read: false
-        ),
+        new Put(),
         new Get(),
         new GetCollection(),
     ],

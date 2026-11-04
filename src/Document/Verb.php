@@ -14,7 +14,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Controller\FetchVerbByCode;
 use App\Exception\EmptySlugException;
 use App\Filter\WithInflectionsFilter;
 use App\State\SaveProcessor;
@@ -42,13 +41,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     operations: [
         new Post(),
         new Delete(),
-        new Put(
-            controller: FetchVerbByCode::class,
-            uriTemplate: '/verbs/{code}',
-            /* bypassing faulty internal document fetching with our custom
-               controller */
-            read: false
-        ),
+        new Put(),
         new Get(),
         new GetCollection(),
     ],

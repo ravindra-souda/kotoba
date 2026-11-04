@@ -20,6 +20,7 @@ api_platform:
     keep_legacy_inflector: false
     serializer:
         hydra_prefix: false
+    use_symfony_listeners: false
     exception_to_status:
         App\Exception\CardsNotFoundException: 422
         App\Exception\NotFoundException: 404
