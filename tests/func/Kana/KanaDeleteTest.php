@@ -15,7 +15,7 @@ class KanaDeleteTest extends ApiTestCase
         'katakana' => 'キ',
     ];
 
-    public function testDecksDelete(): void
+    public function testKanaDelete(): void
     {
         $response = static::createClient()->request(
             'POST',
