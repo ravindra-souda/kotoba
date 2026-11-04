@@ -35,6 +35,8 @@ Le wrapper ```./bin/composer``` peut être utile pour ne pas avoir à taper ```d
 ./bin/composer i
 ```
 
+De même avec ```./bin/php``` si vous souhaitez appeler PHP depuis le container app.
+
 ## Scripts
 
 #### Tests
