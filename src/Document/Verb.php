@@ -121,9 +121,15 @@ class Verb extends Card
     #[MongoDB\Field(type: 'hash')]
     #[ApiProperty(
         /* needed for unit-testing
-        https://api-platform.com/docs/v3.1/core/json-schema/#overriding-the-json-schema-specification */
+        https://api-platform.com/docs/v3.4/core/json-schema/#overriding-the-json-schema-specification */
         jsonSchemaContext: [
             'type' => 'object',
+            'additionalProperties' => [
+                'oneOf' => [
+                    ['type' => 'string'],
+                    ['type' => 'object'],
+                ],
+            ],
         ]
     )]
     protected array $inflections = [
