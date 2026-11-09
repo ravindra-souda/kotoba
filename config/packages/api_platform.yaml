@@ -16,8 +16,6 @@ api_platform:
             standard_put: true
             rfc_7807_compliant_errors: true
         pagination_items_per_page: '%env(int:ITEMS_PER_PAGE)%'
-    event_listeners_backward_compatibility_layer: false
-    keep_legacy_inflector: false
     serializer:
         hydra_prefix: false
     use_symfony_listeners: false
