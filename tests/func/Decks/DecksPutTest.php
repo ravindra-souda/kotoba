@@ -27,7 +27,7 @@ class DecksPutTest extends ApiTestCase
         'title' => 'Basic vocab',
         'description' => 'Words for your daily life',
         'type' => 'any',
-        'color' => '#A09050B0',
+        'color' => '#a09050b0',
     ];
 
     private const PUT_FIXTURE_DECKS = [
@@ -578,7 +578,10 @@ class DecksPutTest extends ApiTestCase
                 null,
                 self::PUT_VALID_DECKS['color'],
                 null,
-                self::PUT_VALID_DECKS['color'],
+                [
+                    ...self::PUT_VALID_DECKS['color'],
+                    'color' => '#f1f2f3f4',
+                ],
                 null,
                 'basic-vocab-4',
             ],

@@ -33,6 +33,7 @@ class DecksPostTest extends ApiTestCase
     private const POST_COMPLETE_EXPECTED_DECK = [
         ...self::POST_COMPLETE_VALID_DECK,
         'title' => 'My first ten animals',
+        'color' => '#a0b0c0d0',
     ];
 
     private const POST_MINIMAL_VALID_DECK = [
