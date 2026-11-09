@@ -268,7 +268,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -289,7 +289,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
 
         $content = json_decode($response->getContent(), true);
@@ -315,7 +315,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -359,7 +359,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
 
         $this->assertJsonContains([
@@ -386,7 +386,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains([
             '@type' => 'Collection',

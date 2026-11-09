@@ -357,7 +357,7 @@ class NounsPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains($expected);
         $this->assertMatchesResourceItemJsonSchema(Noun::class);
@@ -420,7 +420,7 @@ class NounsPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception
