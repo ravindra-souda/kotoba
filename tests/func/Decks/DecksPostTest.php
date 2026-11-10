@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Deck;
 use App\Exception\CardsNotFoundException;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -18,7 +17,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @phpstan-import-type DeckExpectedType from Types
  * @phpstan-import-type CardExpectedType from Types
  */
-class DecksPostTest extends ApiTestCase
+class DecksPostTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
     use Trait\CardAssociationTrait;
@@ -33,6 +32,7 @@ class DecksPostTest extends ApiTestCase
     private const POST_COMPLETE_EXPECTED_DECK = [
         ...self::POST_COMPLETE_VALID_DECK,
         'title' => 'My first ten animals',
+        'color' => '#a0b0c0d0',
     ];
 
     private const POST_MINIMAL_VALID_DECK = [
@@ -407,7 +407,7 @@ class DecksPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(201);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains($expected);
         $this->assertMatchesResourceItemJsonSchema(Deck::class);
@@ -452,7 +452,7 @@ class DecksPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -521,7 +521,7 @@ class DecksPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception
@@ -562,7 +562,7 @@ class DecksPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception
@@ -612,7 +612,7 @@ class DecksPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception

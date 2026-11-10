@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Kana;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Kana;
  *
  * @phpstan-import-type KanaType from Types
  */
-class KanaGetTest extends ApiTestCase
+class KanaGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'hiragana' => [
@@ -159,7 +158,7 @@ class KanaGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -213,7 +212,7 @@ class KanaGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -237,7 +236,7 @@ class KanaGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
 
         $content = json_decode($response->getContent(), true);
@@ -263,7 +262,7 @@ class KanaGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -307,7 +306,7 @@ class KanaGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
 
         $this->assertJsonContains([
@@ -334,7 +333,7 @@ class KanaGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains([
             '@type' => 'Collection',

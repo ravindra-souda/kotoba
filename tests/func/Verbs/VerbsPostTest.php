@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Verb;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
@@ -16,7 +15,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @phpstan-import-type VerbType from Types
  * @phpstan-import-type VerbExpectedType from Types
  */
-class VerbsPostTest extends ApiTestCase
+class VerbsPostTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
 
@@ -707,7 +706,7 @@ class VerbsPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(201);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains($expected);
         $this->assertMatchesResourceItemJsonSchema(Verb::class);
@@ -750,7 +749,7 @@ class VerbsPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception

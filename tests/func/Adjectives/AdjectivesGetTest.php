@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Adjective;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Adjective;
  *
  * @phpstan-import-type AdjectiveType from Types
  */
-class AdjectivesGetTest extends ApiTestCase
+class AdjectivesGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'hiragana' => [
@@ -352,7 +351,7 @@ class AdjectivesGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -414,7 +413,7 @@ class AdjectivesGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -438,7 +437,7 @@ class AdjectivesGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
 
         $content = json_decode($response->getContent(), true);
@@ -464,7 +463,7 @@ class AdjectivesGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -508,7 +507,7 @@ class AdjectivesGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
 
         $this->assertJsonContains([
@@ -535,7 +534,7 @@ class AdjectivesGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains([
             '@type' => 'Collection',

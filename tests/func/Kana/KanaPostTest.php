@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Kana;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
@@ -16,7 +15,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @phpstan-import-type KanaType from Types
  * @phpstan-import-type KanaExpectedType from Types
  */
-class KanaPostTest extends ApiTestCase
+class KanaPostTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
 
@@ -219,7 +218,7 @@ class KanaPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(201);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains($expected);
         $this->assertMatchesResourceItemJsonSchema(Kana::class);
@@ -262,7 +261,7 @@ class KanaPostTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception

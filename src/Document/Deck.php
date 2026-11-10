@@ -227,7 +227,7 @@ class Deck extends AbstractKotobaDocument
 
     public function setColor(?string $color): static
     {
-        $this->color = $color;
+        $this->color = strtolower($color);
 
         return $this;
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Kanji;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Kanji;
  *
  * @phpstan-import-type KanjiType from Types
  */
-class KanjiGetTest extends ApiTestCase
+class KanjiGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'kanji' => [
@@ -268,7 +267,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -289,7 +288,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
 
         $content = json_decode($response->getContent(), true);
@@ -315,7 +314,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -359,7 +358,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
 
         $this->assertJsonContains([
@@ -386,7 +385,7 @@ class KanjiGetTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains([
             '@type' => 'Collection',

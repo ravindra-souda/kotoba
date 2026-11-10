@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Deck;
 use App\Exception\CardsNotFoundException;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -18,7 +17,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @phpstan-import-type DeckExpectedType from Types
  * @phpstan-import-type CardExpectedType from Types
  */
-class DecksPutTest extends ApiTestCase
+class DecksPutTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
     use Trait\CardAssociationTrait;
@@ -27,7 +26,7 @@ class DecksPutTest extends ApiTestCase
         'title' => 'Basic vocab',
         'description' => 'Words for your daily life',
         'type' => 'any',
-        'color' => '#A09050B0',
+        'color' => '#a09050b0',
     ];
 
     private const PUT_FIXTURE_DECKS = [
@@ -578,7 +577,10 @@ class DecksPutTest extends ApiTestCase
                 null,
                 self::PUT_VALID_DECKS['color'],
                 null,
-                self::PUT_VALID_DECKS['color'],
+                [
+                    ...self::PUT_VALID_DECKS['color'],
+                    'color' => '#f1f2f3f4',
+                ],
                 null,
                 'basic-vocab-4',
             ],
@@ -700,7 +702,7 @@ class DecksPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains($expected);
         $this->assertMatchesResourceItemJsonSchema(Deck::class);
@@ -755,7 +757,7 @@ class DecksPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $content = json_decode($response->getContent(), true);
 
@@ -850,7 +852,7 @@ class DecksPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception
@@ -907,7 +909,7 @@ class DecksPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception
@@ -983,7 +985,7 @@ class DecksPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Adjective;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
@@ -15,7 +14,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  *
  * @phpstan-import-type AdjectiveType from Types
  */
-class AdjectivesPutTest extends ApiTestCase
+class AdjectivesPutTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
 
@@ -484,7 +483,7 @@ class AdjectivesPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/ld+json; charset=utf-8'
+            'application/ld+json'
         );
         $this->assertJsonContains($expected);
         $this->assertMatchesResourceItemJsonSchema(Adjective::class);
@@ -547,7 +546,7 @@ class AdjectivesPutTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame(
             'content-type',
-            'application/problem+json; charset=utf-8'
+            'application/problem+json'
         );
 
         // needed to trigger the exception
