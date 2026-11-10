@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Kanji;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
@@ -15,7 +14,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  *
  * @phpstan-import-type KanjiType from Types
  */
-class KanjiPutTest extends ApiTestCase
+class KanjiPutTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
 

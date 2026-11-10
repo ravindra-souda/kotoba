@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+namespace App\Tests;
 
 /**
  * @internal
  *
  * @coversNothing
  */
-class DecksDeleteTest extends ApiTestCase
+class DecksDeleteTest extends KotobaApiTestCase
 {
     private const DELETE_VALID_DECK = [
         'title' => 'deck to be deleted',

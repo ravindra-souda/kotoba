@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Kana;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
@@ -16,7 +15,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @phpstan-import-type KanaType from Types
  * @phpstan-import-type KanaExpectedType from Types
  */
-class KanaPutTest extends ApiTestCase
+class KanaPutTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
 

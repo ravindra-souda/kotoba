@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Noun;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
@@ -15,7 +14,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  *
  * @phpstan-import-type NounType from Types
  */
-class NounsPutTest extends ApiTestCase
+class NounsPutTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Adjective;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
@@ -16,7 +15,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @phpstan-import-type AdjectiveType from Types
  * @phpstan-import-type AdjectiveExpectedType from Types
  */
-class AdjectivesPostTest extends ApiTestCase
+class AdjectivesPostTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Kanji;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Kanji;
  *
  * @phpstan-import-type KanjiType from Types
  */
-class KanjiGetTest extends ApiTestCase
+class KanjiGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'kanji' => [

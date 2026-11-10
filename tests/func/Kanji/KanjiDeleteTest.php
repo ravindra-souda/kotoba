@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+namespace App\Tests;
 
 /**
  * @internal
  *
  * @coversNothing
  */
-class KanjiDeleteTest extends ApiTestCase
+class KanjiDeleteTest extends KotobaApiTestCase
 {
     private const DELETE_VALID_KANJI = [
         'kanji' => '猫',

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+namespace App\Tests;
 
 /**
  * @internal
  *
  * @coversNothing
  */
-class AdjectivesDeleteTest extends ApiTestCase
+class AdjectivesDeleteTest extends KotobaApiTestCase
 {
     private const DELETE_VALID_ADJECTIVE = [
         'hiragana' => 'おいしい',

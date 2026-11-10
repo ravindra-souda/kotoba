@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Kana;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Kana;
  *
  * @phpstan-import-type KanaType from Types
  */
-class KanaGetTest extends ApiTestCase
+class KanaGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'hiragana' => [

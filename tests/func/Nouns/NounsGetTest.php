@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Noun;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Noun;
  *
  * @phpstan-import-type NounType from Types
  */
-class NounsGetTest extends ApiTestCase
+class NounsGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'hiragana' => [

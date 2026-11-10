@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Verb;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Verb;
  *
  * @phpstan-import-type VerbType from Types
  */
-class VerbsGetTest extends ApiTestCase
+class VerbsGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'hiragana' => [

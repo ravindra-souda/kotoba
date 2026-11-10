@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Adjective;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Adjective;
  *
  * @phpstan-import-type AdjectiveType from Types
  */
-class AdjectivesGetTest extends ApiTestCase
+class AdjectivesGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'hiragana' => [

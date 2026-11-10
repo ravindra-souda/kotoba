@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Deck;
 use App\Exception\CardsNotFoundException;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -18,7 +17,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
  * @phpstan-import-type DeckExpectedType from Types
  * @phpstan-import-type CardExpectedType from Types
  */
-class DecksPostTest extends ApiTestCase
+class DecksPostTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
     use Trait\CardAssociationTrait;

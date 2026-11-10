@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Document\Deck;
 
 /**
@@ -14,7 +13,7 @@ use App\Document\Deck;
  *
  * @phpstan-import-type DeckType from Types
  */
-class DecksGetTest extends ApiTestCase
+class DecksGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
         'title' => [
