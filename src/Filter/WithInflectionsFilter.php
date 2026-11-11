@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use MongoDB\BSON\Regex;
 use Symfony\Component\PropertyInfo\Type;
 
-final class WithInflectionsFilter extends AbstractFilter
+final class WithInflectionsFilter implements FilterInterface
 {
     /**
      * This function is only used to hook in documentation generators
@@ -20,23 +21,7 @@ final class WithInflectionsFilter extends AbstractFilter
      */
     public function getDescription(string $resourceClass): array
     {
-        $description['hiragana'] = [
-            'property' => 'hiragana',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-        ];
-        $description['kanji'] = [
-            'property' => 'kanji',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-        ];
-        $description['katakana'] = [
-            'property' => 'katakana',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-        ];
-
-        return $description;
+        return [];
     }
 
     /**
@@ -57,6 +42,50 @@ final class WithInflectionsFilter extends AbstractFilter
         ) {
             return;
         }
+
+        if (!in_array($property, ['hiragana', 'katakana', 'kanji'])) {
+            return;
+        }
+
+        $value = trim($value);
+        $regexp = 'kanji' === $property ?
+            new Regex($value) : new Regex("^{$value}");
+
+        $aggregationBuilder
+            ->match()
+            ->addOr(
+                $aggregationBuilder
+                    ->matchExpr()
+                    ->field($property)
+                    ->equals($regexp)
+            )
+            ->addOr(
+                $aggregationBuilder
+                    ->matchExpr()
+                    ->field('searchInflections')
+                    ->in([$value])
+            )
+        ;
+    }
+
+    public function apply(
+        Builder $aggregationBuilder,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array &$context = []
+    ): void {
+        $parameter = $context['parameter'] ?? null;
+        $value = $parameter?->getValue();
+
+        // The parameter may not be present.
+        // It's recommended to add validation (e.g., `required: true`) on the Parameter attribute
+        // if the filter logic depends on the value.
+        if ($value instanceof ParameterNotFound) {
+            return;
+        }
+
+        dump($parameter);
+        $property = $parameter->getProperty() ?? $parameter->getKey();
 
         if (!in_array($property, ['hiragana', 'katakana', 'kanji'])) {
             return;

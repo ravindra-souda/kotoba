@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Exception\EmptySlugException;
 use App\Filter\WithInflectionsFilter;
 use App\State\SaveProcessor;
@@ -36,7 +37,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     properties: ['romaji'],
     arguments: ['orderParameterName' => 'order'],
 )]
-#[ApiFilter(WithInflectionsFilter::class)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -44,7 +44,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Delete(),
         new Put(),
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            parameters: [
+                'search[:property]' => new QueryParameter(
+                    properties: ['hiragana', 'katakana', 'kanji'],
+                    filter: new WithInflectionsFilter()
+                )
+            ]
+        ),
     ],
     normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
