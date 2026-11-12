@@ -46,7 +46,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(
             parameters: [
-                'search[:property]' => new QueryParameter(
+                ':property' => new QueryParameter(
                     properties: ['hiragana', 'katakana', 'kanji'],
                     filter: new WithInflectionsFilter()
                 )
