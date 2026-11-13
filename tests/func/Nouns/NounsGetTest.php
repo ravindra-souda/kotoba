@@ -205,7 +205,7 @@ class NounsGetTest extends KotobaApiTestCase
                 ],
             ],
             'bikago_o_hiragana' => [
-                'url' => '?hiragana=おかし&romaji=pagination',
+                'url' => '?hiragana= おかし&romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['bikago_o'],
                 ],

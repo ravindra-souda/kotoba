@@ -231,7 +231,7 @@ class KanjiGetTest extends KotobaApiTestCase
                 ],
             ],
             'meaning_lang' => [
-                'url' => '?meaning[lang]=fr&meaning[search]=sacoche',
+                'url' => '?meaning[lang]=fr&meaning[search]= sacoche',
                 'expected' => [
                     self::GET_EXPECTED_KANJI['same_onyomi_2'],
                 ],

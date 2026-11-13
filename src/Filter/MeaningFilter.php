@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class MeaningFilter extends AbstractFilter
+final class MeaningFilter extends AbstractKotobaFilter
+implements FilterInterface
 {
     /**
      * This function is only used to hook in documentation generators
@@ -19,59 +20,26 @@ final class MeaningFilter extends AbstractFilter
      */
     public function getDescription(string $resourceClass): array
     {
-        if (!$this->properties) {
-            return [];
-        }
-
-        $description['meaning[lang]'] = [
-            'property' => 'meaning[lang]',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-            'openapi' => [
-                'example' => 'en',
-                'allowReserved' => false,
-                'allowEmptyValue' => false,
-                'explode' => false,
-            ],
-        ];
-        $description['meaning[search]'] = [
-            'property' => 'meaning[search]',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-            'openapi' => [
-                'example' => 'school',
-                'allowReserved' => false,
-                'allowEmptyValue' => false,
-                'explode' => false,
-            ],
-        ];
-
-        return $description;
+        return [];
     }
 
-    /**
-     * @param array<mixed> $context
-     */
-    protected function filterProperty(
-        string $property,
-        mixed $value,
+    public function apply(
         Builder $aggregationBuilder,
         string $resourceClass,
         ?Operation $operation = null,
         array &$context = []
     ): void {
-        // Otherwise filter is applied to order and page as well
-        if (
-            !$this->isPropertyEnabled($property, $resourceClass)
-            || !$this->isPropertyMapped($property, $resourceClass)
-        ) {
+        $parameter = $context['parameter'] ?? null;
+        if (is_null($parameter)) {
             return;
         }
 
+        $property = $parameter->getProperty();
         if ('meaning' !== $property) {
             return;
         }
 
+        $value = $this->getTrimmedValue($parameter);
         if (!array_key_exists('lang', $value)
             || !array_key_exists('search', $value)
         ) {

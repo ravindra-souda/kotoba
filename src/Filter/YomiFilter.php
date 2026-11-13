@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\Operation;
 use App\Document\Kanji;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class YomiFilter extends AbstractFilter
+final class YomiFilter extends AbstractKotobaFilter
+implements FilterInterface
 {
     /**
      * This function is only used to hook in documentation generators
@@ -20,60 +21,26 @@ final class YomiFilter extends AbstractFilter
      */
     public function getDescription(string $resourceClass): array
     {
-        if (!$this->properties) {
-            return [];
-        }
-
-        $description['kunyomi'] = [
-            'property' => 'kunyomi',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-            'description' => 'can be written in romaji or hiragana',
-            'openapi' => [
-                'example' => 'amatsu',
-                'allowReserved' => false,
-                'allowEmptyValue' => false,
-                'explode' => false,
-            ],
-        ];
-        $description['onyomi'] = [
-            'property' => 'onyomi',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-            'description' => 'can be written in romaji or katakana',
-            'openapi' => [
-                'example' => 'テン',
-                'allowReserved' => false,
-                'allowEmptyValue' => false,
-                'explode' => false,
-            ],
-        ];
-
-        return $description;
+        return [];
     }
 
-    /**
-     * @param array<mixed> $context
-     */
-    protected function filterProperty(
-        string $property,
-        mixed $value,
+    public function apply(
         Builder $aggregationBuilder,
         string $resourceClass,
         ?Operation $operation = null,
         array &$context = []
     ): void {
-        // Otherwise filter is applied to order and page as well
-        if (
-            !$this->isPropertyEnabled($property, $resourceClass)
-            || !$this->isPropertyMapped($property, $resourceClass)
-        ) {
+        $parameter = $context['parameter'] ?? null;
+        if (is_null($parameter)) {
             return;
         }
 
+        $property = $parameter->getProperty();
         if (!in_array($property, ['kunyomi', 'onyomi'])) {
             return;
         }
+
+        $value = $this->getTrimmedValue($parameter);
 
         $script = Kanji::detect($value);
 

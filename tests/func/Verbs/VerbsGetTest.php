@@ -131,7 +131,7 @@ class VerbsGetTest extends KotobaApiTestCase
                 ],
             ],
             'hiragana_start' => [
-                'url' => '?hiragana=あ&romaji=pagination&order[romaji]=asc',
+                'url' => '?hiragana= あ&romaji=pagination&order[romaji]=asc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana'],
                     self::GET_SEARCH_FIXTURES['romaji'],
@@ -150,7 +150,7 @@ class VerbsGetTest extends KotobaApiTestCase
                 ],
             ],
             'katakana' => [
-                'url' => '?katakana=モテ&romaji=pagination',
+                'url' => '?katakana=モテ &romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['katakana'],
                 ],

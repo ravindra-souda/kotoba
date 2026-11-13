@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Exception\EmptySlugException;
+use App\Filter\MeaningFilter;
 use App\Filter\WithInflectionsFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
@@ -49,7 +50,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                 ':property' => new QueryParameter(
                     properties: ['hiragana', 'katakana', 'kanji'],
                     filter: new WithInflectionsFilter()
-                )
+                ),
+                'meaning' => new QueryParameter(
+                    property: 'meaning',
+                    filter: new MeaningFilter()
+                ),
             ]
         ),
     ],

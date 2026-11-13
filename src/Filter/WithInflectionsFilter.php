@@ -11,7 +11,8 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use MongoDB\BSON\Regex;
 use Symfony\Component\PropertyInfo\Type;
 
-final class WithInflectionsFilter implements FilterInterface
+final class WithInflectionsFilter extends AbstractKotobaFilter
+implements FilterInterface
 {
     /**
      * This function is only used to hook in documentation generators
@@ -40,7 +41,7 @@ final class WithInflectionsFilter implements FilterInterface
             return;
         }
 
-        $value = trim($parameter->getValue());
+        $value = $this->getTrimmedValue($parameter);
         $regexp = 'kanji' === $property ?
             new Regex($value) : new Regex("^{$value}");
 

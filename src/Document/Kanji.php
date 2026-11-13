@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
+use App\Filter\MeaningFilter;
 use App\Filter\YomiFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
@@ -32,7 +34,18 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Delete(),
         new Put(),
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            parameters: [
+                'meaning' => new QueryParameter(
+                    property: 'meaning',
+                    filter: new MeaningFilter()
+                ),
+                ':property' => new QueryParameter(
+                    properties: ['kunyomi', 'onyomi'],
+                    filter: new YomiFilter()
+                ),
+            ]
+        ),
     ],
     normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
@@ -77,7 +90,6 @@ class Kanji extends Card
     ])]
     #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
-    #[ApiFilter(YomiFilter::class)]
     protected ?array $kunyomi = null;
 
     /** Must be written using only lowercase roman or katakana characters,
@@ -93,7 +105,6 @@ class Kanji extends Card
     ])]
     #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
-    #[ApiFilter(YomiFilter::class)]
     protected ?array $onyomi = null;
 
     public function getKanji(): string

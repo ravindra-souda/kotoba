@@ -13,7 +13,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Exception\EmptySlugException;
+use App\Filter\MeaningFilter;
 use App\Filter\WithBikagoFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
@@ -33,7 +35,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     properties: ['romaji'],
     arguments: ['orderParameterName' => 'order'],
 )]
-#[ApiFilter(WithBikagoFilter::class)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -41,7 +42,18 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(),
         new Put(),
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            parameters: [
+                ':property' => new QueryParameter(
+                    properties: ['hiragana', 'kanji'],
+                    filter: new WithBikagoFilter()
+                ),
+                'meaning' => new QueryParameter(
+                    property: 'meaning',
+                    filter: new MeaningFilter()
+                ),
+            ]
+        ),
     ],
     normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
