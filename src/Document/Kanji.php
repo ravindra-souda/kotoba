@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -21,12 +22,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/*
 #[ApiFilter(
     SearchFilter::class,
     properties: [
         'kanji' => 'exact',
     ],
 )]
+*/
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -36,6 +39,10 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(
             parameters: [
+                'kanji' => new QueryParameter(
+                    property: 'kanji',
+                    filter: new ExactFilter()
+                ),
                 'meaning' => new QueryParameter(
                     property: 'meaning',
                     filter: new MeaningFilter()

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
+use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/*
 #[ApiFilter(
     SearchFilter::class,
     // hiragana, katakana and kanji
@@ -32,11 +33,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         'romaji' => 'istart',
     ],
 )]
+*/
+/*
 #[ApiFilter(
     OrderFilter::class,
     properties: ['romaji'],
     arguments: ['orderParameterName' => 'order'],
 )]
+*/
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -46,13 +50,21 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(
             parameters: [
+                'meaning' => new QueryParameter(
+                    property: 'meaning',
+                    filter: new MeaningFilter()
+                ),
                 ':property' => new QueryParameter(
                     properties: ['hiragana', 'katakana', 'kanji'],
                     filter: new WithInflectionsFilter()
                 ),
-                'meaning' => new QueryParameter(
-                    property: 'meaning',
-                    filter: new MeaningFilter()
+                'romaji' => new QueryParameter(
+                    property: 'romaji',
+                    filter: new StartSearchFilter(caseSensitive: false)
+                ),
+                'order[:property]' => new QueryParameter(
+                    property: 'romaji',
+                    filter: new SortFilter()
                 ),
             ]
         ),

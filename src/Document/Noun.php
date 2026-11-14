@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
+use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -22,6 +22,7 @@ use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/*
 #[ApiFilter(
     SearchFilter::class,
     // hiragana and kanji will be processed through WithBikagoFilter
@@ -30,11 +31,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         'romaji' => 'istart',
     ],
 )]
+*/
+/*
 #[ApiFilter(
     OrderFilter::class,
     properties: ['romaji'],
     arguments: ['orderParameterName' => 'order'],
 )]
+*/
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -44,13 +48,25 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new GetCollection(
             parameters: [
-                ':property' => new QueryParameter(
-                    properties: ['hiragana', 'kanji'],
-                    filter: new WithBikagoFilter()
+                'katakana' => new QueryParameter(
+                    property: 'katakana',
+                    filter: new StartSearchFilter()
                 ),
                 'meaning' => new QueryParameter(
                     property: 'meaning',
                     filter: new MeaningFilter()
+                ),
+                ':property' => new QueryParameter(
+                    properties: ['hiragana', 'kanji'],
+                    filter: new WithBikagoFilter()
+                ),
+                'romaji' => new QueryParameter(
+                    property: 'romaji',
+                    filter: new StartSearchFilter(caseSensitive: false)
+                ),
+                'order[:property]' => new QueryParameter(
+                    property: 'romaji',
+                    filter: new SortFilter()
                 ),
             ]
         ),
