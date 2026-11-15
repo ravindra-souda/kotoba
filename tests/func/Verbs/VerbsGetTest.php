@@ -124,6 +124,22 @@ class VerbsGetTest extends KotobaApiTestCase
     public function searchVerbsProvider(): array
     {
         return [
+            'group_godan' => [
+                'url' => '?group=godan&romaji=pagination&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['romaji'],
+                    self::GET_SEARCH_FIXTURES['meaning'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['kanji'],
+                ],
+            ],
+            'group_ichidan' => [
+                'url' => '?group=ichidan&romaji=pagination&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                ],
+            ],
             'hiragana' => [
                 'url' => '?hiragana=あけ&romaji=pagination',
                 'expected' => [

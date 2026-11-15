@@ -31,7 +31,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     // hiragana, katakana and kanji
     // will be processed through WithInflectionsFilter
     properties: [
-        'group' => 'iexact',
+        'group' => 'exact',
         'romaji' => 'istart',
     ],
 )]
