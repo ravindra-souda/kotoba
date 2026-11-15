@@ -302,7 +302,8 @@ class VerbsGetTest extends KotobaApiTestCase
                 ],
             ],
             'enum_and_order' => [
-                'url' => '?group[]=ichidan&group[]=godan&order[romaji]=desc',
+                'url' => '?romaji=pagination&group[]=ichidan&group[]=godan'
+                .'&order[romaji]=desc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['kanji'],
                     self::GET_SEARCH_FIXTURES['katakana'],
