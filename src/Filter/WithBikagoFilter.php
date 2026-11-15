@@ -42,7 +42,7 @@ implements FilterInterface
         }
 
         $bikago = null;
-        $value = $this->getTrimmedValue($parameter);
+        $value = $this->getLowerAndTrimmedValue($parameter);
         foreach (Noun::ALLOWED_BIKAGO as $allowedBikago) {
             if (str_starts_with($value, $allowedBikago)) {
                 $bikago = $allowedBikago;

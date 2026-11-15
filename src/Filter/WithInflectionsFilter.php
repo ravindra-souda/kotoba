@@ -41,7 +41,7 @@ implements FilterInterface
             return;
         }
 
-        $value = $this->getTrimmedValue($parameter);
+        $value = $this->getLowerAndTrimmedValue($parameter);
         $regexp = 'kanji' === $property ?
             new Regex($value) : new Regex("^{$value}");
 

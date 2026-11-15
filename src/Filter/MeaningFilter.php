@@ -39,7 +39,7 @@ implements FilterInterface
             return;
         }
 
-        $value = $this->getTrimmedValue($parameter);
+        $value = $this->getLowerAndTrimmedValue($parameter);
         if (!array_key_exists('lang', $value)
             || !array_key_exists('search', $value)
         ) {
@@ -53,7 +53,7 @@ implements FilterInterface
             ->match()
             ->field('meaning.'.$lang)
             ->elemMatch(
-                ['$elemMatch' => ['$in' => [trim(strtolower($search))],
+                ['$elemMatch' => ['$in' => [$search],
                 ],
                 ]
             )

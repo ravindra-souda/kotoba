@@ -40,7 +40,7 @@ implements FilterInterface
             return;
         }
 
-        $value = $this->getTrimmedValue($parameter);
+        $value = $this->getLowerAndTrimmedValue($parameter);
 
         $script = Kanji::detect($value);
 
