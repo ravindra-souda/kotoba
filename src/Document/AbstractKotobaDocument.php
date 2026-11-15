@@ -190,7 +190,7 @@ abstract class AbstractKotobaDocument
 
         if (is_string($value)) {
             // lower and trimmed or null if nullable for empty strings
-            $value = trim(strtolower($value)) ?: ($nullable ? null : '');
+            $value = mb_strtolower(trim($value)) ?: ($nullable ? null : '');
         }
 
         if (is_array($value)) {
@@ -198,7 +198,7 @@ abstract class AbstractKotobaDocument
             array_walk_recursive(
                 $value,
                 function (&$v) use (&$isEmpty) {
-                    $v = trim(strtolower($v));
+                    $v = mb_strtolower(trim($v));
                     if ($isEmpty && '' !== $v) {
                         $isEmpty = false;
                     }
