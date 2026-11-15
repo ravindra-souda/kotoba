@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -51,6 +52,10 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(
             parameters: [
+                'group' => new QueryParameter(
+                    property: 'group',
+                    filter: new ExactFilter()
+                ),
                 'meaning' => new QueryParameter(
                     property: 'meaning',
                     filter: new MeaningFilter()
