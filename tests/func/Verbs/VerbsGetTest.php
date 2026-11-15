@@ -301,6 +301,17 @@ class VerbsGetTest extends KotobaApiTestCase
                     self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
+            'enum_and_order' => [
+                'url' => '?group[]=ichidan&group[]=godan&order[romaji]=desc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['meaning'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                ],
+            ],
         ];
     }
 
@@ -327,6 +338,9 @@ class VerbsGetTest extends KotobaApiTestCase
 
         $this->assertSame($content['totalItems'], count($expected));
         for ($i = 0; $i < count($expected); ++$i) {
+            if ($i >= $this->getItemsPerPage()) {
+                break;
+            }
             $this->assertArraySubset(
                 $expected[$i],
                 $content['member'][$i]
