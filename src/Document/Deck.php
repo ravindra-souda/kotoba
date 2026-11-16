@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Document\Dto\DeckInput;
+use App\Filter\Workaround\MultiSortFilter;
 use App\State\SaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -72,11 +73,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                     property: 'type',
                     filter: new ExactFilter()
                 ),
-                'order[:property]' => new QueryParameter(
+                'order' => new QueryParameter(
                     properties: ['title', 'description', 'type'],
-                    filter: new SortFilter(
-                        OrderFilterInterface::NULLS_ALWAYS_LAST
-                    )
+                    filter: new MultiSortFilter()
                 ),
             ]
         ),
