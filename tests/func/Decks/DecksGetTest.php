@@ -175,49 +175,49 @@ class DecksGetTest extends KotobaApiTestCase
     public function sortDeckProvider(): array
     {
         return [
-            // 'order_asc' => [
-            //     'url' => '?title=title_sort&order[title]=asc',
-            //     'expected' => [
-            //         self::GET_SORT_FIXTURES['title_asc'][0],
-            //         self::GET_SORT_FIXTURES['title_asc'][1],
-            //         self::GET_SORT_FIXTURES['title_asc'][2],
-            //     ],
-            // ],
-            // 'order_desc' => [
-            //     'url' => '?title=desc&order[description]=desc',
-            //     'expected' => [
-            //         self::GET_SORT_FIXTURES['description_desc'][2],
-            //         self::GET_SORT_FIXTURES['description_desc'][1],
-            //         self::GET_SORT_FIXTURES['description_desc'][0],
-            //     ],
-            // ],
+            'order_asc' => [
+                'url' => '?title=title_sort&order[title]=asc',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['title_asc'][0],
+                    self::GET_SORT_FIXTURES['title_asc'][1],
+                    self::GET_SORT_FIXTURES['title_asc'][2],
+                ],
+            ],
+            'order_desc' => [
+                'url' => '?title=desc&order[description]=desc',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['description_desc'][2],
+                    self::GET_SORT_FIXTURES['description_desc'][1],
+                    self::GET_SORT_FIXTURES['description_desc'][0],
+                ],
+            ],
             'order_asc_then_desc' => [
                 'url' => '?title=two fields&order[description]=asc'.
-                    '&order[title]=desc&order[loul]=asc',
+                    '&order[dummy]=asc&order[title]=deSc',
                 'expected' => [
                     self::GET_SORT_FIXTURES['description_asc, title_desc'][2],
                     self::GET_SORT_FIXTURES['description_asc, title_desc'][0],
                     self::GET_SORT_FIXTURES['description_asc, title_desc'][1],
                 ],
             ],
-            // 'search_and_order' => [
-            //     'url' => '?title=hiRAg&order[description]=asc'.
-            //         '&order[title]=desc',
-            //     'expected' => [
-            //         self::GET_SORT_FIXTURES['search and sort'][2],
-            //         self::GET_SORT_FIXTURES['search and sort'][1],
-            //         self::GET_SORT_FIXTURES['search and sort'][0],
-            //     ],
-            // ],
-            // 'enum_and_order' => [
-            //     'url' => '?type[]=nouns&type[]=kana&order[title]=desc',
-            //     'expected' => [
-            //         self::GET_SEARCH_FIXTURES['type'],
-            //         self::GET_SORT_FIXTURES['search and sort'][2],
-            //         self::GET_SORT_FIXTURES['search and sort'][1],
-            //         self::GET_SORT_FIXTURES['search and sort'][0],
-            //     ],
-            // ],
+            'search_and_order' => [
+                'url' => '?title=hiRAg&order[description]=asc'.
+                    '&order[title]=desc',
+                'expected' => [
+                    self::GET_SORT_FIXTURES['search and sort'][2],
+                    self::GET_SORT_FIXTURES['search and sort'][1],
+                    self::GET_SORT_FIXTURES['search and sort'][0],
+                ],
+            ],
+            'enum_and_order' => [
+                'url' => '?type[]=nouns&type[]=kana&order[title]=desc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['type'],
+                    self::GET_SORT_FIXTURES['search and sort'][2],
+                    self::GET_SORT_FIXTURES['search and sort'][1],
+                    self::GET_SORT_FIXTURES['search and sort'][0],
+                ],
+            ],
         ];
     }
 

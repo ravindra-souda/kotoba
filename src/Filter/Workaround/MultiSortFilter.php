@@ -38,35 +38,27 @@ implements FilterInterface
             return;
         }
 
-        // $property = $parameter->getProperty();
-
-        // if ('meaning' !== $property) {
-        //     return;
-        // }
-
-        $key = $parameter->getKey();
         $properties = $parameter->getProperties();
         $value = $this->getLowerAndTrimmedValue($parameter);
-        dump($key, $value, $properties);
-        return;
-
-        if (!array_key_exists('lang', $value)
-            || !array_key_exists('search', $value)
-        ) {
+        if (!is_array($properties) || !is_array($value)) {
             return;
         }
 
-        ['lang' => $lang, 'search' => $search] = $value;
+        $sort = [];
+        foreach ($value as $field => $direction) {
+            if (!in_array($field, $properties)) {
+                continue;
+            }
+            $direction = strtolower($direction);
+            if (!in_array($direction, ['asc', 'desc'])) {
+                continue;
+            }
+            $sort[$field] = $direction;
+        }
 
-        // $elemMatch is needed to search in nested arrays
-        $aggregationBuilder
-            ->match()
-            ->field('meaning.'.$lang)
-            ->elemMatch(
-                ['$elemMatch' => ['$in' => [$search],
-                ],
-                ]
-            )
-        ;
+        if (!empty($sort)) {
+            $aggregationBuilder->sort($sort);
+        }
+
     }
 }

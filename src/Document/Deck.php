@@ -73,6 +73,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                     property: 'type',
                     filter: new ExactFilter()
                 ),
+                /* Workaround using our own MultiSortFilter, since sorting on
+                   multiple fields is not possible with SortFilter in
+                   API Platform 4.4 */
                 'order' => new QueryParameter(
                     properties: ['title', 'description', 'type'],
                     filter: new MultiSortFilter()
