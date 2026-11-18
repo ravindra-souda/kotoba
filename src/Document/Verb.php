@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
+use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -14,7 +14,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Exception\EmptySlugException;
+use App\Filter\MeaningFilter;
 use App\Filter\WithInflectionsFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
@@ -22,20 +24,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-#[ApiFilter(
-    SearchFilter::class,
-    // hiragana, katakana and kanji
-    // will be processed through WithInflectionsFilter
-    properties: [
-        'romaji' => 'istart',
-    ],
-)]
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['romaji'],
-    arguments: ['orderParameterName' => 'order'],
-)]
-#[ApiFilter(WithInflectionsFilter::class)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -43,7 +31,30 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Delete(),
         new Put(),
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            parameters: [
+                'group' => new QueryParameter(
+                    property: 'group',
+                    filter: new ExactFilter()
+                ),
+                'meaning' => new QueryParameter(
+                    property: 'meaning',
+                    filter: new MeaningFilter()
+                ),
+                ':property' => new QueryParameter(
+                    properties: ['hiragana', 'katakana', 'kanji'],
+                    filter: new WithInflectionsFilter()
+                ),
+                'romaji' => new QueryParameter(
+                    property: 'romaji',
+                    filter: new StartSearchFilter(caseSensitive: false)
+                ),
+                'order[:property]' => new QueryParameter(
+                    property: 'romaji',
+                    filter: new SortFilter()
+                ),
+            ]
+        ),
     ],
     normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],

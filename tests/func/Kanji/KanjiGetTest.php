@@ -185,7 +185,7 @@ class KanjiGetTest extends KotobaApiTestCase
                 ],
             ],
             'kunyomi_romaji' => [
-                'url' => '?kunyomi=karada',
+                'url' => '?kunyomi=kaRada',
                 'expected' => [
                     self::GET_EXPECTED_KANJI['kunyomi'],
                 ],
@@ -205,7 +205,7 @@ class KanjiGetTest extends KotobaApiTestCase
                 ],
             ],
             'onyomi_romaji' => [
-                'url' => '?onyomi=ta',
+                'url' => '?onyomi=tA',
                 'expected' => [
                     self::GET_EXPECTED_KANJI['meaning'],
                 ],
@@ -231,7 +231,7 @@ class KanjiGetTest extends KotobaApiTestCase
                 ],
             ],
             'meaning_lang' => [
-                'url' => '?meaning[lang]=fr&meaning[search]=sacoche',
+                'url' => '?meaning[lang]=fr&meaning[search]= sacoche',
                 'expected' => [
                     self::GET_EXPECTED_KANJI['same_onyomi_2'],
                 ],

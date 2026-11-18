@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
+use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -13,7 +15,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Document\Dto\DeckInput;
+use App\Filter\Workaround\MultiSortFilter;
 use App\State\SaveProcessor;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,20 +27,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'code' => 'iexact',
-        'title' => 'ipartial',
-        'description' => 'ipartial',
-        'type' => 'iexact',
-    ],
-)]
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['title', 'description', 'type'],
-    arguments: ['orderParameterName' => 'order'],
-)]
 #[ApiResource(
     /* using a DTO to prevent automatic deserialization, allowing us to apply
        our business logic without throwing HTTP 500 errors
@@ -47,7 +37,29 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Delete(),
         new Put(),
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            parameters: [
+                'description' => new QueryParameter(
+                    property: 'description',
+                    filter: new PartialSearchFilter(caseSensitive: false)
+                ),
+                'title' => new QueryParameter(
+                    property: 'title',
+                    filter: new PartialSearchFilter(caseSensitive: false)
+                ),
+                'type' => new QueryParameter(
+                    property: 'type',
+                    filter: new ExactFilter()
+                ),
+                /* Workaround using our own MultiSortFilter, since sorting on
+                   multiple fields is not possible with SortFilter in
+                   API Platform 4.4 */
+                'order' => new QueryParameter(
+                    properties: ['title', 'description', 'type'],
+                    filter: new MultiSortFilter()
+                ),
+            ]
+        ),
     ],
     normalizationContext: ['groups' => ['deck:read']],
     denormalizationContext: ['groups' => ['write']],

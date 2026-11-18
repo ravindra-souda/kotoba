@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use MongoDB\BSON\Regex;
 use Symfony\Component\PropertyInfo\Type;
 
-final class WithInflectionsFilter extends AbstractFilter
+final class WithInflectionsFilter extends AbstractKotobaFilter
+implements FilterInterface
 {
     /**
      * This function is only used to hook in documentation generators
@@ -20,49 +22,26 @@ final class WithInflectionsFilter extends AbstractFilter
      */
     public function getDescription(string $resourceClass): array
     {
-        $description['hiragana'] = [
-            'property' => 'hiragana',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-        ];
-        $description['kanji'] = [
-            'property' => 'kanji',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-        ];
-        $description['katakana'] = [
-            'property' => 'katakana',
-            'type' => Type::BUILTIN_TYPE_STRING,
-            'required' => false,
-        ];
-
-        return $description;
+        return [];
     }
 
-    /**
-     * @param array<mixed> $context
-     */
-    protected function filterProperty(
-        string $property,
-        mixed $value,
+    public function apply(
         Builder $aggregationBuilder,
         string $resourceClass,
         ?Operation $operation = null,
         array &$context = []
     ): void {
-        // Otherwise filter is applied to order and page as well
-        if (
-            !$this->isPropertyEnabled($property, $resourceClass)
-            || !$this->isPropertyMapped($property, $resourceClass)
-        ) {
+        $parameter = $context['parameter'] ?? null;
+        if (is_null($parameter)) {
             return;
         }
 
+        $property = $parameter->getProperty();
         if (!in_array($property, ['hiragana', 'katakana', 'kanji'])) {
             return;
         }
 
-        $value = trim($value);
+        $value = $this->getLowerAndTrimmedValue($parameter);
         $regexp = 'kanji' === $property ?
             new Regex($value) : new Regex("^{$value}");
 

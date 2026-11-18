@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
+use App\Filter\MeaningFilter;
 use App\Filter\YomiFilter;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
@@ -19,12 +21,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'kanji' => 'exact',
-    ],
-)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -32,7 +28,22 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Delete(),
         new Put(),
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            parameters: [
+                'kanji' => new QueryParameter(
+                    property: 'kanji',
+                    filter: new ExactFilter()
+                ),
+                'meaning' => new QueryParameter(
+                    property: 'meaning',
+                    filter: new MeaningFilter()
+                ),
+                ':property' => new QueryParameter(
+                    properties: ['kunyomi', 'onyomi'],
+                    filter: new YomiFilter()
+                ),
+            ]
+        ),
     ],
     normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],
@@ -77,7 +88,6 @@ class Kanji extends Card
     ])]
     #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
-    #[ApiFilter(YomiFilter::class)]
     protected ?array $kunyomi = null;
 
     /** Must be written using only lowercase roman or katakana characters,
@@ -93,7 +103,6 @@ class Kanji extends Card
     ])]
     #[Groups(['card:read', 'deck:read', 'write'])]
     #[MongoDB\Field(type: 'collection')]
-    #[ApiFilter(YomiFilter::class)]
     protected ?array $onyomi = null;
 
     public function getKanji(): string

@@ -4,34 +4,22 @@ declare(strict_types=1);
 
 namespace App\Document;
 
-use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
+use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Exception\EmptySlugException;
 use App\State\SaveProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'hiragana' => 'exact',
-        'katakana' => 'exact',
-        'romaji' => 'istart',
-    ],
-)]
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['romaji'],
-    arguments: ['orderParameterName' => 'order'],
-)]
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
@@ -39,7 +27,22 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Delete(),
         new Put(),
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            parameters: [
+                ':property' => new QueryParameter(
+                    properties: ['hiragana', 'katakana'],
+                    filter: new ExactFilter()
+                ),
+                'romaji' => new QueryParameter(
+                    property: 'romaji',
+                    filter: new StartSearchFilter(caseSensitive: false)
+                ),
+                'order[:property]' => new QueryParameter(
+                    property: 'romaji',
+                    filter: new SortFilter()
+                ),
+            ]
+        ),
     ],
     normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['write']],

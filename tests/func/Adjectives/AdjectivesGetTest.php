@@ -224,7 +224,7 @@ class AdjectivesGetTest extends KotobaApiTestCase
                 ],
             ],
             'hiragana_start' => [
-                'url' => '?hiragana=た&romaji=pagination',
+                'url' => '?hiragana=た &romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['hiragana'],
                     self::GET_SEARCH_FIXTURES['hiragana_2'],
@@ -271,7 +271,7 @@ class AdjectivesGetTest extends KotobaApiTestCase
                 ],
             ],
             'meaning_lang' => [
-                'url' => '?meaning[lang]=fr&meaning[search]=loin&romaji=pagination',
+                'url' => '?meaning[lang]=fr&meaning[search]=loin &romaji=pagination',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['romaji'],
                 ],
