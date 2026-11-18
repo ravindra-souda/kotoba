@@ -27,23 +27,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/*
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'title' => 'ipartial',
-        'description' => 'ipartial',
-        'type' => 'exact',
-    ],
-)]
-*/
-/*
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['title', 'description', 'type'],
-    arguments: ['orderParameterName' => 'order'],
-)]
-*/
 #[ApiResource(
     /* using a DTO to prevent automatic deserialization, allowing us to apply
        our business logic without throwing HTTP 500 errors
@@ -56,10 +39,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new Get(),
         new GetCollection(
             parameters: [
-                'code' => new QueryParameter(
-                    property: 'code',
-                    filter: new ExactFilter()
-                ),
                 'description' => new QueryParameter(
                     property: 'description',
                     filter: new PartialSearchFilter(caseSensitive: false)

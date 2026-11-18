@@ -6,7 +6,6 @@ namespace App\Document;
 
 use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -22,23 +21,6 @@ use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/*
-#[ApiFilter(
-    SearchFilter::class,
-    // hiragana and kanji will be processed through WithBikagoFilter
-    properties: [
-        'katakana' => 'start',
-        'romaji' => 'istart',
-    ],
-)]
-*/
-/*
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['romaji'],
-    arguments: ['orderParameterName' => 'order'],
-)]
-*/
 #[ApiResource(
     routePrefix: '/cards',
     operations: [

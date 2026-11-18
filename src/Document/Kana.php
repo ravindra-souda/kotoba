@@ -7,7 +7,6 @@ namespace App\Document;
 use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -21,23 +20,6 @@ use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/*
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'hiragana' => 'exact',
-        'katakana' => 'exact',
-        'romaji' => 'istart',
-    ],
-)]
-*/
-/*
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['romaji'],
-    arguments: ['orderParameterName' => 'order'],
-)]
-*/
 #[ApiResource(
     routePrefix: '/cards',
     operations: [

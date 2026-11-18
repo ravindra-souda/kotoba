@@ -7,7 +7,6 @@ namespace App\Document;
 use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -25,24 +24,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/*
-#[ApiFilter(
-    SearchFilter::class,
-    // hiragana, katakana and kanji
-    // will be processed through WithInflectionsFilter
-    properties: [
-        'group' => 'exact',
-        'romaji' => 'istart',
-    ],
-)]
-*/
-/*
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['romaji'],
-    arguments: ['orderParameterName' => 'order'],
-)]
-*/
 #[ApiResource(
     routePrefix: '/cards',
     operations: [
