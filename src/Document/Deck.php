@@ -31,7 +31,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ApiFilter(
     SearchFilter::class,
     properties: [
-        'code' => 'exact',
         'title' => 'ipartial',
         'description' => 'ipartial',
         'type' => 'exact',
