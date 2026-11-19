@@ -393,6 +393,28 @@ class AdjectivesGetTest extends KotobaApiTestCase
                     self::GET_SORT_FIXTURES['search_and_sort'][2],
                 ],
             ],
+            'enum_and_order' => [
+                'url' => '?group[]=i&group[]=na&order[romaji]=desc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['hiragana_2'],
+                    self::GET_SORT_FIXTURES['romaji_desc'][2],
+                    self::GET_SORT_FIXTURES['romaji_desc'][0],
+                    self::GET_SORT_FIXTURES['romaji_desc'][1],
+                    self::GET_SORT_FIXTURES['romaji_asc'][0],
+                    self::GET_SORT_FIXTURES['romaji_asc'][2],
+                    self::GET_SORT_FIXTURES['romaji_asc'][1],
+                    self::GET_SEARCH_FIXTURES['kanji'],
+                    self::GET_SORT_FIXTURES['search_and_sort'][1],
+                    self::GET_SORT_FIXTURES['search_and_sort'][0],
+                    self::GET_SORT_FIXTURES['search_and_sort'][2],
+                    self::GET_SEARCH_FIXTURES['meaning'],
+                    self::GET_SEARCH_FIXTURES['kanji_2'],
+                ],
+            ],
         ];
     }
 
@@ -419,6 +441,9 @@ class AdjectivesGetTest extends KotobaApiTestCase
 
         $this->assertSame($content['totalItems'], count($expected));
         for ($i = 0; $i < count($expected); ++$i) {
+            if ($i >= $this->getItemsPerPage()) {
+                break;
+            }
             $this->assertArraySubset(
                 $expected[$i],
                 $content['member'][$i]

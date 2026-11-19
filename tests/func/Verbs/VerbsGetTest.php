@@ -124,6 +124,22 @@ class VerbsGetTest extends KotobaApiTestCase
     public function searchVerbsProvider(): array
     {
         return [
+            'group_godan' => [
+                'url' => '?group=godan&romaji=pagination&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['romaji'],
+                    self::GET_SEARCH_FIXTURES['meaning'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['kanji'],
+                ],
+            ],
+            'group_ichidan' => [
+                'url' => '?group=ichidan&romaji=pagination&order[romaji]=asc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                ],
+            ],
             'hiragana' => [
                 'url' => '?hiragana=あけ&romaji=pagination',
                 'expected' => [
@@ -285,6 +301,18 @@ class VerbsGetTest extends KotobaApiTestCase
                     self::GET_SEARCH_FIXTURES['romaji'],
                 ],
             ],
+            'enum_and_order' => [
+                'url' => '?romaji=pagination&group[]=ichidan&group[]=godan'
+                .'&order[romaji]=desc',
+                'expected' => [
+                    self::GET_SEARCH_FIXTURES['kanji'],
+                    self::GET_SEARCH_FIXTURES['katakana'],
+                    self::GET_SEARCH_FIXTURES['katakana_2'],
+                    self::GET_SEARCH_FIXTURES['meaning'],
+                    self::GET_SEARCH_FIXTURES['romaji'],
+                    self::GET_SEARCH_FIXTURES['hiragana'],
+                ],
+            ],
         ];
     }
 
@@ -311,6 +339,9 @@ class VerbsGetTest extends KotobaApiTestCase
 
         $this->assertSame($content['totalItems'], count($expected));
         for ($i = 0; $i < count($expected); ++$i) {
+            if ($i >= $this->getItemsPerPage()) {
+                break;
+            }
             $this->assertArraySubset(
                 $expected[$i],
                 $content['member'][$i]
