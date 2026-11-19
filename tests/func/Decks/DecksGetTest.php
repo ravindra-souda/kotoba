@@ -138,7 +138,7 @@ class DecksGetTest extends KotobaApiTestCase
                 'expected' => self::GET_SEARCH_FIXTURES['description'],
             ],
             'type' => [
-                'url' => '?type=NouNS',
+                'url' => '?type=nouns',
                 'expected' => self::GET_SEARCH_FIXTURES['type'],
             ],
         ];
@@ -210,7 +210,7 @@ class DecksGetTest extends KotobaApiTestCase
                 ],
             ],
             'enum_and_order' => [
-                'url' => '?type[]=nouNs&type[]=kaNa&order[title]=desc',
+                'url' => '?type[]=nouns&type[]=kana&order[title]=desc',
                 'expected' => [
                     self::GET_SEARCH_FIXTURES['type'],
                     self::GET_SORT_FIXTURES['search and sort'][2],

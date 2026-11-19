@@ -26,10 +26,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ApiFilter(
     SearchFilter::class,
     properties: [
-        'code' => 'iexact',
         'title' => 'ipartial',
         'description' => 'ipartial',
-        'type' => 'iexact',
+        'type' => 'exact',
     ],
 )]
 #[ApiFilter(
