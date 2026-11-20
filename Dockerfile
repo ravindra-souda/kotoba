@@ -1,6 +1,6 @@
-FROM dunglas/frankenphp:sha-69416cc-php8.2-alpine@sha256:a5b9d58f6ee3298b05cf3113c76267b6d5a34afe8259e0a37089001beb614d9c AS base
+FROM dunglas/frankenphp:1.13.6-php8.5-alpine@sha256:0b064e00fd2cc0c72546da62f02daeee709635879730d34cbde1922ea43e6b94 AS base
 
-RUN install-php-extensions mongodb-1.21.12 intl
+RUN install-php-extensions mongodb-2.5.8 intl
 WORKDIR /app
 
 # running as a non-root user

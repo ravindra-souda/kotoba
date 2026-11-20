@@ -11,7 +11,7 @@ services:
     build:
       target: dev
       # sometimes needed for DNS issues when building the image (quick fix for dev only, don't use it in prod)
-      network: host
+      # network: host
     volumes:
       - ./:/app
     # human-readable logs
