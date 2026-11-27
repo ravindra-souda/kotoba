@@ -131,17 +131,19 @@ final class DtoToDeckHelper
     {
         $validCards = [];
         $invalidIris = [];
+        $cardsClasses = array_keys(self::CARDS_CLASSES);
 
         foreach ($iris as $iri) {
             $code = basename($iri);
+            $path = dirname($iri);
 
-            try {
-                $className = self::CARDS_CLASSES[dirname($iri)];
-            } catch (\Throwable $e) {
+            if (!in_array($path, $cardsClasses)) {
                 $invalidIris[] = $iri;
 
                 continue;
             }
+
+            $className = self::CARDS_CLASSES[$path];
 
             $card = $this
                 ->dm
