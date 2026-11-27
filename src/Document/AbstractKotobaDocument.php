@@ -6,7 +6,7 @@ namespace App\Document;
 
 use ApiPlatform\Metadata\ApiProperty;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 abstract class AbstractKotobaDocument
 {

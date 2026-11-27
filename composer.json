@@ -79,7 +79,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.4.*",
+            "require": "8.1.*",
             "docker": true
         }
     },
@@ -93,6 +93,6 @@
         "symfony/browser-kit": "*",
         "symfony/css-selector": "*",
         "symfony/http-client": "*",
-        "symfony/phpunit-bridge": "^7.4"
+        "symfony/phpunit-bridge": "^8.1"
     }
 }

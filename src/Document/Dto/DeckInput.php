@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Document\Dto;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 final class DeckInput
 {
