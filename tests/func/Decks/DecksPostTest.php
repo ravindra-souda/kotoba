@@ -6,6 +6,7 @@ namespace App\Tests;
 
 use App\Document\Deck;
 use App\Exception\CardsNotFoundException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -351,7 +352,7 @@ class DecksPostTest extends KotobaApiTestCase
     /**
      * @return array<string,array<DeckType|string>>
      */
-    public function validDeckProvider(): array
+    public static function validDeckProvider(): array
     {
         return [
             'complete_deck' => [
@@ -379,11 +380,10 @@ class DecksPostTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider validDeckProvider
-     *
      * @param DeckType $payload
      * @param DeckType $expected
      */
+    #[DataProvider('validDeckProvider')]
     public function testDecksPostValid(
         array $payload,
         string $payloadCardsKey,
@@ -484,16 +484,15 @@ class DecksPostTest extends KotobaApiTestCase
     /**
      * @return array<string,array<DeckType|string>>
      */
-    public function invalidDeckProvider(): array
+    public static function invalidDeckProvider(): array
     {
-        return $this->buildPostProvider(self::POST_INVALID_DECKS);
+        return self::buildPostProvider(self::POST_INVALID_DECKS);
     }
 
     /**
-     * @dataProvider invalidDeckProvider
-     *
      * @param DeckType $payload
      */
+    #[DataProvider('invalidDeckProvider')]
     public function testDecksPostInvalid(array $payload, string $message): void
     {
         $this->expectException(ClientException::class);

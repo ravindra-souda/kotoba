@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Kanji;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -169,7 +170,7 @@ class KanjiGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<KanjiType>|string>>
      */
-    public function searchKanjiProvider(): array
+    public static function searchKanjiProvider(): array
     {
         return [
             'kanji' => [
@@ -252,10 +253,9 @@ class KanjiGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider searchKanjiProvider
-     *
      * @param list<KanjiType> $expected
      */
+    #[DataProvider('searchKanjiProvider')]
     public function testKanjiGetSearch(
         string $url,
         array $expected,
@@ -339,16 +339,14 @@ class KanjiGetTest extends KotobaApiTestCase
     /**
      * @return array<array<string>>
      */
-    public function emptyCollectionProvider(): array
+    public static function emptyCollectionProvider(): array
     {
         return [
             'field' => ['?kunyomi=っ'],
         ];
     }
 
-    /**
-     * @dataProvider emptyCollectionProvider
-     */
+    #[DataProvider('emptyCollectionProvider')]
     public function testKanjiGetEmptyCollection(string $url): void
     {
         static::createClient()->request(

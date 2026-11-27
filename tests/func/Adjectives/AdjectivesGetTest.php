@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Adjective;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -187,7 +188,7 @@ class AdjectivesGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<AdjectiveType>|string>>
      */
-    public function searchAdjectiveProvider(): array
+    public static function searchAdjectiveProvider(): array
     {
         return [
             'group_i' => [
@@ -336,10 +337,9 @@ class AdjectivesGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider searchAdjectiveProvider
-     *
      * @param list<AdjectiveType> $expected
      */
+    #[DataProvider('searchAdjectiveProvider')]
     public function testAdjectivesGetSearch(
         string $url,
         array $expected,
@@ -366,7 +366,7 @@ class AdjectivesGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<AdjectiveType>|string>>
      */
-    public function sortAdjectiveProvider(): array
+    public static function sortAdjectiveProvider(): array
     {
         return [
             'romaji_asc' => [
@@ -397,10 +397,9 @@ class AdjectivesGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider sortAdjectiveProvider
-     *
      * @param list<AdjectiveType> $expected
      */
+    #[DataProvider('sortAdjectiveProvider')]
     public function testAdjectivesGetSort(
         string $url,
         array $expected,
@@ -488,16 +487,14 @@ class AdjectivesGetTest extends KotobaApiTestCase
     /**
      * @return array<array<string>>
      */
-    public function emptyCollectionProvider(): array
+    public static function emptyCollectionProvider(): array
     {
         return [
             'field' => ['?romaji=dummy'],
         ];
     }
 
-    /**
-     * @dataProvider emptyCollectionProvider
-     */
+    #[DataProvider('emptyCollectionProvider')]
     public function testAdjectivesGetEmptyCollection(string $url): void
     {
         static::createClient()->request(

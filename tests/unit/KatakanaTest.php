@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Document\Trait\KatakanaTrait;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -15,7 +16,7 @@ class KatakanaTest extends TestCase
     /**
      * @return array<array<null|bool|string>>
      */
-    public function isValidKatakanaProvider(): array
+    public static function isValidKatakanaProvider(): array
     {
         return [
             'true_empty' => ['', true],
@@ -37,10 +38,9 @@ class KatakanaTest extends TestCase
     }
 
     /**
-     * @dataProvider isValidKatakanaProvider
-     *
      * @param ?string $string
      */
+    #[DataProvider('isValidKatakanaProvider')]
     public function testIsValidKatakana(
         ?string $string,
         bool $expected,

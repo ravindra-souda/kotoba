@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Document\Trait\Script\ScriptTrait;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -15,7 +16,7 @@ class ScriptTest extends TestCase
     /**
      * @return array<string,array<null|false|string>>
      */
-    public function toHiraganaProvider(): array
+    public static function toHiraganaProvider(): array
     {
         $tests = [
             'empty' => ['', null],
@@ -60,14 +61,13 @@ class ScriptTest extends TestCase
             ['maccha', false],
         ];
 
-        return $this->setProviderKeys($tests);
+        return self::setProviderKeys($tests);
     }
 
     /**
-     * @dataProvider toHiraganaProvider
-     *
      * @param ?string $string
      */
+    #[DataProvider('toHiraganaProvider')]
     public function testToHiragana(
         ?string $string,
         string|null|bool $expected,
@@ -80,7 +80,7 @@ class ScriptTest extends TestCase
     /**
      * @return array<string,array<null|false|string>>
      */
-    public function toKatakanaProvider(): array
+    public static function toKatakanaProvider(): array
     {
         $tests = [
             'empty' => ['', null],
@@ -116,7 +116,7 @@ class ScriptTest extends TestCase
             ['hocchikisu', false],
         ];
 
-        return $this->setProviderKeys($tests);
+        return self::setProviderKeys($tests);
     }
 
     /**
@@ -124,6 +124,7 @@ class ScriptTest extends TestCase
      *
      * @param ?string $string
      */
+    #[DataProvider('toKatakanaProvider')]
     public function testToKatakana(
         ?string $string,
         string|null|bool $expected,
@@ -136,7 +137,7 @@ class ScriptTest extends TestCase
     /**
      * @return array<string,array<null|false|string>>
      */
-    public function toRomajiProvider(): array
+    public static function toRomajiProvider(): array
     {
         $tests = [
             'empty' => ['', null],
@@ -175,14 +176,13 @@ class ScriptTest extends TestCase
             'integer' => ['1', false],
         ];
 
-        return $this->setProviderKeys($tests);
+        return self::setProviderKeys($tests);
     }
 
     /**
-     * @dataProvider toRomajiProvider
-     *
      * @param ?string $string
      */
+    #[DataProvider('toRomajiProvider')]
     public function testToRomaji(
         ?string $string,
         string|null|bool $expected,
@@ -195,10 +195,10 @@ class ScriptTest extends TestCase
     /**
      * @return array<array<null|false|string>>
      */
-    public function detectProvider(): array
+    public static function detectProvider(): array
     {
         /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(ScriptTrait::class);
+        $mock = self::getMockForTrait(ScriptTrait::class);
         $tests = [
             ['あ', $mock::HIRAGANA],
             ['しゃ', $mock::HIRAGANA],
@@ -221,12 +221,10 @@ class ScriptTest extends TestCase
             ['あア', null],
         ];
 
-        return $this->setProviderKeys($tests);
+        return self::setProviderKeys($tests);
     }
 
-    /**
-     * @dataProvider detectProvider
-     */
+    #[DataProvider('detectProvider')]
     public function testDetect(
         string $string,
         string|null $expected,
@@ -241,7 +239,7 @@ class ScriptTest extends TestCase
      *
      * @return array<string,array<null|false|string>>
      */
-    private function setProviderKeys(array $tests): array
+    private static function setProviderKeys(array $tests): array
     {
         $provider = [];
         foreach ($tests as $key => $test) {

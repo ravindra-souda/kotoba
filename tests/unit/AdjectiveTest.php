@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Document\Adjective;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -15,7 +16,7 @@ class AdjectiveTest extends TestCase
     /**
      * @return array<array<array<mixed>>>
      */
-    public function conjugateValidProvider(): array
+    public static function conjugateValidProvider(): array
     {
         return [
             'i_adjective_with_kanji' => [
@@ -119,11 +120,10 @@ class AdjectiveTest extends TestCase
     }
 
     /**
-     * @dataProvider conjugateValidProvider
-     *
      * @param array<mixed> $params
      * @param array<mixed> $expected
      */
+    #[DataProvider('conjugateValidProvider')]
     public function testValidConjugate(
         array $params,
         array $expected,
@@ -143,7 +143,7 @@ class AdjectiveTest extends TestCase
     /**
      * @return array<string,array<array<string,null|string>|string>>
      */
-    public function conjugateInvalidProvider(): array
+    public static function conjugateInvalidProvider(): array
     {
         return [
             'incorrect_group_hiragana' => [
@@ -169,10 +169,9 @@ class AdjectiveTest extends TestCase
     }
 
     /**
-     * @dataProvider conjugateInvalidProvider
-     *
      * @param array<string> $params
      */
+    #[DataProvider('conjugateInvalidProvider')]
     public function testInvalidConjugate(
         array $params,
         string $errMessage,
@@ -192,7 +191,7 @@ class AdjectiveTest extends TestCase
     /**
      * @return array<array<array<string>|int>>
      */
-    public function isValidGroupProvider(): array
+    public static function isValidGroupProvider(): array
     {
         return [
             '0_i_adjective_hiragana' => [
@@ -257,10 +256,9 @@ class AdjectiveTest extends TestCase
     }
 
     /**
-     * @dataProvider isValidGroupProvider
-     *
      * @param array<string> $params
      */
+    #[DataProvider('isValidGroupProvider')]
     public function testIsValidGroup(array $params, int $isValidGroup): void
     {
         $adjective = new Adjective();

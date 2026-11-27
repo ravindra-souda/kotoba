@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Kana;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -210,7 +211,7 @@ class KanaPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<KanaType|string>>
      */
-    public function validKanaProvider(): array
+    public static function validKanaProvider(): array
     {
         $provider = [];
 
@@ -226,12 +227,11 @@ class KanaPutTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider validKanaProvider
-     *
      * @param KanaType         $fixture
      * @param KanaType         $payload
      * @param KanaExpectedType $expected
      */
+    #[DataProvider('validKanaProvider')]
     public function testKanaPutValid(
         array $fixture,
         array $payload,
@@ -284,20 +284,19 @@ class KanaPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<KanaType|string>>
      */
-    public function invalidKanaProvider(): array
+    public static function invalidKanaProvider(): array
     {
-        return $this->buildPutProvider(
+        return self::buildPutProvider(
             self::PUT_INVALID_KANA,
             self::PUT_FIXTURE_KANA
         );
     }
 
     /**
-     * @dataProvider invalidKanaProvider
-     *
      * @param KanaType $fixture
      * @param KanaType $payload
      */
+    #[DataProvider('invalidKanaProvider')]
     public function testKanaPutInvalid(
         array $fixture,
         array $payload,

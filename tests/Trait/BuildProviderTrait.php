@@ -34,15 +34,15 @@ trait BuildProviderTrait
      *
      * @return array<string,array<AdjectiveType|DeckType|string>>
      */
-    final protected function buildPostProvider(array $tests): array
+    final protected static function buildPostProvider(array $tests): array
     {
         $provider = [];
 
         foreach ($tests as $key => $test) {
             ['payload' => $payload, 'message' => $message] = $test;
 
-            $payload = $this->generateMaxlengthValues($test, $payload);
-            $message = $this->generateMessage($message);
+            $payload = self::generateMaxlengthValues($test, $payload);
+            $message = self::generateMessage($message);
 
             $provider[$key] = [$payload, $message];
         }
@@ -56,7 +56,7 @@ trait BuildProviderTrait
      *
      * @return array<string,array<AdjectiveType|DeckType|string>>
      */
-    final protected function buildPutProvider(
+    final protected static function buildPutProvider(
         array $tests,
         array $fixtures
     ): array {
@@ -73,8 +73,8 @@ trait BuildProviderTrait
             /** @var AdjectiveType|DeckType $payload */
             $payload = array_merge($fixture, $payload);
 
-            $payload = $this->generateMaxlengthValues($test, $payload);
-            $message = $this->generateMessage($message);
+            $payload = self::generateMaxlengthValues($test, $payload);
+            $message = self::generateMessage($message);
 
             $provider[$key] = [$fixture, $payload, $message];
         }
@@ -88,7 +88,7 @@ trait BuildProviderTrait
      *
      * @return AdjectiveType|DeckType
      */
-    private function generateMaxlengthValues(
+    private static function generateMaxlengthValues(
         array $test,
         array $payload
     ): array {
@@ -113,7 +113,7 @@ trait BuildProviderTrait
     /**
      * @param array<string,array<string>|int|string>|string $message
      */
-    private function generateMessage(array|string $message): string
+    private static function generateMessage(array|string $message): string
     {
         if (is_array($message)) {
             /** @var string $text */

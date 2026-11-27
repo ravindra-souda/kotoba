@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Document\Noun;
 use App\Document\Trait\HiraganaTrait;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -16,7 +17,7 @@ class HiraganaTest extends TestCase
     /**
      * @return array<array<null|bool|string>>
      */
-    public function isValidHiraganaProvider(): array
+    public static function isValidHiraganaProvider(): array
     {
         return [
             'true_empty' => ['', true],
@@ -37,10 +38,9 @@ class HiraganaTest extends TestCase
     }
 
     /**
-     * @dataProvider isValidHiraganaProvider
-     *
      * @param ?string $string
      */
+    #[DataProvider('isValidHiraganaProvider')]
     public function testIsValidHiragana(?string $string, bool $expected): void
     {
         /** @var App\Document\Noun $mock */
@@ -51,7 +51,7 @@ class HiraganaTest extends TestCase
     /**
      * @return array<array<null|bool|string>>
      */
-    public function hasHiraganaOrKatakanaProvider(): array
+    public static function hasHiraganaOrKatakanaProvider(): array
     {
         return [
             'true_hiragana_katakana' => ['あ', 'ア', true],
@@ -74,11 +74,10 @@ class HiraganaTest extends TestCase
     }
 
     /**
-     * @dataProvider hasHiraganaOrKatakanaProvider
-     *
      * @param ?string $hiragana
      * @param ?string $katakana
      */
+    #[DataProvider('hasHiraganaOrKatakanaProvider')]
     public function testhasHiraganaOrKatakana(
         ?string $hiragana,
         ?string $katakana,
@@ -96,7 +95,7 @@ class HiraganaTest extends TestCase
     /**
      * @return array<array<null|bool|string>>
      */
-    public function hasHiraganaOrKatakanaSingleProvider(): array
+    public static function hasHiraganaOrKatakanaSingleProvider(): array
     {
         return [
             'true' => ['あ', true],
@@ -107,13 +106,12 @@ class HiraganaTest extends TestCase
     }
 
     /*
-     * @dataProvider hasHiraganaOrKatakanaSingleProvider
-     *
      * @param ?string $hiragana
      * @param bool $expected
      */
     /* uncomment this when there will be an object with only hiragana
        and no katakana property
+    #[DataProvider('hasHiraganaOrKatakanaSingleProvider')]
     public function testhasHiraganaOrKatakanaSingle(
         ?string $string,
         bool $expected

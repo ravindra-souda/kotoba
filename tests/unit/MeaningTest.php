@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Document\Noun;
 use App\Document\Trait\MeaningTrait;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -16,7 +17,7 @@ class MeaningTest extends TestCase
     /**
      * @return array<string,array<mixed>|int>
      */
-    public function isValidMeaningProvider(): array
+    public static function isValidMeaningProvider(): array
     {
         $mandatoryLang = Noun::getMandatoryLang();
         $secondaryLang = Noun::getAllowedLangs()[1];
@@ -140,10 +141,9 @@ class MeaningTest extends TestCase
     }
 
     /**
-     * @dataProvider isValidMeaningProvider
-     *
      * @param null|array<mixed>|string $meaning
      */
+    #[DataProvider('isValidMeaningProvider')]
     public function testIsValidMeaning(
         string|array|null $meaning,
         int $expected,

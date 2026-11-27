@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Verb;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -673,7 +674,7 @@ class VerbsPostTest extends KotobaApiTestCase
     /**
      * @return array<string,list<VerbType>>
      */
-    public function validVerbsProvider(): array
+    public static function validVerbsProvider(): array
     {
         $provider = [];
 
@@ -686,11 +687,10 @@ class VerbsPostTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider validVerbsProvider
-     *
      * @param VerbType         $payload
      * @param VerbExpectedType $expected
      */
+    #[DataProvider('validVerbsProvider')]
     public function testVerbsPostValid(
         array $payload,
         array $expected,
@@ -723,16 +723,15 @@ class VerbsPostTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string|VerbType>>
      */
-    public function invalidVerbsProvider(): array
+    public static function invalidVerbsProvider(): array
     {
-        return $this->buildPostProvider(self::POST_INVALID_VERBS);
+        return self::buildPostProvider(self::POST_INVALID_VERBS);
     }
 
     /**
-     * @dataProvider invalidVerbsProvider
-     *
      * @param VerbType $payload
      */
+    #[DataProvider('invalidVerbsProvider')]
     public function testVerbsPostInvalid(array $payload, string $message): void
     {
         $this->expectException(ClientException::class);

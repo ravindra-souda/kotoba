@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Document\Trait\KanjiTrait;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -15,7 +16,7 @@ class KanjiTest extends TestCase
     /**
      * @return array<array<null|bool|string>>
      */
-    public function isValidKanjiProvider(): array
+    public static function isValidKanjiProvider(): array
     {
         return [
             'true_empty' => ['', true],
@@ -37,10 +38,9 @@ class KanjiTest extends TestCase
     }
 
     /**
-     * @dataProvider isValidKanjiProvider
-     *
      * @param ?string $string
      */
+    #[DataProvider('isValidKanjiProvider')]
     public function testIsValidKanji(
         ?string $string,
         bool $expected,

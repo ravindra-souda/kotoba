@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Kana;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -89,7 +90,7 @@ class KanaGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<KanaType>|string>>
      */
-    public function searchKanaProvider(): array
+    public static function searchKanaProvider(): array
     {
         return [
             'hiragana' => [
@@ -143,10 +144,9 @@ class KanaGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider searchKanaProvider
-     *
      * @param list<KanaType> $expected
      */
+    #[DataProvider('searchKanaProvider')]
     public function testKanaGetSearch(
         string $url,
         array $expected,
@@ -173,7 +173,7 @@ class KanaGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<KanaType>|string>>
      */
-    public function sortKanaProvider(): array
+    public static function sortKanaProvider(): array
     {
         return [
             'romaji_asc' => [
@@ -196,10 +196,9 @@ class KanaGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider sortKanaProvider
-     *
      * @param list<KanaType> $expected
      */
+    #[DataProvider('sortKanaProvider')]
     public function testKanaGetSort(
         string $url,
         array $expected,
@@ -287,16 +286,14 @@ class KanaGetTest extends KotobaApiTestCase
     /**
      * @return array<array<string>>
      */
-    public function emptyCollectionProvider(): array
+    public static function emptyCollectionProvider(): array
     {
         return [
             'field' => ['?romaji=dummy'],
         ];
     }
 
-    /**
-     * @dataProvider emptyCollectionProvider
-     */
+    #[DataProvider('emptyCollectionProvider')]
     public function testKanaGetEmptyCollection(string $url): void
     {
         static::createClient()->request(

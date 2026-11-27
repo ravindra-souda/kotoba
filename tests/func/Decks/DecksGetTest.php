@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Deck;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -126,7 +127,7 @@ class DecksGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array{url:string,expected:DeckType}>
      */
-    public function searchDeckProvider(): array
+    public static function searchDeckProvider(): array
     {
         return [
             'title' => [
@@ -145,10 +146,9 @@ class DecksGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider searchDeckProvider
-     *
      * @param DeckType $expected
      */
+    #[DataProvider('searchDeckProvider')]
     public function testDecksGetSearch(
         string $url,
         array $expected,
@@ -172,7 +172,7 @@ class DecksGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array{url:string,expected:list<DeckType>}>
      */
-    public function sortDeckProvider(): array
+    public static function sortDeckProvider(): array
     {
         return [
             'order_asc' => [
@@ -222,10 +222,9 @@ class DecksGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider sortDeckProvider
-     *
      * @param list<DeckType> $expected
      */
+    #[DataProvider('sortDeckProvider')]
     public function testDecksGetSort(
         string $url,
         array $expected,
@@ -313,16 +312,14 @@ class DecksGetTest extends KotobaApiTestCase
     /**
      * @return array{field:list<string>,enum:list<string>}
      */
-    public function emptyCollectionProvider(): array
+    public static function emptyCollectionProvider(): array
     {
         return [
             'field' => ['?title=dummy'], 'enum' => ['?type=kan'],
         ];
     }
 
-    /**
-     * @dataProvider emptyCollectionProvider
-     */
+    #[DataProvider('emptyCollectionProvider')]
     public function testDecksGetEmptyCollection(string $url): void
     {
         static::createClient()->request(

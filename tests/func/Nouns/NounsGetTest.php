@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Noun;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -161,7 +162,7 @@ class NounsGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<NounType>|string>>
      */
-    public function searchNounsProvider(): array
+    public static function searchNounsProvider(): array
     {
         return [
             'hiragana' => [
@@ -291,10 +292,9 @@ class NounsGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider searchNounsProvider
-     *
      * @param list<NounType> $expected
      */
+    #[DataProvider('searchNounsProvider')]
     public function testNounsGetSearch(
         string $url,
         array $expected,
@@ -321,7 +321,7 @@ class NounsGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<NounType>|string>>
      */
-    public function sortNounsProvider(): array
+    public static function sortNounsProvider(): array
     {
         return [
             'romaji_asc' => [
@@ -356,6 +356,7 @@ class NounsGetTest extends KotobaApiTestCase
      *
      * @param list<NounType> $expected
      */
+    #[DataProvider('sortNounsProvider')]
     public function testNounsGetSort(
         string $url,
         array $expected,
@@ -443,16 +444,14 @@ class NounsGetTest extends KotobaApiTestCase
     /**
      * @return array<array<string>>
      */
-    public function emptyCollectionProvider(): array
+    public static function emptyCollectionProvider(): array
     {
         return [
             'field' => ['?romaji=dummy'],
         ];
     }
 
-    /**
-     * @dataProvider emptyCollectionProvider
-     */
+    #[DataProvider('emptyCollectionProvider')]
     public function testNounsGetEmptyCollection(string $url): void
     {
         static::createClient()->request(

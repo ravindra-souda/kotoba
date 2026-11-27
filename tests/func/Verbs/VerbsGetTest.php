@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Verb;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -121,7 +122,7 @@ class VerbsGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<VerbType>|string>>
      */
-    public function searchVerbsProvider(): array
+    public static function searchVerbsProvider(): array
     {
         return [
             'hiragana' => [
@@ -231,10 +232,9 @@ class VerbsGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider searchVerbsProvider
-     *
      * @param list<VerbType> $expected
      */
+    #[DataProvider('searchVerbsProvider')]
     public function testVerbsGetSearch(
         string $url,
         array $expected,
@@ -261,7 +261,7 @@ class VerbsGetTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string,list<VerbType>|string>>
      */
-    public function sortVerbsProvider(): array
+    public static function sortVerbsProvider(): array
     {
         return [
             'romaji_asc' => [
@@ -289,10 +289,9 @@ class VerbsGetTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider sortVerbsProvider
-     *
      * @param list<VerbType> $expected
      */
+    #[DataProvider('sortVerbsProvider')]
     public function testVerbsGetSort(
         string $url,
         array $expected,
@@ -380,16 +379,14 @@ class VerbsGetTest extends KotobaApiTestCase
     /**
      * @return array<array<string>>
      */
-    public function emptyCollectionProvider(): array
+    public static function emptyCollectionProvider(): array
     {
         return [
             'field' => ['?romaji=dummy'],
         ];
     }
 
-    /**
-     * @dataProvider emptyCollectionProvider
-     */
+    #[DataProvider('emptyCollectionProvider')]
     public function testVerbsGetEmptyCollection(string $url): void
     {
         static::createClient()->request(

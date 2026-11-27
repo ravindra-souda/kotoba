@@ -6,6 +6,7 @@ namespace App\Tests;
 
 use App\Document\Deck;
 use App\Exception\CardsNotFoundException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -488,7 +489,7 @@ class DecksPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<null|DeckType|string>>
      */
-    public function validDeckProvider(): array
+    public static function validDeckProvider(): array
     {
         return [
             'title' => [
@@ -642,12 +643,11 @@ class DecksPutTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider validDeckProvider
-     *
      * @param DeckType $fixture
      * @param DeckType $payload
      * @param DeckType $expected
      */
+    #[DataProvider('validDeckProvider')]
     public function testDecksPutValid(
         array $fixture,
         ?string $fixtureCardsKey,
@@ -789,20 +789,19 @@ class DecksPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<DeckType|string>>
      */
-    public function invalidDeckProvider(): array
+    public static function invalidDeckProvider(): array
     {
-        return $this->buildPutProvider(
+        return self::buildPutProvider(
             self::PUT_INVALID_DECKS,
             self::PUT_FIXTURE_DECKS
         );
     }
 
     /**
-     * @dataProvider invalidDeckProvider
-     *
      * @param DeckType $fixture
      * @param DeckType $payload
      */
+    #[DataProvider('invalidDeckProvider')]
     public function testDecksPutInvalid(
         array $fixture,
         array $payload,

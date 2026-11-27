@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Document\Verb;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -15,7 +16,7 @@ class VerbTest extends TestCase
     /**
      * @return array<string,array<array<mixed>|int>>>
      */
-    public function hasValidGroupProvider(): array
+    public static function hasValidGroupProvider(): array
     {
         return [
             '0_ichidan' => [
@@ -162,10 +163,9 @@ class VerbTest extends TestCase
     }
 
     /**
-     * @dataProvider hasValidGroupProvider
-     *
      * @param array<mixed> $params
      */
+    #[DataProvider('hasValidGroupProvider')]
     public function testHasValidGroup(
         array $params,
         int $expected,
@@ -184,7 +184,7 @@ class VerbTest extends TestCase
     /**
      * @return array<string,array<array<mixed>|bool>>>
      */
-    public function conjugateValidProvider(): array
+    public static function conjugateValidProvider(): array
     {
         return [
             'ichidan' => [
@@ -584,11 +584,10 @@ class VerbTest extends TestCase
     }
 
     /**
-     * @dataProvider conjugateValidProvider
-     *
      * @param array<mixed> $params
      * @param array<mixed> $expected
      */
+    #[DataProvider('conjugateValidProvider')]
     public function testConjugateValid(
         array $params,
         array $expected,
@@ -608,12 +607,12 @@ class VerbTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function conjugateInvalidProvider(): array
+    public static function conjugateInvalidProvider(): array
     {
         $provider = [];
 
         // Get only invalid inflections
-        foreach ($this->hasValidGroupProvider() as $key => [$payload, $expected]) {
+        foreach (self::hasValidGroupProvider() as $key => [$payload, $expected]) {
             /** @var array{inflections:null|array<string>|string} $payload */
             if (0 !== $expected && is_array($payload['inflections'])) {
                 $provider[$key] = $payload;
@@ -624,10 +623,9 @@ class VerbTest extends TestCase
     }
 
     /**
-     * @dataProvider conjugateInvalidProvider
-     *
      * @param array<mixed> $inflections
      */
+    #[DataProvider('conjugateInvalidProvider')]
     public function testConjugateInvalid(
         string $group,
         array $inflections,

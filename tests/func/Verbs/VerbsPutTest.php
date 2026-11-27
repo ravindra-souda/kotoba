@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Verb;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -939,7 +940,7 @@ class VerbsPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string|VerbType>>
      */
-    public function validVerbsProvider(): array
+    public static function validVerbsProvider(): array
     {
         $provider = [];
 
@@ -960,12 +961,11 @@ class VerbsPutTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider validVerbsProvider
-     *
      * @param VerbType $fixture
      * @param VerbType $payload
      * @param VerbType $expected
      */
+    #[DataProvider('validVerbsProvider')]
     public function testVerbsPutValid(
         array $fixture,
         array $payload,
@@ -1018,20 +1018,19 @@ class VerbsPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<string|VerbType>>
      */
-    public function invalidVerbsProvider(): array
+    public static function invalidVerbsProvider(): array
     {
-        return $this->buildPutProvider(
+        return self::buildPutProvider(
             self::PUT_INVALID_VERBS,
             self::PUT_FIXTURE_VERBS
         );
     }
 
     /**
-     * @dataProvider invalidVerbsProvider
-     *
      * @param VerbType $fixture
      * @param VerbType $payload
      */
+    #[DataProvider('invalidVerbsProvider')]
     public function testVerbsPutInvalid(
         array $fixture,
         array $payload,

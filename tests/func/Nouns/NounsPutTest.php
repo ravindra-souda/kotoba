@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Noun;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -285,7 +286,7 @@ class NounsPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<NounType|string>>
      */
-    public function validNounsProvider(): array
+    public static function validNounsProvider(): array
     {
         $provider = [];
 
@@ -312,12 +313,11 @@ class NounsPutTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider validNounsProvider
-     *
      * @param NounType $fixture
      * @param NounType $payload
      * @param NounType $expected
      */
+    #[DataProvider('validNounsProvider')]
     public function testNounsPutValid(
         array $fixture,
         array $payload,
@@ -370,20 +370,19 @@ class NounsPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<NounType|string>>
      */
-    public function invalidNounsProvider(): array
+    public static function invalidNounsProvider(): array
     {
-        return $this->buildPutProvider(
+        return self::buildPutProvider(
             self::PUT_INVALID_NOUNS,
             self::PUT_FIXTURE_NOUNS
         );
     }
 
     /**
-     * @dataProvider invalidNounsProvider
-     *
      * @param NounType $fixture
      * @param NounType $payload
      */
+    #[DataProvider('invalidNounsProvider')]
     public function testNounsPutInvalid(
         array $fixture,
         array $payload,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Adjective;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -299,7 +300,7 @@ class AdjectivesPostTest extends KotobaApiTestCase
     /**
      * @return array<string,list<AdjectiveType>>
      */
-    public function validAdjectivesProvider(): array
+    public static function validAdjectivesProvider(): array
     {
         $provider = [];
 
@@ -312,11 +313,10 @@ class AdjectivesPostTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider validAdjectivesProvider
-     *
      * @param AdjectiveType         $payload
      * @param AdjectiveExpectedType $expected
      */
+    #[DataProvider('validAdjectivesProvider')]
     public function testAdjectivesPostValid(
         array $payload,
         array $expected,
@@ -349,16 +349,15 @@ class AdjectivesPostTest extends KotobaApiTestCase
     /**
      * @return array<string,array<AdjectiveType|string>>
      */
-    public function invalidAdjectivesProvider(): array
+    public static function invalidAdjectivesProvider(): array
     {
-        return $this->buildPostProvider(self::POST_INVALID_ADJECTIVES);
+        return self::buildPostProvider(self::POST_INVALID_ADJECTIVES);
     }
 
     /**
-     * @dataProvider invalidAdjectivesProvider
-     *
      * @param AdjectiveType $payload
      */
+    #[DataProvider('invalidAdjectivesProvider')]
     public function testAdjectivesPostInvalid(
         array $payload,
         string $message

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Kanji;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
@@ -294,7 +295,7 @@ class KanjiPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<KanjiType|string>>
      */
-    public function validKanjiProvider(): array
+    public static function validKanjiProvider(): array
     {
         $provider = [];
 
@@ -320,12 +321,11 @@ class KanjiPutTest extends KotobaApiTestCase
     }
 
     /**
-     * @dataProvider validKanjiProvider
-     *
      * @param KanjiType $fixture
      * @param KanjiType $payload
      * @param KanjiType $expected
      */
+    #[DataProvider('validKanjiProvider')]
     public function testKanjiPutValid(
         array $fixture,
         array $payload,
@@ -378,20 +378,19 @@ class KanjiPutTest extends KotobaApiTestCase
     /**
      * @return array<string,array<KanjiType|string>>
      */
-    public function invalidKanjiProvider(): array
+    public static function invalidKanjiProvider(): array
     {
-        return $this->buildPutProvider(
+        return self::buildPutProvider(
             self::PUT_INVALID_KANJI,
             self::PUT_FIXTURE_KANJI
         );
     }
 
     /**
-     * @dataProvider invalidKanjiProvider
-     *
      * @param KanjiType $fixture
      * @param KanjiType $payload
      */
+    #[DataProvider('invalidKanjiProvider')]
     public function testKanjiPutInvalid(
         array $fixture,
         array $payload,

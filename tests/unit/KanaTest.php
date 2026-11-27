@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Document\Kana;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
@@ -15,7 +16,7 @@ class KanaTest extends TestCase
     /**
      * @return array<array<null|bool|string>>
      */
-    public function isValidHiraganaProvider(): array
+    public static function isValidHiraganaProvider(): array
     {
         return [
             'true_empty' => ['', true],
@@ -43,10 +44,9 @@ class KanaTest extends TestCase
     }
 
     /**
-     * @dataProvider isValidHiraganaProvider
-     *
      * @param ?string $string
      */
+    #[DataProvider('isValidHiraganaProvider')]
     public function testIsValidHiragana(
         ?string $string,
         bool $expected,
@@ -57,7 +57,7 @@ class KanaTest extends TestCase
     /**
      * @return array<array<null|bool|string>>
      */
-    public function isValidKatakanaProvider(): array
+    public static function isValidKatakanaProvider(): array
     {
         return [
             'true_empty' => ['', true],
@@ -87,7 +87,7 @@ class KanaTest extends TestCase
     /**
      * @return array<array<string|true>>
      */
-    public function specialKatakanaGlideProvider(): array
+    public static function specialKatakanaGlideProvider(): array
     {
         // list from https://www.tofugu.com/japanese/learn-katakana/
         $specialGlides = [
@@ -118,6 +118,8 @@ class KanaTest extends TestCase
      *
      * @param ?string $string
      */
+    #[DataProvider('isValidKatakanaProvider')]
+    #[DataProvider('specialKatakanaGlideProvider')]
     public function testIsValidKatakana(
         ?string $string,
         bool $expected,
