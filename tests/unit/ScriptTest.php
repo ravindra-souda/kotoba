@@ -198,8 +198,6 @@ class ScriptTest extends TestCase
      */
     public static function detectProvider(): array
     {
-        /** @var App\Document\Noun $mock */
-        //$mock = self::getMockForTrait(ScriptTrait::class);
         $tests = [
             ['あ', Noun::HIRAGANA],
             ['しゃ', Noun::HIRAGANA],
