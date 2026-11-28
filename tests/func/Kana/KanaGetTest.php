@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Kana;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type KanaType from Types
  */
+#[CoversNothing]
 class KanaGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
@@ -249,9 +248,7 @@ class KanaGetTest extends KotobaApiTestCase
         return $content['member'][0]['@id'];
     }
 
-    /**
-     * @depends testKanaGetOneKana
-     */
+    #[Depends('testKanaGetOneKana')]
     public function testKanaGetOneKanaByCode(string $code): void
     {
         $response = static::createClient()->request(

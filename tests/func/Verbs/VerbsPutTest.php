@@ -6,13 +6,11 @@ namespace App\Tests;
 
 use App\Document\Verb;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
+#[CoversNothing]
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type VerbType from Types
  */
 class VerbsPutTest extends KotobaApiTestCase

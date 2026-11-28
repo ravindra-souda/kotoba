@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+use PHPUnit\Framework\Attributes\CoversNothing;
+
+#[CoversNothing]
 class NounsDeleteTest extends KotobaApiTestCase
 {
     private const DELETE_VALID_NOUN = [

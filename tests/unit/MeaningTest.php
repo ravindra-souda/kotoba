@@ -3,15 +3,11 @@
 declare(strict_types=1);
 
 use App\Document\Noun;
-use App\Document\Trait\MeaningTrait;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+#[CoversNothing]
 class MeaningTest extends TestCase
 {
     /**
@@ -148,8 +144,6 @@ class MeaningTest extends TestCase
         string|array|null $meaning,
         int $expected,
     ): void {
-        /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(MeaningTrait::class);
-        $this->assertEquals($mock->isValidMeaning($meaning), $expected);
+        $this->assertEquals($expected, Noun::isValidMeaning($meaning));
     }
 }

@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Deck;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type DeckType from Types
  */
+#[CoversNothing]
 class DecksGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
@@ -275,9 +274,8 @@ class DecksGetTest extends KotobaApiTestCase
         return $content['member'][0]['@id'];
     }
 
-    /**
-     * @depends testDecksGetOneDeck
-     */
+
+    #[Depends('testDecksGetOneDeck')]
     public function testDecksGetOneDeckByCode(string $code): void
     {
         $response = static::createClient()->request(

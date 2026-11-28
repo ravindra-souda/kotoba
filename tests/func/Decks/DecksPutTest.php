@@ -6,18 +6,17 @@ namespace App\Tests;
 
 use App\Document\Deck;
 use App\Exception\CardsNotFoundException;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type DeckType from Types
  * @phpstan-import-type DeckExpectedType from Types
  * @phpstan-import-type CardExpectedType from Types
  */
+#[CoversNothing]
 class DecksPutTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
@@ -1065,10 +1064,9 @@ class DecksPutTest extends KotobaApiTestCase
     }
 
     /**
-     * @depends testReverseMappingCard
-     *
      * @param array{0:DeckExpectedType,1:CardExpectedType} $fixtures
      */
+    #[Depends('testReverseMappingCard')]
     public function testNoCircularReferences(array $fixtures): void
     {
         [$deck, $card] = $fixtures;

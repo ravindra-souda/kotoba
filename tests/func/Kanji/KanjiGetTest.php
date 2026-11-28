@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Kanji;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type KanjiType from Types
  */
+#[CoversNothing]
 class KanjiGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
@@ -302,9 +301,7 @@ class KanjiGetTest extends KotobaApiTestCase
         return $content['member'][0]['@id'];
     }
 
-    /**
-     * @depends testKanjiGetOneKanji
-     */
+    #[Depends('testKanjiGetOneKanji')]
     public function testKanjiGetOneKanjiByCode(string $code): void
     {
         $response = static::createClient()->request(

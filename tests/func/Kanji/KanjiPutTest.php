@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Kanji;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type KanjiType from Types
  */
+#[CoversNothing]
 class KanjiPutTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;

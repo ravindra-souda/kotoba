@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Adjective;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type AdjectiveType from Types
  */
+#[CoversNothing]
 class AdjectivesGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
@@ -450,9 +449,7 @@ class AdjectivesGetTest extends KotobaApiTestCase
         return $content['member'][0]['@id'];
     }
 
-    /**
-     * @depends testAdjectivesGetOneAdjective
-     */
+    #[Depends('testAdjectivesGetOneAdjective')]
     public function testAdjectivesGetOneAdjectiveByCode(string $code): void
     {
         $response = static::createClient()->request(

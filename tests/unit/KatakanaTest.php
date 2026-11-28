@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Document\Trait\KatakanaTrait;
+use App\Document\Noun;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+#[CoversNothing]
 class KatakanaTest extends TestCase
 {
     /**
@@ -45,8 +42,6 @@ class KatakanaTest extends TestCase
         ?string $string,
         bool $expected,
     ): void {
-        /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(KatakanaTrait::class);
-        $this->assertEquals($mock->isValidKatakana($string), $expected);
+        $this->assertEquals($expected, Noun::isValidKatakana($string));
     }
 }

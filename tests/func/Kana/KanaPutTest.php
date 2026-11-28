@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Kana;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type KanaType from Types
  * @phpstan-import-type KanaExpectedType from Types
  */
+#[CoversNothing]
 class KanaPutTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;

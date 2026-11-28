@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 use App\Document\Adjective;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+#[CoversNothing]
 class AdjectiveTest extends TestCase
 {
     /**

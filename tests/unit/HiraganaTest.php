@@ -5,13 +5,10 @@ declare(strict_types=1);
 use App\Document\Noun;
 use App\Document\Trait\HiraganaTrait;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+#[CoversNothing]
 class HiraganaTest extends TestCase
 {
     /**
@@ -43,9 +40,7 @@ class HiraganaTest extends TestCase
     #[DataProvider('isValidHiraganaProvider')]
     public function testIsValidHiragana(?string $string, bool $expected): void
     {
-        /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(HiraganaTrait::class);
-        $this->assertEquals($mock->isValidHiragana($string), $expected);
+        $this->assertEquals($expected, Noun::isValidHiragana($string));
     }
 
     /**

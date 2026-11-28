@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 use App\Document\Kana;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+#[CoversNothing]
 class KanaTest extends TestCase
 {
     /**
@@ -51,7 +48,7 @@ class KanaTest extends TestCase
         ?string $string,
         bool $expected,
     ): void {
-        $this->assertEquals(Kana::isValidHiragana($string), $expected);
+        $this->assertEquals($expected, Kana::isValidHiragana($string));
     }
 
     /**
@@ -124,6 +121,6 @@ class KanaTest extends TestCase
         ?string $string,
         bool $expected,
     ): void {
-        $this->assertEquals(Kana::isValidKatakana($string), $expected);
+        $this->assertEquals($expected, Kana::isValidKatakana($string));
     }
 }

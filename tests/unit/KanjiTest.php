@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Document\Trait\KanjiTrait;
+use App\Document\Noun;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+#[CoversNothing]
 class KanjiTest extends TestCase
 {
     /**
@@ -45,8 +42,6 @@ class KanjiTest extends TestCase
         ?string $string,
         bool $expected,
     ): void {
-        /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(KanjiTrait::class);
-        $this->assertEquals($mock->isValidKanji($string), $expected);
+        $this->assertEquals($expected, Noun::isValidKanji($string));
     }
 }

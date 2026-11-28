@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Verb;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type VerbType from Types
  */
+#[CoversNothing]
 class VerbsGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
@@ -342,9 +341,7 @@ class VerbsGetTest extends KotobaApiTestCase
         return $content['member'][0]['@id'];
     }
 
-    /**
-     * @depends testVerbsGetOneVerb
-     */
+    #[Depends('testVerbsGetOneVerb')]
     public function testVerbsGetOneVerbByCode(string $code): void
     {
         $response = static::createClient()->request(

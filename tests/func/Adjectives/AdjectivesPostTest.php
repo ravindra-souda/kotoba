@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Adjective;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type AdjectiveType from Types
  * @phpstan-import-type AdjectiveExpectedType from Types
  */
+#[CoversNothing]
 class AdjectivesPostTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;

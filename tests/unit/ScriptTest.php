@@ -3,15 +3,11 @@
 declare(strict_types=1);
 
 use App\Document\Noun;
-use App\Document\Trait\Script\ScriptTrait;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+#[CoversNothing]
 class ScriptTest extends TestCase
 {
     /**
@@ -73,9 +69,7 @@ class ScriptTest extends TestCase
         ?string $string,
         string|null|bool $expected,
     ): void {
-        /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(ScriptTrait::class);
-        $this->assertEquals($mock->toHiragana($string), $expected);
+        $this->assertEquals($expected, Noun::toHiragana($string));
     }
 
     /**
@@ -130,9 +124,7 @@ class ScriptTest extends TestCase
         ?string $string,
         string|null|bool $expected,
     ): void {
-        /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(ScriptTrait::class);
-        $this->assertEquals($mock->toKatakana($string), $expected);
+        $this->assertEquals($expected, Noun::toKatakana($string));
     }
 
     /**
@@ -188,9 +180,7 @@ class ScriptTest extends TestCase
         ?string $string,
         string|null|bool $expected,
     ): void {
-        /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(ScriptTrait::class);
-        $this->assertEquals($mock->toRomaji($string), $expected);
+        $this->assertEquals($expected, Noun::toRomaji($string));
     }
 
     /**
@@ -228,9 +218,7 @@ class ScriptTest extends TestCase
         string $string,
         string|null $expected,
     ): void {
-        /** @var App\Document\Noun $mock */
-        $mock = $this->getMockForTrait(ScriptTrait::class);
-        $this->assertEquals($mock->detect($string), $expected);
+        $this->assertEquals($expected, Noun::detect($string));
     }
 
     /**

@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Noun;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type NounType from Types
  */
+#[CoversNothing]
 class NounsGetTest extends KotobaApiTestCase
 {
     private const GET_SEARCH_FIXTURES = [
@@ -407,9 +406,7 @@ class NounsGetTest extends KotobaApiTestCase
         return $content['member'][0]['@id'];
     }
 
-    /**
-     * @depends testNounsGetOneNoun
-     */
+    #[Depends('testNounsGetOneNoun')]
     public function testNounsGetOneNounByCode(string $code): void
     {
         $response = static::createClient()->request(

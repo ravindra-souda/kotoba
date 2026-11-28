@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Noun;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type NounType from Types
  * @phpstan-import-type NounExpectedType from Types
  */
+#[CoversNothing]
 class NounsPostTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;

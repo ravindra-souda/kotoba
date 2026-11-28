@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Document\Verb;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 /**
- * @internal
- *
- * @coversNothing
- *
  * @phpstan-import-type VerbType from Types
  * @phpstan-import-type VerbExpectedType from Types
  */
+#[CoversNothing]
 class VerbsPostTest extends KotobaApiTestCase
 {
     use Trait\BuildProviderTrait;
