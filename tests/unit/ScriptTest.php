@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Document\Noun;
 use App\Document\Trait\Script\ScriptTrait;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -198,18 +199,18 @@ class ScriptTest extends TestCase
     public static function detectProvider(): array
     {
         /** @var App\Document\Noun $mock */
-        $mock = self::getMockForTrait(ScriptTrait::class);
+        //$mock = self::getMockForTrait(ScriptTrait::class);
         $tests = [
-            ['あ', $mock::HIRAGANA],
-            ['しゃ', $mock::HIRAGANA],
-            ['ひ、び、か', $mock::HIRAGANA],
-            ['ゐ', $mock::HIRAGANA],
-            ['ア', $mock::KATAKANA],
-            ['シュ', $mock::KATAKANA],
-            ['ヒ、ビ、カ', $mock::KATAKANA],
-            ['ヰ', $mock::KATAKANA],
-            ['a', $mock::ROMAJI],
-            ['ā', $mock::ROMAJI],
+            ['あ', Noun::HIRAGANA],
+            ['しゃ', Noun::HIRAGANA],
+            ['ひ、び、か', Noun::HIRAGANA],
+            ['ゐ', Noun::HIRAGANA],
+            ['ア', Noun::KATAKANA],
+            ['シュ', Noun::KATAKANA],
+            ['ヒ、ビ、カ', Noun::KATAKANA],
+            ['ヰ', Noun::KATAKANA],
+            ['a', Noun::ROMAJI],
+            ['ā', Noun::ROMAJI],
             'empty' => ['', null],
             'integer' => ['1', null],
             ['字', null],
